@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Welfare App",
+    "slug": "welfare-mobile",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#6366f1"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hackathon.welfare"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#6366f1"
+      },
+      "package": "com.hackathon.welfare"
+    },
+    "scheme": "welfare",
+    "plugins": ["expo-router", "expo-secure-store"]
+  }
+}
