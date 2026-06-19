@@ -84,6 +84,11 @@ export async function getMe() {
 
 export async function getEmployees() {
   const { data } = await api.get('/api/companies/employees/');
+  return Array.isArray(data) ? data : data?.results ?? data;
+}
+
+export async function createEmployee(payload: { full_name: string; email: string; password: string; team_id?: number }) {
+  const { data } = await api.post('/api/companies/employees/', payload);
   return data;
 }
 
@@ -108,11 +113,30 @@ export async function updateCompanySettings(payload: {
 
 export async function getTeams() {
   const { data } = await api.get('/api/companies/teams/');
-  return data;
+  return Array.isArray(data) ? data : data?.results ?? data;
 }
 
 export async function createTeam(payload: { name: string; manager_id?: number }) {
   const { data } = await api.post('/api/companies/teams/', payload);
+  return data;
+}
+
+export async function getTeamDetail(id: number) {
+  const { data } = await api.get(`/api/companies/teams/${id}/`);
+  return data;
+}
+
+export async function updateTeam(id: number, payload: { name?: string }) {
+  const { data } = await api.patch(`/api/companies/teams/${id}/`, payload);
+  return data;
+}
+
+export async function deleteTeam(id: number) {
+  await api.delete(`/api/companies/teams/${id}/`);
+}
+
+export async function updateEmployee(id: number, payload: { full_name?: string; team_id?: number | null; wallet_balance?: number }) {
+  const { data } = await api.patch(`/api/companies/employees/${id}/`, payload);
   return data;
 }
 
@@ -182,8 +206,8 @@ export async function getProviderStats() {
 // ─── Catalog / Perks ───────────────────────────────────────────────────────
 
 export async function getMyPerks() {
-  const { data } = await api.get('/api/catalog/perks/?mine=true');
-  return data;
+  const { data } = await api.get('/api/catalog/perks/manage/');
+  return Array.isArray(data) ? data : data?.results ?? data;
 }
 
 export async function getPerk(id: number) {
@@ -193,23 +217,74 @@ export async function getPerk(id: number) {
 
 export async function createPerk(payload: FormData | Record<string, unknown>) {
   const isFormData = payload instanceof FormData;
-  const { data } = await api.post('/api/catalog/perks/', payload, {
+  const { data } = await api.post('/api/catalog/perks/manage/', payload, {
     headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
   });
   return data;
 }
 
 export async function updatePerk(id: number, payload: Record<string, unknown>) {
-  const { data } = await api.patch(`/api/catalog/perks/${id}/`, payload);
+  const { data } = await api.patch(`/api/catalog/perks/manage/${id}/`, payload);
   return data;
 }
 
 export async function deletePerk(id: number) {
-  await api.delete(`/api/catalog/perks/${id}/`);
+  await api.delete(`/api/catalog/perks/manage/${id}/`);
 }
 
 export async function getCategories() {
   const { data } = await api.get('/api/catalog/categories/');
+  return data;
+}
+
+// ─── Collaborations ────────────────────────────────────────────────────────
+
+export async function getCollaborations() {
+  const { data } = await api.get('/api/collaborations/');
+  return Array.isArray(data) ? data : data?.results ?? data;
+}
+
+export async function inviteCollaboration(payload: { email: string; message?: string }) {
+  const { data } = await api.post('/api/collaborations/', payload);
+  return data;
+}
+
+export async function respondCollaboration(id: number, action: 'accept' | 'decline') {
+  const { data } = await api.patch(`/api/collaborations/${id}/respond/`, { action });
+  return data;
+}
+
+export async function getPackageDeals() {
+  const { data } = await api.get('/api/collaborations/packages/');
+  return Array.isArray(data) ? data : data?.results ?? data;
+}
+
+export async function createPackageDeal(payload: { collaboration_id: number; name: string; description?: string; total_price?: number }) {
+  const { data } = await api.post('/api/collaborations/packages/', payload);
+  return data;
+}
+
+export async function updatePackageDeal(id: number, payload: { name?: string; description?: string; total_price?: number; perk_ids?: number[]; target_employer_email?: string }) {
+  const { data } = await api.patch(`/api/collaborations/packages/${id}/`, payload);
+  return data;
+}
+
+export async function offerPackageDeal(id: number) {
+  const { data } = await api.post(`/api/collaborations/packages/${id}/offer/`);
+  return data;
+}
+
+export async function deletePackageDeal(id: number) {
+  await api.delete(`/api/collaborations/packages/${id}/`);
+}
+
+export async function getEmployerPackageOffers() {
+  const { data } = await api.get('/api/collaborations/offers/');
+  return Array.isArray(data) ? data : data?.results ?? data;
+}
+
+export async function respondPackageOffer(id: number, action: 'accept' | 'reject') {
+  const { data } = await api.patch(`/api/collaborations/offers/${id}/`, { action });
   return data;
 }
 

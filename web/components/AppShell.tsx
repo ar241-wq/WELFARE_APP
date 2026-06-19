@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Users, CheckSquare, Package, Heart, Settings,
   BarChart2, List, PlusCircle, TrendingUp, QrCode, UsersRound,
-  LogOut, Menu, X, ChevronRight,
+  LogOut, Menu, X, ChevronRight, Handshake,
 } from 'lucide-react';
 import { logout, getMe } from '@/lib/api';
 import { useToast } from './Toast';
@@ -25,17 +25,19 @@ const employerNav: NavItem[] = [
   { label: 'Employees',    href: '/employer/employees',    icon: Users },
   { label: 'Approvals',    href: '/employer/approvals',    icon: CheckSquare },
   { label: 'Bundles',      href: '/employer/bundles',      icon: Package },
-  { label: 'Life Moments', href: '/employer/life-moments', icon: Heart, care: true },
-  { label: 'Teams',        href: '/employer/teams',        icon: UsersRound },
-  { label: 'Settings',     href: '/employer/settings',     icon: Settings },
+  { label: 'Life Moments',    href: '/employer/life-moments', icon: Heart, care: true },
+  { label: 'Teams',           href: '/employer/teams',         icon: UsersRound },
+  { label: 'Package Offers',  href: '/employer/packages',      icon: Handshake },
+  { label: 'Settings',        href: '/employer/settings',      icon: Settings },
 ];
 
 const providerNav: NavItem[] = [
-  { label: 'Dashboard',  href: '/provider/dashboard', icon: LayoutDashboard },
-  { label: 'Listings',   href: '/provider/listings',  icon: List },
-  { label: 'New Perk',   href: '/provider/listings/new', icon: PlusCircle },
-  { label: 'Analytics',  href: '/provider/analytics', icon: TrendingUp },
-  { label: 'Scan QR',    href: '/provider/scan',      icon: QrCode },
+  { label: 'Dashboard',      href: '/provider/dashboard',       icon: LayoutDashboard },
+  { label: 'Listings',       href: '/provider/listings',        icon: List },
+  { label: 'New Perk',       href: '/provider/listings/new',    icon: PlusCircle },
+  { label: 'Collaborations', href: '/provider/collaborations',  icon: Handshake },
+  { label: 'Analytics',      href: '/provider/analytics',       icon: TrendingUp },
+  { label: 'Scan QR',        href: '/provider/scan',            icon: QrCode },
 ];
 
 interface AppShellProps {
