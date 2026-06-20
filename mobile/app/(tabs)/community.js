@@ -232,9 +232,6 @@ function InstantViewer({ post, onClose, me }) {
           </View>
       }
 
-      {/* Scrims (non-interactive) */}
-      <View style={iv.scrimTop} pointerEvents="none" />
-      <View style={iv.scrimBottom} pointerEvents="none" />
 
       {/* Reaction pop (non-interactive) */}
       {reacted && (
@@ -344,8 +341,6 @@ function InstantViewer({ post, onClose, me }) {
 const iv = StyleSheet.create({
   root: { ...StyleSheet.absoluteFillObject, zIndex: 999, backgroundColor: '#000' },
   col: { ...StyleSheet.absoluteFillObject, flexDirection: 'column' },
-  scrimTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 200, backgroundColor: 'rgba(0,0,0,0.42)' },
-  scrimBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 280, backgroundColor: 'rgba(0,0,0,0.5)' },
   head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 10 },
   headAv: { width: 40, height: 40, borderRadius: 20, overflow: 'hidden', backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.55)' },
   headName: { color: '#fff', fontWeight: '800', fontSize: 15 },

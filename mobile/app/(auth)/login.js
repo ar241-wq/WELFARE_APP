@@ -26,7 +26,7 @@ export default function LoginScreen() {
       signIn(data.user);
       router.replace('/(tabs)/');
     } catch (err) {
-      Alert.alert('Login Failed', err?.message || String(err));
+      Alert.alert('Login Failed', 'Invalid email or password. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
-  StyleSheet, ActivityIndicator, FlatList,
+  StyleSheet, ActivityIndicator, FlatList, Image,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getCategories, getPerks, getSuggestions } from '../../lib/api';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+function imgSrc(path) {
+  if (!path) return null;
+  if (path.startsWith('http') || path.startsWith('data:')) return path;
+  return `${API_URL}${path}`;
+}
 
 export default function CatalogScreen() {
   const router = useRouter();
@@ -127,6 +134,13 @@ export default function CatalogScreen() {
               style={styles.perkCard}
               onPress={() => router.push(`/perk/${item.id}`)}
             >
+              {item.images?.[0] ? (
+                <Image source={{ uri: imgSrc(item.images[0].image) }} style={styles.perkImage} />
+              ) : (
+                <View style={styles.perkImagePlaceholder}>
+                  <Text style={{ fontSize: 24 }}>🎁</Text>
+                </View>
+              )}
               <View style={styles.perkLeft}>
                 <Text style={styles.perkName}>{item.name}</Text>
                 <Text style={styles.perkProvider}>{item.provider_name}</Text>
@@ -176,9 +190,14 @@ const styles = StyleSheet.create({
   suggestProvider: { fontSize: 11, color: '#6b7280', marginTop: 2 },
   suggestPrice: { fontSize: 13, color: '#6366f1', fontWeight: '700', marginTop: 6 },
   perkCard: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: '#fff', borderRadius: 16, padding: 16,
-    borderWidth: 1.5, borderColor: '#e5e7eb', marginBottom: 10,
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: '#fff', borderRadius: 16, padding: 12,
+    borderWidth: 1.5, borderColor: '#e5e7eb', marginBottom: 10, gap: 12,
+  },
+  perkImage: { width: 56, height: 56, borderRadius: 10 },
+  perkImagePlaceholder: {
+    width: 56, height: 56, borderRadius: 10,
+    backgroundColor: '#eef2ff', justifyContent: 'center', alignItems: 'center',
   },
   perkLeft: { flex: 1 },
   perkName: { fontSize: 15, fontWeight: '700', color: '#111827' },

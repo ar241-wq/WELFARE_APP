@@ -43,3 +43,47 @@ class MeView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(UserSerializer(request.user).data)
+
+
+class AvatarUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        image = request.FILES.get('avatar')
+        if not image:
+            return Response({'detail': 'No image provided.'}, status=400)
+
+        user = request.user
+        if user.avatar:
+            user.avatar.delete(save=False)
+        user.avatar = image
+        user.save()
+        return Response(UserSerializer(user).data)
+
+
+class LogoUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        image = request.FILES.get('logo')
+        if not image:
+            return Response({'detail': 'No image provided.'}, status=400)
+
+        user = request.user
+        if user.role == 'provider':
+            profile, _ = ProviderProfile.objects.get_or_create(
+                user=user,
+                defaults={'company_name': user.full_name}
+            )
+            if profile.logo:
+                profile.logo.delete(save=False)
+            profile.logo = image
+            profile.save()
+        else:
+            # For employers, store in avatar field
+            if user.avatar:
+                user.avatar.delete(save=False)
+            user.avatar = image
+            user.save()
+
+        return Response(UserSerializer(user).data)

@@ -49,8 +49,7 @@ export default function RedeemScreen() {
     );
   }
 
-  // Extract the raw string from base64 QR or use the id as QR data
-  const qrValue = `REDEMPTION:${redemption.id}:${redemption.perk}`;
+  const qrValue = `REDEMPTION:${redemption.id}`;
 
   return (
     <View style={styles.container}>

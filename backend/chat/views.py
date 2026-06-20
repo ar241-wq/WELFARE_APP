@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q, Max, OuterRef, Subquery
 from django.contrib.auth import get_user_model
-from .models import DirectMessage
+from .models import DirectMessage, GroupChat, GroupMessage
 from .serializers import MessageSerializer
 
 User = get_user_model()
@@ -91,3 +91,67 @@ class UserSearchView(APIView):
             'full_name': u.full_name,
             'avatar': request.build_absolute_uri(u.avatar.url) if u.avatar else None,
         } for u in users])
+
+
+class GroupChatListView(APIView):
+    """List all group chats the current user is a member of."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        groups = request.user.group_chats.prefetch_related('messages__sender').select_related('category')
+        result = []
+        for g in groups:
+            last_msg = g.messages.last()
+            result.append({
+                'id': g.id,
+                'name': g.name,
+                'category_icon': g.category.icon if g.category else '',
+                'last_message': last_msg.text if last_msg else '',
+                'last_sender': last_msg.sender.full_name if last_msg else '',
+                'last_time': last_msg.created_at.isoformat() if last_msg else '',
+                'member_count': g.members.count(),
+            })
+        result.sort(key=lambda x: x['last_time'], reverse=True)
+        return Response(result)
+
+
+class GroupChatMessagesView(APIView):
+    """GET messages for a group, POST to send a message."""
+    permission_classes = [IsAuthenticated]
+
+    def _get_group(self, request, pk):
+        try:
+            return request.user.group_chats.get(pk=pk)
+        except GroupChat.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        group = self._get_group(request, pk)
+        if not group:
+            return Response({'detail': 'Not found.'}, status=404)
+        msgs = group.messages.select_related('sender').all()
+        return Response([{
+            'id': m.id,
+            'text': m.text,
+            'sender_id': m.sender_id,
+            'sender_name': m.sender.full_name,
+            'sender_avatar': request.build_absolute_uri(m.sender.avatar.url) if m.sender.avatar else None,
+            'created_at': m.created_at.isoformat(),
+        } for m in msgs])
+
+    def post(self, request, pk):
+        group = self._get_group(request, pk)
+        if not group:
+            return Response({'detail': 'Not found.'}, status=404)
+        text = request.data.get('text', '').strip()
+        if not text:
+            return Response({'detail': 'text is required.'}, status=400)
+        msg = GroupMessage.objects.create(group=group, sender=request.user, text=text)
+        return Response({
+            'id': msg.id,
+            'text': msg.text,
+            'sender_id': msg.sender_id,
+            'sender_name': msg.sender.full_name,
+            'sender_avatar': request.build_absolute_uri(msg.sender.avatar.url) if msg.sender.avatar else None,
+            'created_at': msg.created_at.isoformat(),
+        }, status=201)
