@@ -309,12 +309,17 @@ export async function getPackageDeals() {
   return Array.isArray(data) ? data : data?.results ?? data;
 }
 
+export async function getPackageDeal(id: number) {
+  const { data } = await api.get(`/api/collaborations/packages/${id}/`);
+  return data;
+}
+
 export async function createPackageDeal(payload: { collaboration_id: number; name: string; description?: string; total_price?: number }) {
   const { data } = await api.post('/api/collaborations/packages/', payload);
   return data;
 }
 
-export async function updatePackageDeal(id: number, payload: { name?: string; description?: string; total_price?: number; perk_ids?: number[]; target_employer_email?: string }) {
+export async function updatePackageDeal(id: number, payload: { name?: string; description?: string; total_price?: number; perk_ids?: number[]; target_employer_email?: string; discount_percentage?: number }) {
   const { data } = await api.patch(`/api/collaborations/packages/${id}/`, payload);
   return data;
 }

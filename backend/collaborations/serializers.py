@@ -43,13 +43,15 @@ class PackageDealSerializer(serializers.ModelSerializer):
     providers = serializers.SerializerMethodField()
     from_provider_confirmed = serializers.BooleanField(read_only=True)
     to_provider_confirmed = serializers.BooleanField(read_only=True)
+    discounted_price = serializers.SerializerMethodField()
 
     class Meta:
         model = PackageDeal
         fields = [
             'id', 'collaboration_id', 'collab_id', 'name', 'description', 'perks', 'perk_ids',
             'target_employer_email', 'target_employer_name',
-            'total_price', 'status', 'created_at', 'offered_at', 'providers',
+            'total_price', 'discount_percentage', 'discounted_price',
+            'status', 'created_at', 'offered_at', 'providers',
             'from_provider_confirmed', 'to_provider_confirmed',
         ]
         read_only_fields = ['status', 'created_at', 'offered_at']
@@ -57,6 +59,12 @@ class PackageDealSerializer(serializers.ModelSerializer):
     def get_target_employer_name(self, obj):
         if obj.target_employer:
             return obj.target_employer.full_name
+        return None
+
+    def get_discounted_price(self, obj):
+        if obj.discount_percentage and obj.discount_percentage > 0:
+            total = sum(p.credit_price for p in obj.perks.all())
+            return round(float(total) * (1 - float(obj.discount_percentage) / 100))
         return None
 
     def get_providers(self, obj):
