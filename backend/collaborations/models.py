@@ -41,6 +41,8 @@ class PackageDeal(models.Model):
         null=True, blank=True, related_name='received_packages')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    from_provider_confirmed = models.BooleanField(default=False)
+    to_provider_confirmed = models.BooleanField(default=False)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
         null=True, related_name='created_packages')

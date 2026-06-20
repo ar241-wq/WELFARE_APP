@@ -83,6 +83,58 @@ class CollaborationRespondView(APIView):
         return Response(CollaborationSerializer(collab).data)
 
 
+class CollaborationPerksView(APIView):
+    """Return all active perks from both providers in an accepted collaboration."""
+    permission_classes = [IsProvider]
+
+    def get(self, request, pk):
+        from catalog.models import Perk
+        from catalog.serializers import PerkSerializer
+
+        try:
+            collab = Collaboration.objects.get(pk=pk, status='accepted')
+            if request.user not in (collab.from_provider, collab.to_provider):
+                raise Collaboration.DoesNotExist
+        except Collaboration.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=404)
+
+        def provider_data(provider):
+            name = getattr(getattr(provider, 'provider_profile', None), 'company_name', None) or provider.full_name
+            perks = Perk.objects.filter(provider=provider, is_active=True).select_related('category')
+            return {'id': provider.id, 'name': name, 'perks': PerkSerializer(perks, many=True).data}
+
+        return Response({
+            'from_provider': provider_data(collab.from_provider),
+            'to_provider': provider_data(collab.to_provider),
+        })
+
+
+class CollaborationDetailView(APIView):
+    permission_classes = [IsProvider]
+
+    def patch(self, request, pk):
+        """Allow the sender to edit a pending invite's message."""
+        try:
+            collab = Collaboration.objects.get(pk=pk, from_provider=request.user, status='pending')
+        except Collaboration.DoesNotExist:
+            return Response({'detail': 'Invite not found.'}, status=404)
+
+        if 'message' in request.data:
+            collab.message = request.data['message']
+            collab.save()
+        return Response(CollaborationSerializer(collab).data)
+
+    def delete(self, request, pk):
+        """Allow the sender to cancel/delete a pending invite."""
+        try:
+            collab = Collaboration.objects.get(pk=pk, from_provider=request.user, status='pending')
+        except Collaboration.DoesNotExist:
+            return Response({'detail': 'Invite not found.'}, status=404)
+
+        collab.delete()
+        return Response(status=204)
+
+
 class PackageDealListView(APIView):
     permission_classes = [IsProvider]
 
@@ -167,6 +219,7 @@ class PackageDealDetailView(APIView):
 
         # Update perks
         perk_ids = request.data.get('perk_ids')
+        changed = False
         if perk_ids is not None:
             collab = pkg.collaboration
             valid_perks = Perk.objects.filter(
@@ -174,6 +227,15 @@ class PackageDealDetailView(APIView):
                 provider__in=[collab.from_provider, collab.to_provider]
             )
             pkg.perks.set(valid_perks)
+            changed = True
+
+        if 'total_price' in request.data:
+            changed = True
+
+        # Any change resets both confirmations so both must re-agree
+        if changed:
+            pkg.from_provider_confirmed = False
+            pkg.to_provider_confirmed = False
 
         pkg.save()
         return Response(PackageDealSerializer(pkg).data)
@@ -184,6 +246,27 @@ class PackageDealDetailView(APIView):
             return Response({'detail': 'Not found.'}, status=404)
         pkg.delete()
         return Response(status=204)
+
+
+class PackageDealConfirmView(APIView):
+    """Toggle the current provider's agreement on a draft package."""
+    permission_classes = [IsProvider]
+
+    def post(self, request, pk):
+        try:
+            pkg = PackageDeal.objects.get(pk=pk, status='draft')
+            collab = pkg.collaboration
+            if request.user not in (collab.from_provider, collab.to_provider):
+                raise PackageDeal.DoesNotExist
+        except PackageDeal.DoesNotExist:
+            return Response({'detail': 'Package not found.'}, status=404)
+
+        if request.user == collab.from_provider:
+            pkg.from_provider_confirmed = not pkg.from_provider_confirmed
+        else:
+            pkg.to_provider_confirmed = not pkg.to_provider_confirmed
+        pkg.save()
+        return Response(PackageDealSerializer(pkg).data)
 
 
 class PackageDealOfferView(APIView):
@@ -204,6 +287,8 @@ class PackageDealOfferView(APIView):
             return Response({'detail': 'Add at least one perk before offering.'}, status=400)
         if pkg.status != 'draft':
             return Response({'detail': 'Package has already been offered.'}, status=400)
+        if not (pkg.from_provider_confirmed and pkg.to_provider_confirmed):
+            return Response({'detail': 'Both providers must confirm the package before offering.'}, status=400)
 
         pkg.status = 'offered'
         pkg.offered_at = timezone.now()

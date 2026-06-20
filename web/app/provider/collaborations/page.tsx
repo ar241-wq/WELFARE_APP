@@ -8,27 +8,39 @@ import StatusPill from '@/components/StatusPill';
 import { useToast } from '@/components/Toast';
 import {
   getCollaborations, inviteCollaboration, respondCollaboration,
+  deleteCollaborationInvite, updateCollaborationInvite,
   getPackageDeals, createPackageDeal, updatePackageDeal,
-  offerPackageDeal, deletePackageDeal, getMyPerks,
+  offerPackageDeal, deletePackageDeal, getMe,
+  getCollaborationPerks, confirmPackageDeal,
 } from '@/lib/api';
-import { Handshake, Plus, CheckCircle, XCircle, Package, Trash2, Send, ChevronRight } from 'lucide-react';
+import { Handshake, Plus, CheckCircle, XCircle, Package, Trash2, Send, ChevronRight, Pencil } from 'lucide-react';
 
 interface Provider { id: number; full_name: string; email: string; company_name?: string; }
 interface Collab { id: number; from_provider: Provider; to_provider: Provider; message: string; status: string; created_at: string; package_count: number; }
-interface Perk { id: number; name: string; credit_price: number; category_name?: string; }
+interface Perk { id: number; name: string; credit_price: number; category_name?: string; provider_name?: string; }
 interface PackagePerk { id: number; name: string; credit_price: number; }
-interface Package { id: number; name: string; description: string; perks: PackagePerk[]; total_price: number; discount_percentage: number; discounted_price: number; status: string; target_employer_name?: string; providers: Provider[]; offered_at?: string; }
+interface Package { id: number; collab_id: number; name: string; description: string; perks: PackagePerk[]; total_price: number; discount_percentage: number; discounted_price: number; status: string; target_employer_name?: string; providers: Provider[]; offered_at?: string; from_provider_confirmed: boolean; to_provider_confirmed: boolean; }
+interface CollabPerks { from_provider: { id: number; name: string; perks: Perk[] }; to_provider: { id: number; name: string; perks: Perk[] }; }
 
 type View = 'list' | 'package';
 
 export default function CollaborationsPage() {
   const { toast } = useToast();
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [collabs, setCollabs] = useState<Collab[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
-  const [myPerks, setMyPerks] = useState<Perk[]>([]);
+  const [collabPerks, setCollabPerks] = useState<CollabPerks | null>(null);
+  const [collabPerksLoading, setCollabPerksLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>('list');
   const [activePackage, setActivePackage] = useState<Package | null>(null);
+  const [confirming, setConfirming] = useState(false);
+
+  // edit invite modal
+  const [editInviteOpen, setEditInviteOpen] = useState(false);
+  const [editInviteId, setEditInviteId] = useState<number | null>(null);
+  const [editInviteMessage, setEditInviteMessage] = useState('');
+  const [editInviteSubmitting, setEditInviteSubmitting] = useState(false);
 
   // invite modal
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -57,22 +69,31 @@ export default function CollaborationsPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const [c, p, mp] = await Promise.all([getCollaborations(), getPackageDeals(), getMyPerks()]);
+      const [me, c, p] = await Promise.all([getMe(), getCollaborations(), getPackageDeals()]);
+      setCurrentUserId(me?.id ?? null);
       setCollabs(Array.isArray(c) ? c : []);
       setPackages(Array.isArray(p) ? p : []);
-      setMyPerks(Array.isArray(mp) ? mp : []);
     } catch { /* noop */ }
     setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
 
-  const openPackage = (pkg: Package) => {
+  const openPackage = async (pkg: Package) => {
     setActivePackage(pkg);
     setSelectedPerkIds(pkg.perks.map((p) => p.id));
     setEditEmployerEmail('');
     setDiscount(pkg.discount_percentage > 0 ? String(pkg.discount_percentage) : '');
+    setCollabPerks(null);
     setView('package');
+    if (pkg.collab_id) {
+      setCollabPerksLoading(true);
+      try {
+        const cp = await getCollaborationPerks(pkg.collab_id);
+        setCollabPerks(cp);
+      } catch { /* noop */ }
+      setCollabPerksLoading(false);
+    }
   };
 
   const handleSaveDiscount = async () => {
@@ -105,6 +126,39 @@ export default function CollaborationsPage() {
       setInviteError(msg || 'Could not send invite.');
     } finally {
       setInviteSubmitting(false);
+    }
+  };
+
+  const handleCancelInvite = async (id: number) => {
+    if (!window.confirm('Cancel this collaboration invite?')) return;
+    try {
+      await deleteCollaborationInvite(id);
+      setCollabs((prev) => prev.filter((c) => c.id !== id));
+      toast('Invite cancelled', 'success');
+    } catch {
+      toast('Could not cancel invite', 'error');
+    }
+  };
+
+  const openEditInvite = (c: Collab) => {
+    setEditInviteId(c.id);
+    setEditInviteMessage(c.message);
+    setEditInviteOpen(true);
+  };
+
+  const handleEditInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editInviteId) return;
+    setEditInviteSubmitting(true);
+    try {
+      const updated = await updateCollaborationInvite(editInviteId, { message: editInviteMessage });
+      setCollabs((prev) => prev.map((c) => c.id === editInviteId ? { ...c, ...updated } : c));
+      toast('Invite updated', 'success');
+      setEditInviteOpen(false);
+    } catch {
+      toast('Could not update invite', 'error');
+    } finally {
+      setEditInviteSubmitting(false);
     }
   };
 
@@ -190,6 +244,21 @@ export default function CollaborationsPage() {
     }
   };
 
+  const handleConfirm = async () => {
+    if (!activePackage) return;
+    setConfirming(true);
+    try {
+      const updated = await confirmPackageDeal(activePackage.id);
+      setActivePackage(updated);
+      setPackages((prev) => prev.map((p) => p.id === updated.id ? updated : p));
+      toast('Agreement updated', 'success');
+    } catch {
+      toast('Could not update agreement', 'error');
+    } finally {
+      setConfirming(false);
+    }
+  };
+
   const handleDeletePackage = async (id: number) => {
     if (!window.confirm('Delete this package?')) return;
     try {
@@ -221,7 +290,20 @@ export default function CollaborationsPage() {
   // ── Package detail view ─────────────────────────────────────────────────
   if (view === 'package' && activePackage) {
     const isDraft = activePackage.status === 'draft';
-    const canOffer = isDraft && !!activePackage.target_employer_name && activePackage.perks.length > 0;
+    const bothConfirmed = activePackage.from_provider_confirmed && activePackage.to_provider_confirmed;
+    const canOffer = isDraft && !!activePackage.target_employer_name && activePackage.perks.length > 0 && bothConfirmed;
+    // Determine which provider slot the current user is
+    const iAmFromProvider = activePackage.providers[0]?.id === currentUserId;
+    const myConfirmed = iAmFromProvider ? activePackage.from_provider_confirmed : activePackage.to_provider_confirmed;
+    const partnerConfirmed = iAmFromProvider ? activePackage.to_provider_confirmed : activePackage.from_provider_confirmed;
+    const partnerName = iAmFromProvider ? activePackage.providers[1]?.company_name || activePackage.providers[1]?.full_name : activePackage.providers[0]?.company_name || activePackage.providers[0]?.full_name;
+    // All perks from both providers for the selector
+    const allCollabPerks = collabPerks
+      ? [
+          ...collabPerks.from_provider.perks.map(p => ({ ...p, _owner: collabPerks.from_provider.name, _ownerId: collabPerks.from_provider.id })),
+          ...collabPerks.to_provider.perks.map(p => ({ ...p, _owner: collabPerks.to_provider.name, _ownerId: collabPerks.to_provider.id })),
+        ]
+      : [];
 
     return (
       <AppShell role="provider" pageTitle="Package Deal">
@@ -262,35 +344,46 @@ export default function CollaborationsPage() {
             </div>
           </div>
 
-          {/* Perks selector */}
+          {/* Perks selector — both providers' perks */}
           <div className="bg-white rounded-[12px] border border-[#E7E9EE] p-5">
-            <p className="text-xs font-semibold text-[#5B5F6B] uppercase tracking-wider mb-3">Perks in this package</p>
-            {myPerks.length === 0 ? (
-              <p className="text-sm text-[#5B5F6B]">You have no perks listed yet.</p>
+            <p className="text-xs font-semibold text-[#5B5F6B] uppercase tracking-wider mb-3">Select perks from both providers</p>
+            {collabPerksLoading ? (
+              <div className="space-y-2">{[...Array(4)].map((_, i) => <div key={i} className="h-10 shimmer rounded" />)}</div>
+            ) : allCollabPerks.length === 0 ? (
+              <p className="text-sm text-[#5B5F6B]">No active perks found for this collaboration.</p>
             ) : (
-              <div className="space-y-2">
-                {myPerks.map((perk) => {
-                  const selected = selectedPerkIds.includes(perk.id);
-                  return (
-                    <button
-                      key={perk.id}
-                      type="button"
-                      onClick={() => isDraft && togglePerk(perk.id)}
-                      disabled={!isDraft}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-[8px] border text-left transition-colors ${selected ? 'border-[#3D5AFE] bg-[#3D5AFE]/5' : 'border-[#E7E9EE] hover:border-[#3D5AFE]/40'} ${!isDraft ? 'opacity-60 cursor-default' : ''}`}
-                    >
-                      <div>
-                        <p className="text-sm font-semibold text-[#15161A]">{perk.name}</p>
-                        <p className="text-xs text-[#5B5F6B]">{perk.category_name}</p>
+              <>
+                {collabPerks && [collabPerks.from_provider, collabPerks.to_provider].map((group) => (
+                  group.perks.length > 0 && (
+                    <div key={group.id} className="mb-4">
+                      <p className="text-xs font-semibold text-[#3D5AFE] mb-2">{group.name}</p>
+                      <div className="space-y-2">
+                        {group.perks.map((perk) => {
+                          const selected = selectedPerkIds.includes(perk.id);
+                          return (
+                            <button
+                              key={perk.id}
+                              type="button"
+                              onClick={() => isDraft && togglePerk(perk.id)}
+                              disabled={!isDraft}
+                              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-[8px] border text-left transition-colors ${selected ? 'border-[#3D5AFE] bg-[#3D5AFE]/5' : 'border-[#E7E9EE] hover:border-[#3D5AFE]/40'} ${!isDraft ? 'opacity-60 cursor-default' : ''}`}
+                            >
+                              <div>
+                                <p className="text-sm font-semibold text-[#15161A]">{perk.name}</p>
+                                <p className="text-xs text-[#5B5F6B]">{perk.category_name}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold text-[#3D5AFE] tabular">{perk.credit_price} cr</span>
+                                {selected && <CheckCircle size={15} className="text-[#3D5AFE]" />}
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-[#3D5AFE] tabular">{perk.credit_price} cr</span>
-                        {selected && <CheckCircle size={15} className="text-[#3D5AFE]" />}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+                    </div>
+                  )
+                ))}
+              </>
             )}
             {isDraft && (
               <button
@@ -303,6 +396,35 @@ export default function CollaborationsPage() {
               </button>
             )}
           </div>
+
+          {/* Agreement section */}
+          {isDraft && (
+            <div className="bg-white rounded-[12px] border border-[#E7E9EE] p-5">
+              <p className="text-xs font-semibold text-[#5B5F6B] uppercase tracking-wider mb-3">Both providers must agree</p>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-[#15161A] font-medium">You</span>
+                  {myConfirmed
+                    ? <span className="flex items-center gap-1 text-emerald-600 font-semibold text-xs"><CheckCircle size={13} /> Agreed</span>
+                    : <span className="text-xs text-[#5B5F6B]">Not agreed yet</span>}
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-[#15161A] font-medium">{partnerName || 'Partner'}</span>
+                  {partnerConfirmed
+                    ? <span className="flex items-center gap-1 text-emerald-600 font-semibold text-xs"><CheckCircle size={13} /> Agreed</span>
+                    : <span className="text-xs text-[#5B5F6B]">Waiting…</span>}
+                </div>
+              </div>
+              <button
+                onClick={handleConfirm}
+                disabled={confirming}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-[8px] text-sm font-semibold transition-colors ${myConfirmed ? 'bg-[#F7F8FA] text-[#5B5F6B] border border-[#E7E9EE] hover:bg-red-50 hover:text-[#D23B3B] hover:border-red-200' : 'bg-emerald-600 text-white hover:bg-emerald-700'} disabled:opacity-60`}
+              >
+                {confirming && <span className="w-3.5 h-3.5 border-2 border-current/30 border-t-current rounded-full animate-spin" />}
+                {myConfirmed ? 'Withdraw my agreement' : 'Agree to this package'}
+              </button>
+            </div>
+          )}
 
           {/* Target employer */}
           <div className="bg-white rounded-[12px] border border-[#E7E9EE] p-5">
@@ -399,7 +521,7 @@ export default function CollaborationsPage() {
                 onClick={handleOffer}
                 disabled={!canOffer || offering}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-[10px] bg-[#3D5AFE] text-white text-sm font-semibold hover:bg-[#2E45C4] disabled:opacity-50 transition-colors"
-                title={!canOffer ? 'Add perks and set an employer first' : ''}
+                title={!bothConfirmed ? 'Both providers must agree before offering' : !canOffer ? 'Add perks and set an employer first' : ''}
               >
                 {offering ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send size={14} />}
                 {offering ? 'Offering…' : 'Offer to Employer'}
@@ -438,22 +560,39 @@ export default function CollaborationsPage() {
           <div className="bg-amber-50 border border-amber-200 rounded-[12px] p-4 space-y-3">
             <p className="text-xs font-semibold text-amber-700 uppercase tracking-wider">Pending invites</p>
             {pending.map((c) => {
-              const isReceived = true; // show respond only if I'm the recipient (we filter later)
+              const isSender = c.from_provider.id === currentUserId;
+              const isRecipient = c.to_provider.id === currentUserId;
               return (
                 <div key={c.id} className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-[#15161A]">
-                      {c.from_provider.company_name || c.from_provider.full_name}
+                      {isSender
+                        ? <>Sent to <span className="text-[#3D5AFE]">{c.to_provider.company_name || c.to_provider.full_name}</span></>
+                        : <>{c.from_provider.company_name || c.from_provider.full_name}</>}
                     </p>
                     {c.message && <p className="text-xs text-[#5B5F6B] mt-0.5">"{c.message}"</p>}
                   </div>
                   <div className="flex gap-2 shrink-0">
-                    <button onClick={() => handleRespond(c.id, 'accept')} className="flex items-center gap-1 px-3 py-1.5 rounded-[6px] bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700">
-                      <CheckCircle size={12} /> Accept
-                    </button>
-                    <button onClick={() => handleRespond(c.id, 'decline')} className="flex items-center gap-1 px-3 py-1.5 rounded-[6px] border border-[#E7E9EE] text-xs font-medium text-[#5B5F6B] hover:bg-white">
-                      <XCircle size={12} /> Decline
-                    </button>
+                    {isRecipient && (
+                      <>
+                        <button onClick={() => handleRespond(c.id, 'accept')} className="flex items-center gap-1 px-3 py-1.5 rounded-[6px] bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700">
+                          <CheckCircle size={12} /> Accept
+                        </button>
+                        <button onClick={() => handleRespond(c.id, 'decline')} className="flex items-center gap-1 px-3 py-1.5 rounded-[6px] border border-[#E7E9EE] text-xs font-medium text-[#5B5F6B] hover:bg-white">
+                          <XCircle size={12} /> Decline
+                        </button>
+                      </>
+                    )}
+                    {isSender && (
+                      <>
+                        <button onClick={() => openEditInvite(c)} className="flex items-center gap-1 px-3 py-1.5 rounded-[6px] border border-[#E7E9EE] text-xs font-medium text-[#5B5F6B] hover:bg-white">
+                          <Pencil size={12} /> Edit
+                        </button>
+                        <button onClick={() => handleCancelInvite(c.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-[6px] border border-red-200 text-xs font-medium text-[#D23B3B] hover:bg-red-50">
+                          <XCircle size={12} /> Cancel
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               );
@@ -553,6 +692,22 @@ export default function CollaborationsPage() {
             <button type="submit" disabled={inviteSubmitting} className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-[8px] bg-[#3D5AFE] text-white text-sm font-semibold hover:bg-[#2E45C4] disabled:opacity-60">
               {inviteSubmitting && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
               Send invite
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit invite modal */}
+      <Modal open={editInviteOpen} onClose={() => setEditInviteOpen(false)} title="Edit Invite" size="sm">
+        <form onSubmit={handleEditInvite} className="space-y-4">
+          <FormField label="Message" id="edit-inv-msg">
+            <textarea value={editInviteMessage} onChange={(e) => setEditInviteMessage(e.target.value)} rows={3} className={inputClass()} style={{ resize: 'none' }} />
+          </FormField>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setEditInviteOpen(false)} className="flex-1 px-4 py-2.5 rounded-[8px] border border-[#E7E9EE] text-sm font-medium text-[#5B5F6B] hover:bg-[#F7F8FA]">Cancel</button>
+            <button type="submit" disabled={editInviteSubmitting} className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-[8px] bg-[#3D5AFE] text-white text-sm font-semibold hover:bg-[#2E45C4] disabled:opacity-60">
+              {editInviteSubmitting && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              Save
             </button>
           </div>
         </form>

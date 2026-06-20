@@ -39,14 +39,18 @@ class PackageDealSerializer(serializers.ModelSerializer):
     target_employer_email = serializers.EmailField(write_only=True, required=False)
     target_employer_name = serializers.SerializerMethodField()
     collaboration_id = serializers.IntegerField(write_only=True, required=False)
+    collab_id = serializers.IntegerField(source='collaboration_id', read_only=True)
     providers = serializers.SerializerMethodField()
+    from_provider_confirmed = serializers.BooleanField(read_only=True)
+    to_provider_confirmed = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = PackageDeal
         fields = [
-            'id', 'collaboration_id', 'name', 'description', 'perks', 'perk_ids',
+            'id', 'collaboration_id', 'collab_id', 'name', 'description', 'perks', 'perk_ids',
             'target_employer_email', 'target_employer_name',
             'total_price', 'status', 'created_at', 'offered_at', 'providers',
+            'from_provider_confirmed', 'to_provider_confirmed',
         ]
         read_only_fields = ['status', 'created_at', 'offered_at']
 

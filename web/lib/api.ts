@@ -285,6 +285,25 @@ export async function respondCollaboration(id: number, action: 'accept' | 'decli
   return data;
 }
 
+export async function updateCollaborationInvite(id: number, payload: { message: string }) {
+  const { data } = await api.patch(`/api/collaborations/${id}/`, payload);
+  return data;
+}
+
+export async function deleteCollaborationInvite(id: number) {
+  await api.delete(`/api/collaborations/${id}/`);
+}
+
+export async function getCollaborationPerks(collabId: number) {
+  const { data } = await api.get(`/api/collaborations/${collabId}/perks/`);
+  return data;
+}
+
+export async function confirmPackageDeal(id: number) {
+  const { data } = await api.post(`/api/collaborations/packages/${id}/confirm/`);
+  return data;
+}
+
 export async function getPackageDeals() {
   const { data } = await api.get('/api/collaborations/packages/');
   return Array.isArray(data) ? data : data?.results ?? data;
