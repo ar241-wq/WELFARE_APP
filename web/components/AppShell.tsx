@@ -35,6 +35,7 @@ const employerNav: NavItem[] = [
   { label: 'Life Moments',    href: '/employer/life-moments', icon: Heart, care: true },
   { label: 'Teams',           href: '/employer/teams',         icon: UsersRound },
   { label: 'Departments',     href: '/employer/departments',   icon: Building2 },
+  { label: 'Internal Perks',  href: '/employer/internal-perks', icon: Building2 },
   { label: 'Package Offers',  href: '/employer/packages',      icon: Handshake },
   { label: 'Settings',        href: '/employer/settings',      icon: Settings },
 ];

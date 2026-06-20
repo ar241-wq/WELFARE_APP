@@ -16,4 +16,7 @@ urlpatterns = [
     path('api/community/', include('community.urls')),
     path('api/chat/', include('chat.urls')),
     path('api/slack/', include('slack_bot.urls')),
+    path('api/santa/', include('secret_santa.urls')),
+    path('api/group-buy/', include('group_buying.urls')),
+    path('api/internal-perks/', include('internal_perks.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

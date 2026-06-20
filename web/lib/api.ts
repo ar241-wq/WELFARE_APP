@@ -382,4 +382,36 @@ export async function allocateDepartmentCredits(
   return data;
 }
 
+// ─── Internal Perks ────────────────────────────────────────────────────────
+
+export async function getInternalPerks() {
+  const { data } = await api.get('/api/internal-perks/');
+  return Array.isArray(data) ? data : data?.results ?? data;
+}
+
+export async function createInternalPerk(payload: any) {
+  const { data } = await api.post('/api/internal-perks/', payload);
+  return data;
+}
+
+export async function updateInternalPerk(id: number, payload: any) {
+  const { data } = await api.patch(`/api/internal-perks/${id}/`, payload);
+  return data;
+}
+
+export async function deleteInternalPerk(id: number) {
+  await api.delete(`/api/internal-perks/${id}/`);
+}
+
+export async function getHRInternalRequests(status?: string) {
+  const q = status ? `?status=${status}` : '';
+  const { data } = await api.get(`/api/internal-perks/hr/requests/${q}`);
+  return Array.isArray(data) ? data : data?.results ?? data;
+}
+
+export async function resolveInternalRequest(id: number, action: 'approve' | 'deny', hr_note?: string) {
+  const { data } = await api.post(`/api/internal-perks/hr/requests/${id}/resolve/`, { action, hr_note });
+  return data;
+}
+
 export default api;

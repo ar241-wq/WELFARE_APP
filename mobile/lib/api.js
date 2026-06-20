@@ -275,3 +275,21 @@ export async function getColleagueProfile(id) {
 export async function askAI(message) {
   return request('POST', '/api/slack/ai/', { message });
 }
+
+// ─── Secret Santa ──────────────────────────────────────────────────────────────
+export const getSantaEvents = () => request('GET', '/api/santa/');
+export const getSantaEvent = (id) => request('GET', `/api/santa/${id}/`);
+export const joinSantaEvent = (id) => request('POST', `/api/santa/${id}/join/`);
+export const sendSantaGift = (id, amount) => request('POST', `/api/santa/${id}/send-gift/`, { amount });
+
+// ─── Group Buying ─────────────────────────────────────────────────────────────
+export const getPerkGroupBuys = (perkId) => request('GET', `/api/group-buy/perk/${perkId}/`);
+export const startGroupBuy = (perkId) => request('POST', `/api/group-buy/perk/${perkId}/`);
+export const joinGroupBuy = (id) => request('POST', `/api/group-buy/${id}/join/`);
+export const lockInGroupBuy = (id) => request('POST', `/api/group-buy/${id}/lock-in/`);
+export const getMyGroupBuys = () => request('GET', '/api/group-buy/my/');
+
+// ─── Internal Perks ───────────────────────────────────────────────────────────
+export const getInternalPerks = () => request('GET', '/api/internal-perks/');
+export const getInternalPerk = (id) => request('GET', `/api/internal-perks/${id}/`);
+export const redeemInternalPerk = (id, note = '') => request('POST', `/api/internal-perks/${id}/redeem/`, { note });

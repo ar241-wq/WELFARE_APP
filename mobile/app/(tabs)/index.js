@@ -85,6 +85,17 @@ export default function HomeScreen() {
         </View>
       </TouchableOpacity>
 
+      {/* Secret Santa Card */}
+      <TouchableOpacity style={styles.santaCard} onPress={() => router.push('/santa')}>
+        <View style={styles.aiLeft}>
+          <Text style={styles.santaTitle}>🎅  Secret Santa</Text>
+          <Text style={styles.santaSub}>Gift exchange with your team</Text>
+        </View>
+        <View style={styles.aiChevron}>
+          <Text style={{ color: '#fff', fontSize: 20 }}>›</Text>
+        </View>
+      </TouchableOpacity>
+
       {/* Categories */}
       <Text style={styles.sectionTitle}>Browse by Category</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
@@ -182,4 +193,11 @@ const styles = StyleSheet.create({
   aiTitle: { fontSize: 15, fontWeight: '800', color: '#4338ca' },
   aiSub: { fontSize: 13, color: '#6366f1', marginTop: 2 },
   aiChevron: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  santaCard: {
+    marginHorizontal: 16, marginBottom: 8, padding: 16,
+    backgroundColor: '#1a0533', borderRadius: 16,
+    flexDirection: 'row', alignItems: 'center',
+  },
+  santaTitle: { fontSize: 15, fontWeight: '800', color: '#fff' },
+  santaSub: { fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 2 },
 });

@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getCategories, getPerks, getSuggestions } from '../../lib/api';
+import { getCategories, getPerks, getSuggestions, getInternalPerks } from '../../lib/api';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
 function imgSrc(path) {
@@ -21,6 +21,7 @@ export default function CatalogScreen() {
   const [categories, setCategories] = useState([]);
   const [perks, setPerks] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+  const [internalPerks, setInternalPerks] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || null);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -28,6 +29,7 @@ export default function CatalogScreen() {
   useEffect(() => {
     loadCategories();
     loadSuggestions();
+    loadInternalPerks();
   }, []);
 
   useEffect(() => {
@@ -38,6 +40,13 @@ export default function CatalogScreen() {
     try {
       const data = await getCategories();
       setCategories(Array.isArray(data) ? data : data?.results || []);
+    } catch (e) {}
+  }
+
+  async function loadInternalPerks() {
+    try {
+      const data = await getInternalPerks();
+      setInternalPerks(Array.isArray(data) ? data : []);
     } catch (e) {}
   }
 
@@ -120,6 +129,15 @@ export default function CatalogScreen() {
         </View>
       )}
 
+      {internalPerks.length > 0 && !search && !selectedCategory && (
+        <View style={{ paddingHorizontal: 16 }}>
+          <Text style={styles.sectionTitle}>🏢 Your Company Perks</Text>
+          {internalPerks.map(p => (
+            <InternalPerkCard key={p.id} perk={p} onPress={() => router.push(`/internal-perk/${p.id}`)} />
+          ))}
+        </View>
+      )}
+
       <Text style={styles.sectionTitle}>
         {selectedCategory ? selectedCategory : 'All Perks'} {perks.length > 0 ? `(${perks.length})` : ''}
       </Text>
@@ -163,6 +181,51 @@ export default function CatalogScreen() {
     </View>
   );
 }
+
+function InternalPerkCard({ perk, onPress }) {
+  const statusColor = perk.has_requested
+    ? perk.my_request_status === 'approved' ? '#10b981' : perk.my_request_status === 'denied' ? '#ef4444' : '#f59e0b'
+    : '#6366f1';
+
+  return (
+    <TouchableOpacity style={ip.card} onPress={onPress} activeOpacity={0.85}>
+      <View style={ip.iconWrap}>
+        <Text style={{ fontSize: 28 }}>{perk.icon}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={ip.title}>{perk.title}</Text>
+        <Text style={ip.desc} numberOfLines={2}>{perk.description}</Text>
+        <View style={ip.row}>
+          {perk.is_free || perk.credit_cost === 0
+            ? <Text style={ip.free}>FREE</Text>
+            : <Text style={ip.cost}>{perk.credit_cost} credits</Text>
+          }
+          {perk.slots_remaining !== null && (
+            <Text style={ip.slots}>{perk.slots_remaining} left</Text>
+          )}
+          {perk.has_requested && (
+            <View style={[ip.statusBadge, { backgroundColor: statusColor + '20' }]}>
+              <Text style={[ip.statusTxt, { color: statusColor }]}>{perk.my_request_status}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+const ip = StyleSheet.create({
+  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, padding: 14, marginBottom: 10, borderWidth: 1.5, borderColor: '#e0e7ff', gap: 14 },
+  iconWrap: { width: 52, height: 52, borderRadius: 14, backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 14, fontWeight: '800', color: '#111', marginBottom: 3 },
+  desc: { fontSize: 12, color: '#6b7280', lineHeight: 17 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
+  free: { fontSize: 11, fontWeight: '800', color: '#10b981', backgroundColor: '#dcfce7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99 },
+  cost: { fontSize: 11, fontWeight: '700', color: '#6366f1' },
+  slots: { fontSize: 11, color: '#9ca3af' },
+  statusBadge: { borderRadius: 99, paddingHorizontal: 8, paddingVertical: 3 },
+  statusTxt: { fontSize: 11, fontWeight: '700', textTransform: 'capitalize' },
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f9fafb' },
