@@ -98,6 +98,15 @@ class GroupChatListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # Auto-sync: ensure user is a member of their department's group chat
+        from companies.models import DepartmentMembership
+        for dm in DepartmentMembership.objects.filter(employee=request.user).select_related('department'):
+            gc, _ = GroupChat.objects.get_or_create(
+                department=dm.department,
+                defaults={'name': dm.department.name}
+            )
+            gc.members.add(request.user)
+
         groups = request.user.group_chats.prefetch_related('messages__sender').select_related('category', 'department')
         result = []
         for g in groups:
