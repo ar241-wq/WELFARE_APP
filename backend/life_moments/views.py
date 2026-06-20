@@ -94,6 +94,27 @@ class ApproveCarePackageView(APIView):
         return Response(LifeEventSerializer(event).data)
 
 
+class CompanyFeedView(APIView):
+    """Active life events from colleagues in the same company."""
+    permission_classes = [IsEmployee]
+
+    def get(self, request):
+        if not request.user.company:
+            return Response([])
+        events = LifeEvent.objects.filter(
+            employee__company=request.user.company,
+            is_active=True,
+        ).exclude(employee=request.user).select_related('employee').order_by('-created_at')[:20]
+        return Response([{
+            'id': e.id,
+            'event_type': e.event_type,
+            'event_type_display': e.get_event_type_display(),
+            'employee_name': e.employee.full_name,
+            'created_at': e.created_at.isoformat(),
+            'total_donations': sum(d.amount for d in e.donations.all()),
+        } for e in events])
+
+
 class DonateToEventView(APIView):
     permission_classes = [IsEmployee]
 
