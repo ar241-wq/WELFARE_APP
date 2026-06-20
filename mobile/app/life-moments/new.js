@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
   StyleSheet, TextInput, ActivityIndicator, Alert,
-  KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { markLifeEvent } from '../../lib/api';
@@ -42,8 +41,7 @@ export default function NewLifeEventScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: 20, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+    <ScrollView style={styles.container} contentContainerStyle={{ padding: 20, paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
       <Text style={styles.subtitle}>What's happening in your life? This is private — only HR is notified.</Text>
 
       {EVENTS.map((event) => (
@@ -78,7 +76,6 @@ export default function NewLifeEventScreen() {
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Mark Life Event</Text>}
       </TouchableOpacity>
     </ScrollView>
-    </KeyboardAvoidingView>
   );
 }
 

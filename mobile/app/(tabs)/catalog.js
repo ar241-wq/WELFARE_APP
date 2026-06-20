@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
-  StyleSheet, ActivityIndicator, FlatList, Image,
+  StyleSheet, ActivityIndicator, FlatList, Image, Pressable,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -78,17 +78,15 @@ export default function CatalogScreen() {
 
       {/* Category Filter */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
-        <TouchableOpacity
-          activeOpacity={1}
+        <Pressable
           style={[styles.filterChip, !selectedCategory && styles.filterChipActive]}
           onPress={() => setSelectedCategory(null)}
         >
           <Text style={[styles.filterText, !selectedCategory && styles.filterTextActive]}>All</Text>
-        </TouchableOpacity>
+        </Pressable>
         {categories.map((cat) => (
-          <TouchableOpacity
+          <Pressable
             key={cat.id}
-            activeOpacity={1}
             style={[styles.filterChip, selectedCategory === cat.name && styles.filterChipActive]}
             onPress={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
           >
@@ -96,7 +94,7 @@ export default function CatalogScreen() {
             <Text style={[styles.filterText, selectedCategory === cat.name && styles.filterTextActive]}>
               {cat.name}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </ScrollView>
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
-  StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
+  StyleSheet, ActivityIndicator, Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { submitPerkRequest } from '../../lib/api';
@@ -38,8 +38,7 @@ export default function RequestPerkScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: 20, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+    <ScrollView style={styles.container} contentContainerStyle={{ padding: 20, paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
       <Text style={styles.subtitle}>
         Can't find what you need in the catalog? Request it here and HR will review your request.
       </Text>
@@ -89,7 +88,6 @@ export default function RequestPerkScreen() {
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Submit Request</Text>}
       </TouchableOpacity>
     </ScrollView>
-    </KeyboardAvoidingView>
   );
 }
 

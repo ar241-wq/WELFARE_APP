@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity,
+  View, Text, ScrollView, TouchableOpacity, Pressable,
   StyleSheet, ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -89,15 +89,14 @@ export default function HomeScreen() {
       <Text style={styles.sectionTitle}>Browse by Category</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
         {categories.map((cat) => (
-          <TouchableOpacity
+          <Pressable
             key={cat.id}
-            activeOpacity={1}
             style={styles.categoryChip}
             onPress={() => router.push({ pathname: '/(tabs)/catalog', params: { category: cat.name } })}
           >
             <Text style={styles.categoryIcon}>{cat.icon}</Text>
             <Text style={styles.categoryName}>{cat.name}</Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </ScrollView>
 
