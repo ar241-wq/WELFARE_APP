@@ -16,6 +16,9 @@ export default function RootLayout() {
           <Stack.Screen name="life-moments/care-package" options={{ headerShown: true, title: 'Care Package', headerBackTitle: 'Back' }} />
           <Stack.Screen name="life-moments/donate" options={{ headerShown: true, title: 'Send Care Credits', headerBackTitle: 'Back' }} />
           <Stack.Screen name="request/new" options={{ headerShown: true, title: 'Request a Perk', headerBackTitle: 'Back' }} />
+          <Stack.Screen name="profile/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="challenges/index" options={{ headerShown: false }} />
+          <Stack.Screen name="challenges/[id]" options={{ headerShown: false }} />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>

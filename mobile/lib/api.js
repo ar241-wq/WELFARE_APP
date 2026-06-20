@@ -147,6 +147,22 @@ export async function getMyLifeEvents() {
   return request('GET', '/api/life-moments/');
 }
 
+export async function getCompanyFeed() {
+  return request('GET', '/api/life-moments/company-feed/');
+}
+
+export async function getBirthdaysToday() {
+  return request('GET', '/api/auth/birthday-today/');
+}
+
+export async function sendBirthdayGift(recipientId, amount) {
+  return request('POST', '/api/wallet/birthday-gift/', { recipient_id: recipientId, amount });
+}
+
+export async function getBirthdayGiftsReceived() {
+  return request('GET', '/api/wallet/birthday-gifts/received/');
+}
+
 export async function markLifeEvent(eventType, note = '') {
   return request('POST', '/api/life-moments/', { event_type: eventType, note });
 }
@@ -235,6 +251,24 @@ export async function getGroupMessages(groupId) {
 
 export async function sendGroupMessage(groupId, text) {
   return request('POST', `/api/chat/groups/${groupId}/messages/`, { text });
+}
+
+// ─── Challenges ───────────────────────────────────────────────────────────────
+export async function getChallenges() {
+  return request('GET', '/api/challenges/');
+}
+
+export async function getChallengeDetail(id) {
+  return request('GET', `/api/challenges/${id}/`);
+}
+
+export async function getChallengeWinNotifications() {
+  return request('GET', '/api/challenges/win-notifications/');
+}
+
+// ─── Profiles ─────────────────────────────────────────────────────────────────
+export async function getColleagueProfile(id) {
+  return request('GET', `/api/auth/profile/${id}/`);
 }
 
 // ─── AI Assistant ──────────────────────────────────────────────────────────────

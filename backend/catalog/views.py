@@ -124,15 +124,6 @@ class RedeemPerkView(APIView):
             status='pending'
         )
 
-        # Auto-join the community group chat for this perk's category
-        if perk.category:
-            from chat.models import GroupChat
-            group, _ = GroupChat.objects.get_or_create(
-                category=perk.category,
-                defaults={'name': perk.category.name},
-            )
-            group.members.add(request.user)
-
         return Response(RedemptionSerializer(redemption).data, status=201)
 
 

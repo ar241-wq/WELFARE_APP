@@ -1,11 +1,43 @@
-backend/venv/
-backend/__pycache__/
-backend/**/__pycache__/
-backend/**/*.pyc
-mobile/node_modules/
-mobile/.expo/
-backend/media/
-web/node_modules/
-web/.next/
-.DS_Store
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Django
+*.sqlite3
 backend/.env
+backend/staticfiles/
+backend/media/
+
+# Node
+node_modules/
+.expo/
+dist/
+.next/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# Memory files
+project_hackathon26.md

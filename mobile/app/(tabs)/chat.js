@@ -100,7 +100,7 @@ export default function ChatScreen() {
   };
 
   const openGroup = (group) => {
-    router.push({ pathname: '/chat/group/[groupId]', params: { groupId: group.id, groupName: group.name, groupIcon: group.category_icon || '💬' } });
+    router.push({ pathname: '/chat/group/[groupId]', params: { groupId: group.id, groupName: group.name, groupIcon: group.icon || '💬' } });
   };
 
   if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#6366f1" /></View>;
@@ -192,28 +192,43 @@ export default function ChatScreen() {
           renderItem={renderConvo}
           contentContainerStyle={{ paddingTop: 8 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />}
-          ListHeaderComponent={groupChats.length > 0 ? (
-            <View>
-              <Text style={styles.sectionLabel}>Communities</Text>
-              {groupChats.map(g => (
-                <TouchableOpacity key={g.id} style={styles.row} onPress={() => openGroup(g)} activeOpacity={0.7}>
-                  <View style={styles.groupIcon}>
-                    <Text style={{ fontSize: 22 }}>{g.category_icon || '💬'}</Text>
+          ListHeaderComponent={() => {
+            const deptChats = groupChats.filter(g => g.type === 'department');
+            const communityChats = groupChats.filter(g => g.type === 'community');
+            const renderGroup = (g) => (
+              <TouchableOpacity key={g.id} style={styles.row} onPress={() => openGroup(g)} activeOpacity={0.7}>
+                <View style={styles.groupIcon}>
+                  <Text style={{ fontSize: 22 }}>{g.icon || '💬'}</Text>
+                </View>
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  <View style={styles.rowMeta}>
+                    <Text style={styles.rowName}>{g.name}</Text>
+                    <Text style={styles.rowTime}>{g.member_count} members</Text>
                   </View>
-                  <View style={{ flex: 1, marginLeft: 12 }}>
-                    <View style={styles.rowMeta}>
-                      <Text style={styles.rowName}>{g.name}</Text>
-                      <Text style={styles.rowTime}>{g.member_count} members</Text>
-                    </View>
-                    <Text style={styles.rowPreview} numberOfLines={1}>
-                      {g.last_message ? `${g.last_sender}: ${g.last_message}` : 'Start the conversation 👋'}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-              {conversations.length > 0 && <Text style={styles.sectionLabel}>Direct Messages</Text>}
-            </View>
-          ) : null}
+                  <Text style={styles.rowPreview} numberOfLines={1}>
+                    {g.last_message ? `${g.last_sender}: ${g.last_message}` : 'Start the conversation 👋'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+            return (
+              <View>
+                {deptChats.length > 0 && (
+                  <>
+                    <Text style={styles.sectionLabel}>🏢 My Department</Text>
+                    {deptChats.map(renderGroup)}
+                  </>
+                )}
+                {communityChats.length > 0 && (
+                  <>
+                    <Text style={styles.sectionLabel}>Communities</Text>
+                    {communityChats.map(renderGroup)}
+                  </>
+                )}
+                {conversations.length > 0 && <Text style={styles.sectionLabel}>Direct Messages</Text>}
+              </View>
+            );
+          }}
           ListEmptyComponent={groupChats.length === 0 ? (
             <View style={styles.empty}>
               <Text style={{ fontSize: 44, marginBottom: 12 }}>💬</Text>
