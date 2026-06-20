@@ -91,6 +91,7 @@ export default function HomeScreen() {
         {categories.map((cat) => (
           <TouchableOpacity
             key={cat.id}
+            activeOpacity={1}
             style={styles.categoryChip}
             onPress={() => router.push({ pathname: '/(tabs)/catalog', params: { category: cat.name } })}
           >

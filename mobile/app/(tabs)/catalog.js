@@ -79,6 +79,7 @@ export default function CatalogScreen() {
       {/* Category Filter */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
         <TouchableOpacity
+          activeOpacity={1}
           style={[styles.filterChip, !selectedCategory && styles.filterChipActive]}
           onPress={() => setSelectedCategory(null)}
         >
@@ -87,6 +88,7 @@ export default function CatalogScreen() {
         {categories.map((cat) => (
           <TouchableOpacity
             key={cat.id}
+            activeOpacity={1}
             style={[styles.filterChip, selectedCategory === cat.name && styles.filterChipActive]}
             onPress={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
           >
