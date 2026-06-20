@@ -19,6 +19,9 @@ export default function RootLayout() {
           <Stack.Screen name="profile/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="challenges/index" options={{ headerShown: false }} />
           <Stack.Screen name="challenges/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="santa/index" options={{ headerShown: true, title: 'Secret Santa', headerBackTitle: 'Back' }} />
+          <Stack.Screen name="santa/[id]" options={{ headerShown: true, title: 'Secret Santa', headerBackTitle: 'Back' }} />
+          <Stack.Screen name="internal-perk/[id]" options={{ headerShown: true, title: 'Company Perk', headerBackTitle: 'Back' }} />
         </Stack>
       </AuthProvider>
     </SafeAreaProvider>
