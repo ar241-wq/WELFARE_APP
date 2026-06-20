@@ -1,0 +1,1342 @@
+[
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$BE5CkDegxwP1wj4lS2KXC5$nS3Pg0vte+fb3yrPIOSk/Dsx5EQ6LEBvBNRaTdaFU0M=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "ceo@novatech.com",
+    "full_name": "Sophie Carter",
+    "role": "employer",
+    "avatar": "",
+    "company": 2,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:28.308Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$9xSCFqNkC507CVHeTB3yWR$ToYLPA4Akj3e71PD6WYDwAwsdXNyyEZ5dOMo866WfPU=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "hr@greenleaf.com",
+    "full_name": "Marcus Thompson",
+    "role": "employer",
+    "avatar": "",
+    "company": 3,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:28.479Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$QuIvHMLHbbNpUMtKxCd9EJ$Oz07w52WaMry983wd+CXjBkFMK/H0qmiV7WyTYK1Iu0=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "people@pulse.com",
+    "full_name": "Aisha Patel",
+    "role": "employer",
+    "avatar": "",
+    "company": 4,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:28.654Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$iZCXYwW4uVauVF1gzHdi6E$TNocG4CHWQ0ahf6/fZi5MIoz1Vff61fjpTpSpufOiTc=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "hello@zenfit.com",
+    "full_name": "ZenFit Studios",
+    "role": "provider",
+    "avatar": "",
+    "company": null,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:28.829Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$ZlCczz02Mx5A5JzBrh1tzN$TQrWhd85TCPaG4L15Myj0E6R9xAceKUDFrVZFxh6mrU=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "info@boltgym.com",
+    "full_name": "Bolt Gym",
+    "role": "provider",
+    "avatar": "",
+    "company": null,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.000Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$jdq6Cn74GwUxMc8Y0ldAUB$atrqHLHPYc6YMEeJbnXPNScfZGrziwGWZBR0EJmKmoQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "team@mealcraft.com",
+    "full_name": "MealCraft",
+    "role": "provider",
+    "avatar": "",
+    "company": null,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.169Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$rijlfvI2nm0SViygwJFc2T$TM1m/ab4U4yz3fuRyCuhTNL4rxPIW9ivoVX7v6/p8cw=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "hi@skillvault.com",
+    "full_name": "SkillVault",
+    "role": "provider",
+    "avatar": "",
+    "company": null,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.344Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$IET5dVq1o0xKxSsKAlmIZZ$qP0neKRvav1PTKmKlD7w5ZjpDErghvatrxUpGpMfxBk=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "care@mindspace.com",
+    "full_name": "MindSpace",
+    "role": "provider",
+    "avatar": "",
+    "company": null,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.511Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$Wi321GjCnUhKGHTzczWXiV$fuUo/2ywqn6CyhP9JycIE2Jh3Rf4wHbCy2tpL/xQTB4=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "go@wanderpass.com",
+    "full_name": "WanderPass",
+    "role": "provider",
+    "avatar": "",
+    "company": null,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.681Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$0N2KXLRrJXlHVbRlCk3i4M$slyjeLCeBFoFpbPOqGBXgD4v/D1hkGFSvSxYRIdifec=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "liam@novatech.com",
+    "full_name": "Liam Johnson",
+    "role": "employee",
+    "avatar": "",
+    "company": 2,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.859Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$6uK0sJhh85cWSM6QGEXIVR$IKFUNO0dyf5xSje/LvlAQNpMmYLP9ZjpAsAXLpc10jU=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "emma@novatech.com",
+    "full_name": "Emma Rodriguez",
+    "role": "employee",
+    "avatar": "",
+    "company": 2,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:30.036Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$ru4zI7atCSOn53JESL6pqT$CaE4PqN8H5weaAL2v3X+mlxn0h4ZY4NJYN/0Kw9Y9I4=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "noah@novatech.com",
+    "full_name": "Noah Williams",
+    "role": "employee",
+    "avatar": "",
+    "company": 2,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:30.214Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$iTe9f26HHeBjNpfXm6QJFV$9ApxtCN9nB4LKG+L4xhfiKIbVcIpL+j2kBXvzYtx/ik=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "olivia@novatech.com",
+    "full_name": "Olivia Brown",
+    "role": "employee",
+    "avatar": "",
+    "company": 2,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:30.386Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$O83ZaeOK8Tk0llT5eiPJvm$Y7eVL73VWIC0bTiq3FcLGN2ps8EOGuzrYoysI4RNSL8=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "james@greenleaf.com",
+    "full_name": "James Taylor",
+    "role": "employee",
+    "avatar": "",
+    "company": 3,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:30.555Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$VWdSGOHqOwAZTthyGYi24l$uf1BMQBN1hCGrZ2JSHbzVBCVEqRaC3W7wkD0R63EQOc=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "ava@greenleaf.com",
+    "full_name": "Ava Martinez",
+    "role": "employee",
+    "avatar": "",
+    "company": 3,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:30.727Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$1v0cYHJsFejycEbYdE4tKh$0BQmpz3kxdJnAHqoxIJHw4R7zv2fRJjSviY9j6pEWew=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "lucas@greenleaf.com",
+    "full_name": "Lucas Anderson",
+    "role": "employee",
+    "avatar": "",
+    "company": 3,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:30.897Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$clrDlRBMJ9NlzHtTE9xFO5$PJ23g0AWsJVzXAq7ueDlnL5Xi79Wq/V4K3ifVpkok+o=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "mia@pulse.com",
+    "full_name": "Mia Chen",
+    "role": "employee",
+    "avatar": "",
+    "company": 4,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:31.069Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$ixQGfGCLbTQuPiGwS2iOck$DeRcOdfqQ7RmGygFpbsmrvPs1C8TJR66wH7Ko+QdlBw=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "ethan@pulse.com",
+    "full_name": "Ethan Kim",
+    "role": "employee",
+    "avatar": "",
+    "company": 4,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:31.239Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$yKzMdDM4jjJFoduyDRGLIB$dmF7wbGEd0zuyGlmPg+jRIAzBN3oqJ4RML5D1E9rDNM=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "sofia@pulse.com",
+    "full_name": "Sofia Davis",
+    "role": "employee",
+    "avatar": "",
+    "company": 4,
+    "is_active": true,
+    "is_staff": false,
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:31.411Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.providerprofile",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "hello@zenfit.com"
+    ],
+    "company_name": "ZenFit Studios",
+    "description": "Premium yoga & mindfulness studio chain",
+    "logo": "",
+    "website": "",
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:28.829Z"
+  }
+},
+{
+  "model": "users.providerprofile",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "info@boltgym.com"
+    ],
+    "company_name": "Bolt Gym",
+    "description": "High-performance gym with 50+ locations",
+    "logo": "",
+    "website": "",
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.001Z"
+  }
+},
+{
+  "model": "users.providerprofile",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "team@mealcraft.com"
+    ],
+    "company_name": "MealCraft Kitchen",
+    "description": "Chef-designed weekly meal kit delivery",
+    "logo": "",
+    "website": "",
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.170Z"
+  }
+},
+{
+  "model": "users.providerprofile",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "hi@skillvault.com"
+    ],
+    "company_name": "SkillVault Learning",
+    "description": "Professional development & certifications",
+    "logo": "",
+    "website": "",
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.344Z"
+  }
+},
+{
+  "model": "users.providerprofile",
+  "pk": 8,
+  "fields": {
+    "user": [
+      "care@mindspace.com"
+    ],
+    "company_name": "MindSpace Therapy",
+    "description": "Online therapy & mental wellness platform",
+    "logo": "",
+    "website": "",
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.512Z"
+  }
+},
+{
+  "model": "users.providerprofile",
+  "pk": 9,
+  "fields": {
+    "user": [
+      "go@wanderpass.com"
+    ],
+    "company_name": "WanderPass Travel",
+    "description": "Corporate travel perks & hotel discounts",
+    "logo": "",
+    "website": "",
+    "is_verified": true,
+    "created_at": "2026-06-20T14:45:29.682Z"
+  }
+},
+{
+  "model": "companies.company",
+  "pk": 2,
+  "fields": {
+    "name": "NovaTech Solutions",
+    "logo": "",
+    "industry": "Technology",
+    "monthly_budget_per_employee": "500.00",
+    "credits_rollover": false,
+    "created_by": [
+      "ceo@novatech.com"
+    ],
+    "created_at": "2026-06-20T14:45:28.311Z"
+  }
+},
+{
+  "model": "companies.company",
+  "pk": 3,
+  "fields": {
+    "name": "GreenLeaf Corp",
+    "logo": "",
+    "industry": "Healthcare",
+    "monthly_budget_per_employee": "350.00",
+    "credits_rollover": false,
+    "created_by": [
+      "hr@greenleaf.com"
+    ],
+    "created_at": "2026-06-20T14:45:28.480Z"
+  }
+},
+{
+  "model": "companies.company",
+  "pk": 4,
+  "fields": {
+    "name": "Pulse Digital",
+    "logo": "",
+    "industry": "Marketing",
+    "monthly_budget_per_employee": "450.00",
+    "credits_rollover": false,
+    "created_by": [
+      "people@pulse.com"
+    ],
+    "created_at": "2026-06-20T14:45:28.655Z"
+  }
+},
+{
+  "model": "companies.team",
+  "pk": 2,
+  "fields": {
+    "company": 2,
+    "name": "Product",
+    "manager": [
+      "ceo@novatech.com"
+    ],
+    "created_at": "2026-06-20T14:45:28.312Z"
+  }
+},
+{
+  "model": "companies.team",
+  "pk": 3,
+  "fields": {
+    "company": 3,
+    "name": "Product",
+    "manager": [
+      "hr@greenleaf.com"
+    ],
+    "created_at": "2026-06-20T14:45:28.481Z"
+  }
+},
+{
+  "model": "companies.team",
+  "pk": 4,
+  "fields": {
+    "company": 4,
+    "name": "Product",
+    "manager": [
+      "people@pulse.com"
+    ],
+    "created_at": "2026-06-20T14:45:28.656Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 4,
+  "fields": {
+    "employee": [
+      "liam@novatech.com"
+    ],
+    "team": 2,
+    "joined_at": "2026-06-20T14:45:29.861Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 5,
+  "fields": {
+    "employee": [
+      "emma@novatech.com"
+    ],
+    "team": 2,
+    "joined_at": "2026-06-20T14:45:30.038Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 6,
+  "fields": {
+    "employee": [
+      "noah@novatech.com"
+    ],
+    "team": 2,
+    "joined_at": "2026-06-20T14:45:30.217Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 7,
+  "fields": {
+    "employee": [
+      "olivia@novatech.com"
+    ],
+    "team": 2,
+    "joined_at": "2026-06-20T14:45:30.388Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 8,
+  "fields": {
+    "employee": [
+      "james@greenleaf.com"
+    ],
+    "team": 3,
+    "joined_at": "2026-06-20T14:45:30.557Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 9,
+  "fields": {
+    "employee": [
+      "ava@greenleaf.com"
+    ],
+    "team": 3,
+    "joined_at": "2026-06-20T14:45:30.729Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 10,
+  "fields": {
+    "employee": [
+      "lucas@greenleaf.com"
+    ],
+    "team": 3,
+    "joined_at": "2026-06-20T14:45:30.899Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 11,
+  "fields": {
+    "employee": [
+      "mia@pulse.com"
+    ],
+    "team": 4,
+    "joined_at": "2026-06-20T14:45:31.071Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 12,
+  "fields": {
+    "employee": [
+      "ethan@pulse.com"
+    ],
+    "team": 4,
+    "joined_at": "2026-06-20T14:45:31.241Z"
+  }
+},
+{
+  "model": "companies.teammembership",
+  "pk": 13,
+  "fields": {
+    "employee": [
+      "sofia@pulse.com"
+    ],
+    "team": 4,
+    "joined_at": "2026-06-20T14:45:31.413Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 4,
+  "fields": {
+    "employee": [
+      "liam@novatech.com"
+    ],
+    "balance": "500.00",
+    "updated_at": "2026-06-20T14:45:29.859Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 5,
+  "fields": {
+    "employee": [
+      "emma@novatech.com"
+    ],
+    "balance": "500.00",
+    "updated_at": "2026-06-20T14:45:30.037Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 6,
+  "fields": {
+    "employee": [
+      "noah@novatech.com"
+    ],
+    "balance": "320.00",
+    "updated_at": "2026-06-20T14:45:30.216Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 7,
+  "fields": {
+    "employee": [
+      "olivia@novatech.com"
+    ],
+    "balance": "500.00",
+    "updated_at": "2026-06-20T14:45:30.386Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 8,
+  "fields": {
+    "employee": [
+      "james@greenleaf.com"
+    ],
+    "balance": "350.00",
+    "updated_at": "2026-06-20T14:45:30.556Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 9,
+  "fields": {
+    "employee": [
+      "ava@greenleaf.com"
+    ],
+    "balance": "350.00",
+    "updated_at": "2026-06-20T14:45:30.728Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 10,
+  "fields": {
+    "employee": [
+      "lucas@greenleaf.com"
+    ],
+    "balance": "200.00",
+    "updated_at": "2026-06-20T14:45:30.898Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 11,
+  "fields": {
+    "employee": [
+      "mia@pulse.com"
+    ],
+    "balance": "450.00",
+    "updated_at": "2026-06-20T14:45:31.069Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 12,
+  "fields": {
+    "employee": [
+      "ethan@pulse.com"
+    ],
+    "balance": "450.00",
+    "updated_at": "2026-06-20T14:45:31.240Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 13,
+  "fields": {
+    "employee": [
+      "sofia@pulse.com"
+    ],
+    "balance": "100.00",
+    "updated_at": "2026-06-20T14:45:31.412Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 4,
+  "fields": {
+    "wallet": 4,
+    "amount": "500.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from NovaTech Solutions",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:29.860Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 5,
+  "fields": {
+    "wallet": 5,
+    "amount": "500.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from NovaTech Solutions",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:30.037Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 6,
+  "fields": {
+    "wallet": 6,
+    "amount": "320.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from NovaTech Solutions",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:30.216Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 7,
+  "fields": {
+    "wallet": 7,
+    "amount": "500.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from NovaTech Solutions",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:30.387Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 8,
+  "fields": {
+    "wallet": 8,
+    "amount": "350.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from GreenLeaf Corp",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:30.557Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 9,
+  "fields": {
+    "wallet": 9,
+    "amount": "350.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from GreenLeaf Corp",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:30.729Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 10,
+  "fields": {
+    "wallet": 10,
+    "amount": "200.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from GreenLeaf Corp",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:30.899Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 11,
+  "fields": {
+    "wallet": 11,
+    "amount": "450.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from Pulse Digital",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:31.070Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 12,
+  "fields": {
+    "wallet": 12,
+    "amount": "450.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from Pulse Digital",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:31.241Z"
+  }
+},
+{
+  "model": "wallet.transaction",
+  "pk": 13,
+  "fields": {
+    "wallet": 13,
+    "amount": "100.00",
+    "type": "credit",
+    "description": "Monthly credit allocation from Pulse Digital",
+    "reference_id": "",
+    "created_at": "2026-06-20T14:45:31.412Z"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 7,
+  "fields": {
+    "name": "Wellness",
+    "icon": "🧘",
+    "description": "",
+    "order": 0
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 8,
+  "fields": {
+    "name": "Food",
+    "icon": "🍔",
+    "description": "",
+    "order": 0
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 9,
+  "fields": {
+    "name": "Travel",
+    "icon": "✈️",
+    "description": "",
+    "order": 0
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 10,
+  "fields": {
+    "name": "Learning",
+    "icon": "📚",
+    "description": "",
+    "order": 0
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 11,
+  "fields": {
+    "name": "Connectivity",
+    "icon": "📱",
+    "description": "",
+    "order": 0
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 12,
+  "fields": {
+    "name": "Lifestyle",
+    "icon": "🎬",
+    "description": "",
+    "order": 0
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 13,
+  "fields": {
+    "name": "Fitness",
+    "icon": "💪",
+    "description": "",
+    "order": 0
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 21,
+  "fields": {
+    "provider": [
+      "hello@zenfit.com"
+    ],
+    "category": 7,
+    "name": "Monthly Yoga Unlimited",
+    "description": "Unlimited classes at any ZenFit studio",
+    "credit_price": "130.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.683Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 22,
+  "fields": {
+    "provider": [
+      "hello@zenfit.com"
+    ],
+    "category": 7,
+    "name": "Mindfulness Retreat Day",
+    "description": "Full-day guided mindfulness retreat",
+    "credit_price": "200.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.683Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 23,
+  "fields": {
+    "provider": [
+      "hello@zenfit.com"
+    ],
+    "category": 7,
+    "name": "Meditation App — 6 Months",
+    "description": "6-month premium subscription",
+    "credit_price": "45.00",
+    "is_active": true,
+    "is_featured": false,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.683Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 24,
+  "fields": {
+    "provider": [
+      "info@boltgym.com"
+    ],
+    "category": 13,
+    "name": "Bolt Gym Monthly Pass",
+    "description": "Unlimited gym access across all locations",
+    "credit_price": "150.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.684Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 25,
+  "fields": {
+    "provider": [
+      "info@boltgym.com"
+    ],
+    "category": 13,
+    "name": "Personal Training x4",
+    "description": "4 x 1-hour sessions with a certified PT",
+    "credit_price": "200.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.684Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 26,
+  "fields": {
+    "provider": [
+      "info@boltgym.com"
+    ],
+    "category": 13,
+    "name": "Group HIIT Classes Bundle",
+    "description": "10-class HIIT bundle, any location",
+    "credit_price": "80.00",
+    "is_active": true,
+    "is_featured": false,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.684Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 27,
+  "fields": {
+    "provider": [
+      "info@boltgym.com"
+    ],
+    "category": 13,
+    "name": "Recovery & Spa Session",
+    "description": "Post-workout ice bath, sauna & massage",
+    "credit_price": "120.00",
+    "is_active": true,
+    "is_featured": false,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.685Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 28,
+  "fields": {
+    "provider": [
+      "team@mealcraft.com"
+    ],
+    "category": 8,
+    "name": "Weekly Meal Kit (2 people)",
+    "description": "Fresh chef-designed meals for 2, delivered weekly",
+    "credit_price": "110.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.685Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 29,
+  "fields": {
+    "provider": [
+      "team@mealcraft.com"
+    ],
+    "category": 8,
+    "name": "Healthy Lunch Plan",
+    "description": "5 x office lunches delivered Mon–Fri",
+    "credit_price": "90.00",
+    "is_active": true,
+    "is_featured": false,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.685Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 30,
+  "fields": {
+    "provider": [
+      "team@mealcraft.com"
+    ],
+    "category": 8,
+    "name": "Restaurant Voucher",
+    "description": "Valid at 300+ partner restaurants",
+    "credit_price": "50.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.685Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 31,
+  "fields": {
+    "provider": [
+      "hi@skillvault.com"
+    ],
+    "category": 10,
+    "name": "All-Access Learning Pass",
+    "description": "Unlimited courses for 1 month",
+    "credit_price": "100.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.686Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 32,
+  "fields": {
+    "provider": [
+      "hi@skillvault.com"
+    ],
+    "category": 10,
+    "name": "Professional Certification",
+    "description": "One accredited certification of your choice",
+    "credit_price": "250.00",
+    "is_active": true,
+    "is_featured": false,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.686Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 33,
+  "fields": {
+    "provider": [
+      "hi@skillvault.com"
+    ],
+    "category": 10,
+    "name": "Language Learning — 3 Mo",
+    "description": "3-month premium language app subscription",
+    "credit_price": "60.00",
+    "is_active": true,
+    "is_featured": false,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.686Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 34,
+  "fields": {
+    "provider": [
+      "care@mindspace.com"
+    ],
+    "category": 7,
+    "name": "Therapy Session",
+    "description": "1-hour video therapy with a licensed therapist",
+    "credit_price": "90.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.687Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 35,
+  "fields": {
+    "provider": [
+      "care@mindspace.com"
+    ],
+    "category": 7,
+    "name": "Therapy Bundle x4",
+    "description": "4 x therapy sessions — save 15%",
+    "credit_price": "300.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.687Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 36,
+  "fields": {
+    "provider": [
+      "care@mindspace.com"
+    ],
+    "category": 7,
+    "name": "Sleep Improvement Program",
+    "description": "6-week guided sleep coaching program",
+    "credit_price": "75.00",
+    "is_active": true,
+    "is_featured": false,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.687Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 37,
+  "fields": {
+    "provider": [
+      "go@wanderpass.com"
+    ],
+    "category": 9,
+    "name": "Hotel Night Voucher",
+    "description": "One free night at 500+ partner hotels",
+    "credit_price": "180.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.687Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 38,
+  "fields": {
+    "provider": [
+      "go@wanderpass.com"
+    ],
+    "category": 9,
+    "name": "Airport Lounge Pass",
+    "description": "Single-use premium lounge access worldwide",
+    "credit_price": "70.00",
+    "is_active": true,
+    "is_featured": false,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.688Z"
+  }
+},
+{
+  "model": "catalog.perk",
+  "pk": 39,
+  "fields": {
+    "provider": [
+      "go@wanderpass.com"
+    ],
+    "category": 9,
+    "name": "City Weekend Getaway",
+    "description": "Weekend package: hotel + activities for 2",
+    "credit_price": "400.00",
+    "is_active": true,
+    "is_featured": true,
+    "tags": [],
+    "created_at": "2026-06-20T14:45:29.688Z"
+  }
+},
+{
+  "model": "collaborations.collaboration",
+  "pk": 2,
+  "fields": {
+    "from_provider": [
+      "hello@zenfit.com"
+    ],
+    "to_provider": [
+      "info@boltgym.com"
+    ],
+    "message": "Lets build a premium wellness + gym bundle!",
+    "status": "accepted",
+    "created_at": "2026-06-20T14:45:31.413Z",
+    "responded_at": null
+  }
+},
+{
+  "model": "collaborations.collaboration",
+  "pk": 3,
+  "fields": {
+    "from_provider": [
+      "team@mealcraft.com"
+    ],
+    "to_provider": [
+      "care@mindspace.com"
+    ],
+    "message": "Nutrition meets mental health — perfect together",
+    "status": "accepted",
+    "created_at": "2026-06-20T14:45:31.414Z",
+    "responded_at": null
+  }
+},
+{
+  "model": "collaborations.collaboration",
+  "pk": 4,
+  "fields": {
+    "from_provider": [
+      "hi@skillvault.com"
+    ],
+    "to_provider": [
+      "go@wanderpass.com"
+    ],
+    "message": "Learning + travel rewards package idea",
+    "status": "pending",
+    "created_at": "2026-06-20T14:45:31.414Z",
+    "responded_at": null
+  }
+},
+{
+  "model": "collaborations.packagedeal",
+  "pk": 1,
+  "fields": {
+    "collaboration": 2,
+    "name": "Recovery",
+    "description": "healthmaxx",
+    "target_employer": [
+      "ceo@novatech.com"
+    ],
+    "total_price": "0.00",
+    "discount_percentage": "15.00",
+    "status": "draft",
+    "from_provider_confirmed": true,
+    "to_provider_confirmed": true,
+    "created_by": [
+      "hello@zenfit.com"
+    ],
+    "created_at": "2026-06-20T14:48:32.857Z",
+    "offered_at": null,
+    "responded_at": null,
+    "perks": [
+      25,
+      22
+    ]
+  }
+}
+]
