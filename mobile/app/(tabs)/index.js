@@ -91,6 +91,7 @@ export default function HomeScreen() {
         {categories.map((cat) => (
           <Pressable
             key={cat.id}
+            android_ripple={null}
             style={styles.categoryChip}
             onPress={() => router.push({ pathname: '/(tabs)/catalog', params: { category: cat.name } })}
           >

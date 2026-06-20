@@ -79,6 +79,7 @@ export default function CatalogScreen() {
       {/* Category Filter */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
         <Pressable
+          android_ripple={null}
           style={[styles.filterChip, !selectedCategory && styles.filterChipActive]}
           onPress={() => setSelectedCategory(null)}
         >
@@ -87,6 +88,7 @@ export default function CatalogScreen() {
         {categories.map((cat) => (
           <Pressable
             key={cat.id}
+            android_ripple={null}
             style={[styles.filterChip, selectedCategory === cat.name && styles.filterChipActive]}
             onPress={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
           >
