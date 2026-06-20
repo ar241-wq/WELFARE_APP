@@ -7,23 +7,38 @@ import { approveCarePackage } from '@/lib/api';
 
 const EVENT_LABELS: Record<string, string> = {
   new_baby:      'New Baby',
+  medical:       'Medical Leave',
   medical_leave: 'Medical Leave',
   relocation:    'Relocation',
   bereavement:   'Bereavement',
+  burnout:       'Burnout Leave',
   burnout_leave: 'Burnout Leave',
 };
 
-interface SuggestedPerk {
+interface Perk {
+  id: number;
   name: string;
-  credits: number;
+  credit_price: number;
+}
+
+interface CarePackage {
+  id: number;
+  status: string;
+  credit_boost: string | number;
+  perks: Perk[];
+  total_donations: number;
+  approved_at: string | null;
 }
 
 export interface LifeEvent {
   id: number;
   employee_name: string;
   event_type: string;
-  suggested_perks: SuggestedPerk[];
-  status: string;
+  event_type_display: string;
+  note: string;
+  is_active: boolean;
+  created_at: string;
+  care_package: CarePackage;
 }
 
 interface CarePackageCardProps {
@@ -34,7 +49,7 @@ interface CarePackageCardProps {
 export default function CarePackageCard({ event, onApproved }: CarePackageCardProps) {
   const [boost, setBoost] = useState(200);
   const [loading, setLoading] = useState(false);
-  const [approved, setApproved] = useState(event.status === 'approved');
+  const [approved, setApproved] = useState(event.care_package?.status === 'approved');
   const [ribbonVisible, setRibbonVisible] = useState(false);
   const { toast } = useToast();
 
@@ -53,7 +68,8 @@ export default function CarePackageCard({ event, onApproved }: CarePackageCardPr
     }
   };
 
-  const label = EVENT_LABELS[event.event_type] ?? event.event_type;
+  const label = EVENT_LABELS[event.event_type] ?? event.event_type_display ?? event.event_type;
+  const perks = event.care_package?.perks ?? [];
 
   return (
     <div className={`bg-white rounded-[12px] border overflow-hidden transition-all duration-300 ${
@@ -86,20 +102,22 @@ export default function CarePackageCard({ event, onApproved }: CarePackageCardPr
         </div>
 
         {/* Suggested perks */}
-        <div className="mb-5">
-          <p className="text-xs font-medium text-[#5B5F6B] mb-2">Suggested care package</p>
-          <div className="flex flex-wrap gap-1.5">
-            {event.suggested_perks.map((p, i) => (
-              <span
-                key={i}
-                className="inline-flex items-center gap-1.5 bg-[#FCEDE7] border border-[#E8623D]/20 text-[#E8623D] text-xs font-medium px-2.5 py-1 rounded-full"
-              >
-                {p.name}
-                <span className="tabular opacity-70">{p.credits}</span>
-              </span>
-            ))}
+        {perks.length > 0 && (
+          <div className="mb-5">
+            <p className="text-xs font-medium text-[#5B5F6B] mb-2">Suggested care package</p>
+            <div className="flex flex-wrap gap-1.5">
+              {perks.map((p) => (
+                <span
+                  key={p.id}
+                  className="inline-flex items-center gap-1.5 bg-[#FCEDE7] border border-[#E8623D]/20 text-[#E8623D] text-xs font-medium px-2.5 py-1 rounded-full"
+                >
+                  {p.name}
+                  <span className="tabular opacity-70">{p.credit_price}</span>
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Credit boost + action */}
         {!approved && (

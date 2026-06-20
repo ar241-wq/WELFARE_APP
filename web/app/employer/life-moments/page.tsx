@@ -26,8 +26,8 @@ export default function LifeMomentsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const pending  = events.filter((e) => e.status === 'pending_approval');
-  const approved = events.filter((e) => e.status === 'approved');
+  const pending  = events.filter((e) => e.care_package?.status === 'pending_approval');
+  const approved = events.filter((e) => e.care_package?.status === 'approved');
 
   const progressPct = events.length
     ? Math.round((approved.length / events.length) * 100)
@@ -105,7 +105,7 @@ export default function LifeMomentsPage() {
                       </div>
                       <CarePackageCard
                         event={event}
-                        onApproved={(id) => setEvents((prev) => prev.map((e) => e.id === id ? { ...e, status: 'approved' } : e))}
+                        onApproved={(id) => setEvents((prev) => prev.map((e) => e.id === id ? { ...e, care_package: { ...e.care_package, status: 'approved' } } : e))}
                       />
                     </AnimatedSection>
                   ))}
@@ -122,7 +122,7 @@ export default function LifeMomentsPage() {
                     <AnimatedSection key={event.id} direction="up" delay={i * 60}>
                       <CarePackageCard
                         event={event}
-                        onApproved={(id) => setEvents((prev) => prev.map((e) => e.id === id ? { ...e, status: 'approved' } : e))}
+                        onApproved={(id) => setEvents((prev) => prev.map((e) => e.id === id ? { ...e, care_package: { ...e.care_package, status: 'approved' } } : e))}
                       />
                     </AnimatedSection>
                   ))}
