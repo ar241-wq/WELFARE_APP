@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, Alert,
+  StyleSheet, Alert, Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { logout } from '../../lib/api';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+function resolveUrl(src) {
+  if (!src) return null;
+  if (src.startsWith('http') || src.startsWith('data:')) return src;
+  return `${API_URL}${src}`;
+}
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -41,9 +48,13 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.avatarSection}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{initial}</Text>
-        </View>
+        {resolveUrl(user?.avatar) ? (
+          <Image source={{ uri: resolveUrl(user.avatar) }} style={styles.avatarImage} />
+        ) : (
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{initial}</Text>
+          </View>
+        )}
         <Text style={styles.name}>{user?.full_name}</Text>
         <Text style={styles.email}>{user?.email}</Text>
         <View style={styles.badge}>
@@ -73,6 +84,7 @@ const styles = StyleSheet.create({
   header: { backgroundColor: '#fff', paddingHorizontal: 20, paddingBottom: 16 },
   title: { fontSize: 24, fontWeight: '800', color: '#111827' },
   avatarSection: { alignItems: 'center', backgroundColor: '#fff', paddingVertical: 32, marginBottom: 16 },
+  avatarImage: { width: 80, height: 80, borderRadius: 40, marginBottom: 12 },
   avatar: {
     width: 80, height: 80, borderRadius: 40,
     backgroundColor: '#6366f1', justifyContent: 'center', alignItems: 'center', marginBottom: 12,

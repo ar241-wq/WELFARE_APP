@@ -5,7 +5,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { getConversations, searchUsers, getMe, getRedemptions } from '../../lib/api';
+import { getConversations, searchUsers, getMe, getRedemptions, getGroupChats } from '../../lib/api';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -57,6 +57,7 @@ export default function ChatScreen() {
   const router = useRouter();
   const [me, setMe] = useState(null);
   const [conversations, setConversations] = useState([]);
+  const [groupChats, setGroupChats] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -66,9 +67,12 @@ export default function ChatScreen() {
 
   const load = useCallback(async () => {
     try {
-      const [meData, convos, redemptions] = await Promise.all([getMe(), getConversations(), getRedemptions()]);
+      const [meData, convos, redemptions, groups] = await Promise.all([
+        getMe(), getConversations(), getRedemptions(), getGroupChats(),
+      ]);
       setMe(meData);
       setConversations(convos);
+      setGroupChats(Array.isArray(groups) ? groups : []);
       const list = Array.isArray(redemptions) ? redemptions : redemptions?.results || [];
       setHasAccess(list.length > 0);
     } catch (_) {
@@ -93,6 +97,10 @@ export default function ChatScreen() {
 
   const openChat = (userId, userName, userAvatar) => {
     router.push({ pathname: '/chat/[userId]', params: { userId, userName, userAvatar: userAvatar || '' } });
+  };
+
+  const openGroup = (group) => {
+    router.push({ pathname: '/chat/group/[groupId]', params: { groupId: group.id, groupName: group.name, groupIcon: group.category_icon || '💬' } });
   };
 
   if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#6366f1" /></View>;
@@ -184,13 +192,35 @@ export default function ChatScreen() {
           renderItem={renderConvo}
           contentContainerStyle={{ paddingTop: 8 }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />}
-          ListEmptyComponent={
+          ListHeaderComponent={groupChats.length > 0 ? (
+            <View>
+              <Text style={styles.sectionLabel}>Communities</Text>
+              {groupChats.map(g => (
+                <TouchableOpacity key={g.id} style={styles.row} onPress={() => openGroup(g)} activeOpacity={0.7}>
+                  <View style={styles.groupIcon}>
+                    <Text style={{ fontSize: 22 }}>{g.category_icon || '💬'}</Text>
+                  </View>
+                  <View style={{ flex: 1, marginLeft: 12 }}>
+                    <View style={styles.rowMeta}>
+                      <Text style={styles.rowName}>{g.name}</Text>
+                      <Text style={styles.rowTime}>{g.member_count} members</Text>
+                    </View>
+                    <Text style={styles.rowPreview} numberOfLines={1}>
+                      {g.last_message ? `${g.last_sender}: ${g.last_message}` : 'Start the conversation 👋'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+              {conversations.length > 0 && <Text style={styles.sectionLabel}>Direct Messages</Text>}
+            </View>
+          ) : null}
+          ListEmptyComponent={groupChats.length === 0 ? (
             <View style={styles.empty}>
               <Text style={{ fontSize: 44, marginBottom: 12 }}>💬</Text>
               <Text style={styles.emptyTitle}>No messages yet</Text>
               <Text style={styles.emptyTxt}>Search for a colleague to start a conversation</Text>
             </View>
-          }
+          ) : null}
         />
       )}
     </SafeAreaView>
@@ -228,6 +258,8 @@ const styles = StyleSheet.create({
   empty: { alignItems: 'center', paddingTop: 56, paddingHorizontal: 32 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 6 },
   emptyTxt: { fontSize: 14, color: '#a3a3a3', textAlign: 'center' },
+  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#a3a3a3', textTransform: 'uppercase', letterSpacing: 0.8, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 6 },
+  groupIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center' },
   gate: { flex: 1, backgroundColor: '#f9fafb', alignItems: 'center', justifyContent: 'center', padding: 24 },
   gateCard: {
     backgroundColor: '#fff', borderRadius: 28, padding: 32, alignItems: 'center',

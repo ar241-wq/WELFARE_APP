@@ -225,6 +225,18 @@ export async function searchUsers(q) {
   return request('GET', `/api/chat/users/?q=${encodeURIComponent(q)}`);
 }
 
+export async function getGroupChats() {
+  return request('GET', '/api/chat/groups/');
+}
+
+export async function getGroupMessages(groupId) {
+  return request('GET', `/api/chat/groups/${groupId}/messages/`);
+}
+
+export async function sendGroupMessage(groupId, text) {
+  return request('POST', `/api/chat/groups/${groupId}/messages/`, { text });
+}
+
 // ─── AI Assistant ──────────────────────────────────────────────────────────────
 export async function askAI(message) {
   return request('POST', '/api/slack/ai/', { message });

@@ -124,6 +124,15 @@ class RedeemPerkView(APIView):
             status='pending'
         )
 
+        # Auto-join the community group chat for this perk's category
+        if perk.category:
+            from chat.models import GroupChat
+            group, _ = GroupChat.objects.get_or_create(
+                category=perk.category,
+                defaults={'name': perk.category.name},
+            )
+            group.members.add(request.user)
+
         return Response(RedemptionSerializer(redemption).data, status=201)
 
 
@@ -192,6 +201,41 @@ class ProviderPerkCreateView(APIView):
         return Response(status=204)
 
 
+class PerkImageView(APIView):
+    permission_classes = [IsProvider]
+
+    def post(self, request, pk):
+        try:
+            perk = Perk.objects.get(pk=pk, provider=request.user)
+        except Perk.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=404)
+
+        image = request.FILES.get('image')
+        if not image:
+            return Response({'detail': 'No image provided.'}, status=400)
+
+        from .models import PerkImage
+        img = PerkImage.objects.create(perk=perk, image=image)
+        from .serializers import PerkImageSerializer
+        return Response(PerkImageSerializer(img).data, status=201)
+
+    def delete(self, request, pk, img_pk):
+        try:
+            perk = Perk.objects.get(pk=pk, provider=request.user)
+        except Perk.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=404)
+
+        from .models import PerkImage
+        try:
+            img = PerkImage.objects.get(pk=img_pk, perk=perk)
+        except PerkImage.DoesNotExist:
+            return Response({'detail': 'Image not found.'}, status=404)
+
+        img.image.delete(save=False)
+        img.delete()
+        return Response(status=204)
+
+
 class ScanRedemptionView(APIView):
     permission_classes = [IsProvider]
 
@@ -200,32 +244,32 @@ class ScanRedemptionView(APIView):
         if not qr_code:
             return Response({'detail': 'qr_code is required.'}, status=400)
 
-        # QR format: REDEMPTION:<user_id>:<perk_id>:<timestamp>
-        redemption = Redemption.objects.filter(
-            perk__provider=request.user,
-            status='pending'
-        ).filter(
-            qr_code__icontains=qr_code
-        ).select_related('perk', 'employee').first()
+        redemption = None
 
-        # Also try matching by redemption id embedded in QR
-        if not redemption and qr_code.startswith('REDEMPTION:'):
+        # Format 1: REDEMPTION:<redemption_id>  (new mobile format)
+        if qr_code.startswith('REDEMPTION:'):
             parts = qr_code.split(':')
-            if len(parts) >= 3:
-                try:
-                    employee_id = int(parts[1])
-                    perk_id = int(parts[2])
-                    redemption = Redemption.objects.filter(
-                        employee_id=employee_id,
-                        perk_id=perk_id,
-                        perk__provider=request.user,
-                        status='pending'
-                    ).select_related('perk', 'employee').first()
-                except (ValueError, IndexError):
-                    pass
+            try:
+                redemption_id = int(parts[1])
+                redemption = Redemption.objects.filter(
+                    pk=redemption_id,
+                    perk__provider=request.user,
+                ).select_related('perk', 'employee').first()
+            except (ValueError, IndexError):
+                pass
+
+        # Format 2: plain redemption ID
+        if not redemption:
+            try:
+                redemption = Redemption.objects.filter(
+                    pk=int(qr_code),
+                    perk__provider=request.user,
+                ).select_related('perk', 'employee').first()
+            except (ValueError, TypeError):
+                pass
 
         if not redemption:
-            return Response({'detail': 'Redemption not found or already used.'}, status=404)
+            return Response({'detail': 'Redemption not found or does not belong to your perks.'}, status=404)
 
         if redemption.status == 'redeemed':
             return Response({'detail': 'This QR code has already been redeemed.'}, status=400)

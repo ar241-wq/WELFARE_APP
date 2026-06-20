@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, ActivityIndicator, Alert,
+  StyleSheet, ActivityIndicator, Alert, Image,
 } from 'react-native';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+function imgSrc(path) {
+  if (!path) return null;
+  if (path.startsWith('http') || path.startsWith('data:')) return path;
+  return `${API_URL}${path}`;
+}
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getPerkById, redeemPerk, getWallet } from '../../lib/api';
 
@@ -73,9 +80,17 @@ export default function PerkDetailScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        <View style={styles.imagePlaceholder}>
-          <Text style={{ fontSize: 64 }}>🎁</Text>
-        </View>
+        {perk.images?.[0] ? (
+          <Image
+            source={{ uri: imgSrc(perk.images[0].image) }}
+            style={styles.heroImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.imagePlaceholder}>
+            <Text style={{ fontSize: 64 }}>🎁</Text>
+          </View>
+        )}
 
         <View style={styles.content}>
           {perk.is_featured && (
@@ -144,8 +159,9 @@ export default function PerkDetailScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  heroImage: { width: '100%', height: 220 },
   imagePlaceholder: {
-    height: 200, backgroundColor: '#eef2ff',
+    height: 220, backgroundColor: '#eef2ff',
     justifyContent: 'center', alignItems: 'center',
   },
   content: { padding: 20 },

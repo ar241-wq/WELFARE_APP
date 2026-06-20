@@ -36,10 +36,13 @@ export default function PackagesScreen() {
 
   async function handleRedeem(pkg) {
     const totalCredits = pkg.perks?.reduce((s, p) => s + Number(p.credit_price), 0) || 0;
+    const discount = Number(pkg.discount_percentage) || 0;
+    const finalPrice = pkg.discounted_price ?? (discount > 0 ? Math.round(totalCredits * (1 - discount / 100)) : totalCredits);
+    const discountLine = discount > 0 ? `\n${discount}% bundle discount applied!` : '';
 
     Alert.alert(
       'Redeem Package',
-      `"${pkg.name}" costs ${totalCredits} credits.\nYour balance: ${balance ?? '...'} credits.\n\nProceed?`,
+      `"${pkg.name}" costs ${finalPrice} credits.${discountLine}\nYour balance: ${balance ?? '...'} credits.\n\nProceed?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -100,8 +103,10 @@ export default function PackagesScreen() {
             packages.map((pkg) => {
               const isExpanded = expanded === pkg.id;
               const totalCredits = pkg.perks?.reduce((s, p) => s + Number(p.credit_price), 0) || 0;
+              const discount = Number(pkg.discount_percentage) || 0;
+              const finalPrice = pkg.discounted_price ?? (discount > 0 ? Math.round(totalCredits * (1 - discount / 100)) : totalCredits);
               const providers = pkg.providers || [];
-              const canAfford = balance === null || balance >= totalCredits;
+              const canAfford = balance === null || balance >= finalPrice;
               const isRedeemingThis = redeeming === pkg.id;
 
               return (
@@ -123,8 +128,11 @@ export default function PackagesScreen() {
                       </Text>
                     </View>
                     <View style={styles.cardRight}>
-                      <Text style={styles.cardCredits}>{totalCredits}</Text>
-                      <Text style={styles.cardCreditsLabel}>cr total</Text>
+                      {discount > 0 && (
+                        <Text style={styles.cardOriginalPrice}>{totalCredits} cr</Text>
+                      )}
+                      <Text style={styles.cardCredits}>{finalPrice}</Text>
+                      <Text style={styles.cardCreditsLabel}>{discount > 0 ? `cr (${discount}% off)` : 'cr total'}</Text>
                       <Text style={styles.cardChevron}>{isExpanded ? '▲' : '▼'}</Text>
                     </View>
                   </View>
@@ -151,9 +159,21 @@ export default function PackagesScreen() {
                       ))}
 
                       <View style={styles.totalRow}>
-                        <Text style={styles.totalLabel}>Total value</Text>
-                        <Text style={styles.totalValue}>{totalCredits} credits</Text>
+                        <Text style={styles.totalLabel}>Original value</Text>
+                        <Text style={[styles.totalValue, discount > 0 && styles.strikethrough]}>{totalCredits} credits</Text>
                       </View>
+                      {discount > 0 && (
+                        <View style={styles.totalRow}>
+                          <Text style={[styles.totalLabel, { color: '#059669' }]}>Bundle discount</Text>
+                          <Text style={[styles.totalValue, { color: '#059669' }]}>−{discount}%</Text>
+                        </View>
+                      )}
+                      {discount > 0 && (
+                        <View style={[styles.totalRow, { borderTopWidth: 1, borderTopColor: '#e5e7eb', marginTop: 4, paddingTop: 8 }]}>
+                          <Text style={[styles.totalLabel, { fontWeight: '800', color: '#111827' }]}>You pay</Text>
+                          <Text style={[styles.totalValue, { color: '#6366f1', fontSize: 18 }]}>{finalPrice} credits</Text>
+                        </View>
+                      )}
 
                       <View style={styles.exclusiveBadge}>
                         <Text style={styles.exclusiveText}>🔒 Exclusive to your company</Text>
@@ -173,7 +193,7 @@ export default function PackagesScreen() {
                           <ActivityIndicator size="small" color="#fff" />
                         ) : (
                           <Text style={styles.redeemBtnText}>
-                            {canAfford ? `Redeem for ${totalCredits} credits` : 'Insufficient credits'}
+                            {canAfford ? `Redeem for ${finalPrice} credits` : 'Insufficient credits'}
                           </Text>
                         )}
                       </TouchableOpacity>
@@ -326,6 +346,8 @@ const styles = StyleSheet.create({
   },
   totalLabel: { fontSize: 13, color: '#6b7280', fontWeight: '600' },
   totalValue: { fontSize: 16, fontWeight: '800', color: '#111827' },
+  strikethrough: { textDecorationLine: 'line-through', color: '#9ca3af', fontWeight: '400' },
+  cardOriginalPrice: { fontSize: 11, color: '#9ca3af', textDecorationLine: 'line-through', textAlign: 'right' },
   exclusiveBadge: {
     marginTop: 12,
     backgroundColor: '#eef2ff',
