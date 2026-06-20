@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'secret_santa',
     'group_buying',
     'internal_perks',
+    'challenges',
 ]
 
 # ─── Slack Bot ────────────────────────────────────────────────────────────────
