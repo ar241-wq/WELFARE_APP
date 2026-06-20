@@ -125,11 +125,17 @@ class CollaborationDetailView(APIView):
         return Response(CollaborationSerializer(collab).data)
 
     def delete(self, request, pk):
-        """Allow the sender to cancel/delete a pending invite."""
+        """Allow the sender to cancel a pending invite, or either provider to leave an active collaboration."""
         try:
-            collab = Collaboration.objects.get(pk=pk, from_provider=request.user, status='pending')
+            collab = Collaboration.objects.get(pk=pk)
         except Collaboration.DoesNotExist:
-            return Response({'detail': 'Invite not found.'}, status=404)
+            return Response({'detail': 'Collaboration not found.'}, status=404)
+
+        if request.user not in (collab.from_provider, collab.to_provider):
+            return Response({'detail': 'Not found.'}, status=404)
+
+        if collab.status == 'pending' and collab.from_provider != request.user:
+            return Response({'detail': 'Only the sender can cancel a pending invite.'}, status=403)
 
         collab.delete()
         return Response(status=204)
@@ -194,6 +200,12 @@ class PackageDealDetailView(APIView):
         except PackageDeal.DoesNotExist:
             return None
 
+    def get(self, request, pk):
+        pkg = self._get_package(request, pk)
+        if not pkg:
+            return Response({'detail': 'Not found.'}, status=404)
+        return Response(PackageDealSerializer(pkg).data)
+
     def patch(self, request, pk):
         pkg = self._get_package(request, pk)
         if not pkg:
@@ -207,6 +219,8 @@ class PackageDealDetailView(APIView):
             pkg.description = request.data['description']
         if 'total_price' in request.data:
             pkg.total_price = request.data['total_price']
+        if 'discount_percentage' in request.data:
+            pkg.discount_percentage = request.data['discount_percentage']
 
         # Target employer by email
         employer_email = request.data.get('target_employer_email')

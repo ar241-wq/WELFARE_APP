@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AppShell from '@/components/AppShell';
 import Modal from '@/components/Modal';
 import FormField, { inputClass } from '@/components/FormField';
@@ -11,7 +11,7 @@ import {
   deleteCollaborationInvite, updateCollaborationInvite,
   getPackageDeals, createPackageDeal, updatePackageDeal,
   offerPackageDeal, deletePackageDeal, getMe,
-  getCollaborationPerks, confirmPackageDeal,
+  getCollaborationPerks, confirmPackageDeal, getPackageDeal,
 } from '@/lib/api';
 import { Handshake, Plus, CheckCircle, XCircle, Package, Trash2, Send, ChevronRight, Pencil } from 'lucide-react';
 
@@ -35,6 +35,7 @@ export default function CollaborationsPage() {
   const [view, setView] = useState<View>('list');
   const [activePackage, setActivePackage] = useState<Package | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // edit invite modal
   const [editInviteOpen, setEditInviteOpen] = useState(false);
@@ -78,6 +79,25 @@ export default function CollaborationsPage() {
   };
 
   useEffect(() => { load(); }, []);
+
+  // Poll for updates every 4s while viewing a package detail
+  useEffect(() => {
+    if (view === 'package' && activePackage) {
+      const refresh = async () => {
+        try {
+          const updated = await getPackageDeal(activePackage.id);
+          setActivePackage(updated);
+          setPackages((prev) => prev.map((p) => p.id === updated.id ? updated : p));
+          setDiscount(updated.discount_percentage > 0 ? String(updated.discount_percentage) : '');
+          setSelectedPerkIds(updated.perks.map((p: { id: number }) => p.id));
+        } catch { /* noop */ }
+      };
+      pollRef.current = setInterval(refresh, 4000);
+    } else {
+      if (pollRef.current) clearInterval(pollRef.current);
+    }
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [view, activePackage?.id]);
 
   const openPackage = async (pkg: Package) => {
     setActivePackage(pkg);
@@ -126,6 +146,19 @@ export default function CollaborationsPage() {
       setInviteError(msg || 'Could not send invite.');
     } finally {
       setInviteSubmitting(false);
+    }
+  };
+
+  const handleLeaveCollaboration = async (id: number) => {
+    if (!window.confirm('Are you sure you want to leave this collaboration? All packages associated with it will also be deleted.')) return;
+    try {
+      await deleteCollaborationInvite(id);
+      setCollabs((prev) => prev.filter((c) => c.id !== id));
+      setPackages((prev) => prev.filter((p) => p.collab_id !== id));
+      if (view === 'package' && activePackage?.collab_id === id) setView('list');
+      toast('You have left the collaboration', 'success');
+    } catch {
+      toast('Could not leave collaboration', 'error');
     }
   };
 
@@ -320,9 +353,18 @@ export default function CollaborationsPage() {
                 {activePackage.status}
               </span>
             </div>
-            <button onClick={() => handleDeletePackage(activePackage.id)} className="text-[#D23B3B] hover:opacity-70">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={async () => { try { const u = await getPackageDeal(activePackage.id); setActivePackage(u); setDiscount(u.discount_percentage > 0 ? String(u.discount_percentage) : ''); setSelectedPerkIds(u.perks.map((p: {id: number}) => p.id)); } catch {} }}
+                className="text-xs text-[#5B5F6B] hover:text-[#3D5AFE] font-medium"
+                title="Refresh to see partner's latest changes"
+              >
+                ↻ Refresh
+              </button>
+              <button onClick={() => handleDeletePackage(activePackage.id)} className="text-[#D23B3B] hover:opacity-70">
                 <Trash2 size={15} />
               </button>
+            </div>
           </div>
 
           {/* Providers */}
@@ -626,12 +668,21 @@ export default function CollaborationsPage() {
                     </p>
                     <p className="text-xs text-[#5B5F6B] mt-0.5">{c.package_count} package{c.package_count !== 1 ? 's' : ''}</p>
                   </div>
-                  <button
-                    onClick={() => { setPkgCollabId(c.id); setPkgOpen(true); }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-[#3D5AFE] text-white text-xs font-semibold hover:bg-[#2E45C4]"
-                  >
-                    <Plus size={12} /> New Package
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => { setPkgCollabId(c.id); setPkgOpen(true); }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-[#3D5AFE] text-white text-xs font-semibold hover:bg-[#2E45C4]"
+                    >
+                      <Plus size={12} /> New Package
+                    </button>
+                    <button
+                      onClick={() => handleLeaveCollaboration(c.id)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] border border-red-200 text-xs font-medium text-[#D23B3B] hover:bg-red-50"
+                      title="Leave this collaboration"
+                    >
+                      <XCircle size={12} /> Leave
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
