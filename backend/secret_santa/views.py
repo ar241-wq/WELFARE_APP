@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from companies.models import Department, DepartmentMembership
 from wallet.models import Wallet, Transaction
 from .models import SecretSantaEvent, SantaParticipant, SantaAssignment
@@ -40,9 +41,14 @@ class MyDepartmentSantaView(APIView):
             dept = Department.objects.get(pk=dept_id)
         except Department.DoesNotExist:
             return Response({'detail': 'Department not found.'}, status=404)
+        # Parse date strings into datetime objects before saving
+        parsed_join = parse_datetime(join_deadline) if isinstance(join_deadline, str) else join_deadline
+        parsed_reveal = parse_datetime(reveal_date) if isinstance(reveal_date, str) else reveal_date
+        if not parsed_join or not parsed_reveal:
+            return Response({'detail': 'Invalid date format. Use ISO 8601 (e.g. 2026-12-20T23:59:00Z).'}, status=400)
         event = SecretSantaEvent.objects.create(
             department=dept, created_by=request.user, title=title,
-            credit_budget=credit_budget, join_deadline=join_deadline, reveal_date=reveal_date,
+            credit_budget=credit_budget, join_deadline=parsed_join, reveal_date=parsed_reveal,
         )
         return Response(SecretSantaEventSerializer(event, context={'request': request}).data, status=201)
 
