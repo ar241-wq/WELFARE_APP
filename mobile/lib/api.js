@@ -99,6 +99,10 @@ export async function getTransactions() {
   return request('GET', '/api/wallet/transactions/');
 }
 
+export async function giftCredits(recipientId, amount, note = '') {
+  return request('POST', '/api/wallet/gift/', { recipient_id: recipientId, amount, note });
+}
+
 // ─── Catalog ──────────────────────────────────────────────────────────────────
 export async function getCategories() {
   return request('GET', '/api/catalog/categories/');
@@ -161,4 +165,67 @@ export async function getCompanyPackages() {
 
 export async function redeemPackage(id) {
   return request('POST', `/api/collaborations/my-packages/${id}/redeem/`);
+}
+
+// ─── Community ────────────────────────────────────────────────────────────────
+export async function getCommunityCategories() {
+  return request('GET', '/api/community/categories/');
+}
+
+export async function getCommunityPosts(categoryId) {
+  const q = categoryId ? `?category=${categoryId}` : '';
+  return request('GET', `/api/community/${q}`);
+}
+
+export async function getMyInstants() {
+  return request('GET', '/api/community/mine/');
+}
+
+export async function markInstantViewed(id) {
+  return request('POST', `/api/community/${id}/view/`);
+}
+
+export async function createPost(formData) {
+  const token = await getToken();
+  const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+  const res = await fetch(`${API_URL}/api/community/`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `${res.status}`);
+  }
+  return res.json();
+}
+
+export async function likePost(id) {
+  return request('POST', `/api/community/${id}/like/`);
+}
+
+export async function deletePost(id) {
+  return request('DELETE', `/api/community/${id}/`);
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+export async function getConversations() {
+  return request('GET', '/api/chat/conversations/');
+}
+
+export async function getMessages(userId) {
+  return request('GET', `/api/chat/messages/?with=${userId}`);
+}
+
+export async function sendMessage(recipientId, text, replyContext = '') {
+  return request('POST', '/api/chat/messages/', { recipient_id: recipientId, text, reply_context: replyContext });
+}
+
+export async function searchUsers(q) {
+  return request('GET', `/api/chat/users/?q=${encodeURIComponent(q)}`);
+}
+
+// ─── AI Assistant ──────────────────────────────────────────────────────────────
+export async function askAI(message) {
+  return request('POST', '/api/slack/ai/', { message });
 }

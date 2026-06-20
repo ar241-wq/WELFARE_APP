@@ -31,7 +31,17 @@ INSTALLED_APPS = [
     'life_moments',
     'analytics',
     'collaborations',
+    'community',
+    'chat',
+    'slack_bot',
 ]
+
+# ─── Slack Bot ────────────────────────────────────────────────────────────────
+SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN', '')        # xoxb-...
+SLACK_SIGNING_SECRET = os.getenv('SLACK_SIGNING_SECRET', '')
+
+# ─── Groq AI (free) ──────────────────────────────────────────────────────────
+GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

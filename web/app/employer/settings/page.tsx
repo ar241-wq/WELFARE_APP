@@ -1,26 +1,37 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AppShell from '@/components/AppShell';
 import FormField, { inputClass } from '@/components/FormField';
 import AnimatedSection from '@/components/AnimatedSection';
 import { useToast } from '@/components/Toast';
-import { getCompanySettings, updateCompanySettings } from '@/lib/api';
+import { getCompanySettings, updateCompanySettings, uploadLogo, getMe } from '@/lib/api';
 import { mockSettings } from '@/lib/mock-data';
-import { Save, Info } from 'lucide-react';
+import { Save, Info, Upload } from 'lucide-react';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+function resolveUrl(src?: string | null) {
+  if (!src) return null;
+  if (src.startsWith('http') || src.startsWith('data:')) return src;
+  return `${API_URL}${src}`;
+}
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const logoRef = useRef<HTMLInputElement>(null);
   const [budget, setBudget] = useState('');
   const [rollover, setRollover] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
 
   useEffect(() => {
-    getCompanySettings()
-      .then((d) => {
+    Promise.all([getCompanySettings(), getMe()])
+      .then(([d, me]) => {
         setBudget(String(d.monthly_budget_per_employee ?? mockSettings.monthly_budget_per_employee));
         setRollover(d.credits_rollover ?? mockSettings.credits_rollover);
+        setLogoUrl(resolveUrl(me.avatar));
       })
       .catch(() => {
         setBudget(String(mockSettings.monthly_budget_per_employee));
@@ -28,6 +39,21 @@ export default function SettingsPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    setLogoUploading(true);
+    try {
+      const data = await uploadLogo(e.target.files[0]);
+      setLogoUrl(resolveUrl(data.avatar));
+      toast('Logo updated', 'success');
+    } catch {
+      toast('Could not upload logo', 'error');
+    } finally {
+      setLogoUploading(false);
+      if (logoRef.current) logoRef.current.value = '';
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +73,38 @@ export default function SettingsPage() {
         <AnimatedSection direction="up">
           <h2 className="text-base font-semibold text-[#15161A]">Company settings</h2>
           <p className="text-xs text-[#5B5F6B] mt-0.5">Configure budget allocations and credit behaviour for your organisation</p>
+        </AnimatedSection>
+
+        {/* Logo upload */}
+        <AnimatedSection direction="up" delay={40}>
+          <div className="bg-white rounded-[16px] border border-[#E7E9EE] p-6 flex items-center gap-5">
+            <div className="relative shrink-0">
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt="logo" className="w-16 h-16 rounded-full object-cover border-2 border-[#E7E9EE]" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-[#3D5AFE]/10 flex items-center justify-center border-2 border-dashed border-[#3D5AFE]/30">
+                  <span className="text-2xl font-bold text-[#3D5AFE]">E</span>
+                </div>
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[#15161A] mb-0.5">Company logo</p>
+              <p className="text-xs text-[#5B5F6B] mb-3">Shows in the sidebar and on your profile</p>
+              <button
+                type="button"
+                onClick={() => logoRef.current?.click()}
+                disabled={logoUploading}
+                className="flex items-center gap-2 px-3 py-2 rounded-[8px] border border-[#E7E9EE] text-sm font-medium text-[#5B5F6B] hover:border-[#3D5AFE] hover:text-[#3D5AFE] transition-colors disabled:opacity-50"
+              >
+                {logoUploading
+                  ? <span className="w-4 h-4 border-2 border-[#3D5AFE]/30 border-t-[#3D5AFE] rounded-full animate-spin" />
+                  : <Upload size={14} />}
+                {logoUploading ? 'Uploading…' : 'Upload logo'}
+              </button>
+              <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+            </div>
+          </div>
         </AnimatedSection>
 
         <AnimatedSection direction="up" delay={60}>

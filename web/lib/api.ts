@@ -80,6 +80,24 @@ export async function getMe() {
   return data;
 }
 
+export async function uploadAvatar(file: File) {
+  const form = new FormData();
+  form.append('avatar', file);
+  const { data } = await api.post('/api/auth/me/avatar/', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
+export async function uploadLogo(file: File) {
+  const form = new FormData();
+  form.append('logo', file);
+  const { data } = await api.post('/api/auth/me/logo/', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
 // ─── Company / Employees ───────────────────────────────────────────────────
 
 export async function getEmployees() {
@@ -230,6 +248,19 @@ export async function updatePerk(id: number, payload: Record<string, unknown>) {
 
 export async function deletePerk(id: number) {
   await api.delete(`/api/catalog/perks/manage/${id}/`);
+}
+
+export async function uploadPerkImage(perkId: number, file: File) {
+  const form = new FormData();
+  form.append('image', file);
+  const { data } = await api.post(`/api/catalog/perks/manage/${perkId}/images/`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
+export async function deletePerkImage(perkId: number, imgId: number) {
+  await api.delete(`/api/catalog/perks/manage/${perkId}/images/${imgId}/`);
 }
 
 export async function getCategories() {

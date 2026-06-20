@@ -74,6 +74,17 @@ export default function HomeScreen() {
         </TouchableOpacity>
       )}
 
+      {/* AI Assistant Card */}
+      <TouchableOpacity style={styles.aiCard} onPress={() => router.push('/ai-assistant')}>
+        <View style={styles.aiLeft}>
+          <Text style={styles.aiTitle}>✦  Wellness AI</Text>
+          <Text style={styles.aiSub}>Ask me what to redeem today</Text>
+        </View>
+        <View style={styles.aiChevron}>
+          <Text style={{ color: '#6366f1', fontSize: 20 }}>›</Text>
+        </View>
+      </TouchableOpacity>
+
       {/* Categories */}
       <Text style={styles.sectionTitle}>Browse by Category</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
@@ -160,4 +171,14 @@ const styles = StyleSheet.create({
   perkPriceNum: { fontSize: 22, fontWeight: '800', color: '#6366f1' },
   perkPriceLabel: { fontSize: 11, color: '#6b7280', fontWeight: '500' },
   emptyText: { textAlign: 'center', color: '#9ca3af', marginTop: 20, fontSize: 14 },
+  aiCard: {
+    marginHorizontal: 16, marginBottom: 8, padding: 16,
+    backgroundColor: '#eef2ff', borderRadius: 16,
+    flexDirection: 'row', alignItems: 'center',
+    borderWidth: 1.5, borderColor: '#c7d2fe',
+  },
+  aiLeft: { flex: 1 },
+  aiTitle: { fontSize: 15, fontWeight: '800', color: '#4338ca' },
+  aiSub: { fontSize: 13, color: '#6366f1', marginTop: 2 },
+  aiChevron: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
 });

@@ -1,13 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AppShell from '@/components/AppShell';
 import BarChartCard from '@/components/BarChartCard';
 import AnimatedSection from '@/components/AnimatedSection';
 import CountUp from '@/components/CountUp';
-import { getProviderStats } from '@/lib/api';
+import { getProviderStats, getMe, uploadLogo } from '@/lib/api';
 import { mockProviderStats } from '@/lib/mock-data';
-import { ShoppingBag, CreditCard, BadgeCheck, TrendingUp, Clock } from 'lucide-react';
+import { ShoppingBag, CreditCard, BadgeCheck, TrendingUp, Clock, Upload, Camera } from 'lucide-react';
+import { useToast } from '@/components/Toast';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+function resolveUrl(src?: string | null) {
+  if (!src) return null;
+  if (src.startsWith('http') || src.startsWith('data:')) return src;
+  return `${API_URL}${src}`;
+}
 
 interface ProviderStats {
   redemptions_this_month: number;
@@ -19,15 +27,35 @@ interface ProviderStats {
 }
 
 export default function ProviderDashboard() {
+  const { toast } = useToast();
+  const logoRef = useRef<HTMLInputElement>(null);
   const [stats, setStats] = useState<ProviderStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [me, setMe] = useState<{ full_name?: string; provider_profile?: { company_name?: string; logo?: string } } | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
 
   useEffect(() => {
     getProviderStats()
       .then(setStats)
       .catch(() => setStats(mockProviderStats))
       .finally(() => setLoading(false));
+    getMe().then(setMe).catch(() => {});
   }, []);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    setLogoUploading(true);
+    try {
+      const data = await uploadLogo(e.target.files[0]);
+      setMe(data);
+      toast('Logo updated', 'success');
+    } catch {
+      toast('Could not upload logo', 'error');
+    } finally {
+      setLogoUploading(false);
+      if (logoRef.current) logoRef.current.value = '';
+    }
+  };
 
   const timeData  = stats?.redemptions_over_time?.map((d) => ({ name: d.date, value: d.count })) ?? [];
   const peakData  = stats?.peak_times?.map((p) => ({ name: p.hour, value: p.count })) ?? [];
@@ -38,15 +66,37 @@ export default function ProviderDashboard() {
     <AppShell role="provider" pageTitle="Dashboard">
       <div className="space-y-6">
 
-        {/* Verified badge */}
-        {stats?.is_verified && (
-          <AnimatedSection direction="up">
-            <div className="flex items-center gap-2 px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-[8px] w-fit">
-              <BadgeCheck size={15} className="text-[#1F9D6B]" />
-              <span className="text-sm font-medium text-[#1F9D6B]">Verified provider</span>
+        {/* Profile card with logo */}
+        <AnimatedSection direction="up">
+          <div className="bg-white rounded-[16px] border border-[#E7E9EE] p-5 flex items-center gap-4">
+            <div className="relative shrink-0 group cursor-pointer" onClick={() => logoRef.current?.click()}>
+              {resolveUrl(me?.provider_profile?.logo) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={resolveUrl(me?.provider_profile?.logo)!} alt="logo" className="w-16 h-16 rounded-full object-cover border-2 border-[#E7E9EE]" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-[#3D5AFE]/10 border-2 border-dashed border-[#3D5AFE]/30 flex items-center justify-center">
+                  <span className="text-xl font-bold text-[#3D5AFE]">{me?.provider_profile?.company_name?.[0] || me?.full_name?.[0] || 'P'}</span>
+                </div>
+              )}
+              <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                {logoUploading
+                  ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  : <Camera size={16} className="text-white" />}
+              </div>
             </div>
-          </AnimatedSection>
-        )}
+            <div>
+              <p className="text-base font-bold text-[#15161A]">{me?.provider_profile?.company_name || me?.full_name}</p>
+              <p className="text-xs text-[#5B5F6B] mt-0.5 mb-2">Click the logo to update it</p>
+              {stats?.is_verified && (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200 rounded-full w-fit">
+                  <BadgeCheck size={12} className="text-[#1F9D6B]" />
+                  <span className="text-xs font-medium text-[#1F9D6B]">Verified provider</span>
+                </div>
+              )}
+            </div>
+            <input ref={logoRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+          </div>
+        </AnimatedSection>
 
         {/* KPI row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

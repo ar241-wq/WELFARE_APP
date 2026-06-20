@@ -13,4 +13,7 @@ urlpatterns = [
     path('api/life-moments/', include('life_moments.urls')),
     path('api/analytics/', include('analytics.urls')),
     path('api/collaborations/', include('collaborations.urls')),
+    path('api/community/', include('community.urls')),
+    path('api/chat/', include('chat.urls')),
+    path('api/slack/', include('slack_bot.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

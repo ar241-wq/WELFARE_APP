@@ -9,6 +9,13 @@ import {
   LogOut, Menu, X, ChevronRight, Handshake,
 } from 'lucide-react';
 import { logout, getMe } from '@/lib/api';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+function resolveUrl(src?: string | null) {
+  if (!src) return null;
+  if (src.startsWith('http') || src.startsWith('data:')) return src;
+  return `${API_URL}${src}`;
+}
 import { useToast } from './Toast';
 
 type Role = 'employer' | 'provider';
@@ -51,7 +58,7 @@ export default function AppShell({ role, children, pageTitle }: AppShellProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [user, setUser] = useState<{ full_name?: string; email?: string } | null>(null);
+  const [user, setUser] = useState<{ full_name?: string; email?: string; avatar?: string; provider_profile?: { logo?: string; company_name?: string } } | null>(null);
 
   useEffect(() => {
     getMe().then(setUser).catch(() => {
@@ -113,13 +120,23 @@ export default function AppShell({ role, children, pageTitle }: AppShellProps) {
       <div className="px-3 py-4 border-t border-[#E7E9EE]">
         {user && (
           <div className="flex items-center gap-2.5 px-3 py-2 mb-1">
-            <div className="w-7 h-7 rounded-full bg-[#3D5AFE]/10 flex items-center justify-center shrink-0">
-              <span className="text-xs font-semibold text-[#3D5AFE]">
-                {user.full_name?.[0]?.toUpperCase() ?? '?'}
-              </span>
-            </div>
+            {(() => {
+              const logoSrc = resolveUrl(role === 'provider' ? user.provider_profile?.logo : user.avatar);
+              return logoSrc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoSrc} alt="logo" className="w-7 h-7 rounded-full object-cover shrink-0 border border-[#E7E9EE]" />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-[#3D5AFE]/10 flex items-center justify-center shrink-0">
+                  <span className="text-xs font-semibold text-[#3D5AFE]">
+                    {user.full_name?.[0]?.toUpperCase() ?? '?'}
+                  </span>
+                </div>
+              );
+            })()}
             <div className="sidebar-label min-w-0">
-              <p className="text-xs font-semibold text-[#15161A] truncate">{user.full_name}</p>
+              <p className="text-xs font-semibold text-[#15161A] truncate">
+                {role === 'provider' ? (user.provider_profile?.company_name || user.full_name) : user.full_name}
+              </p>
               <p className="text-[11px] text-[#5B5F6B] truncate">{role}</p>
             </div>
           </div>

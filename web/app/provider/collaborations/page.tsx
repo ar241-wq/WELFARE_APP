@@ -17,7 +17,7 @@ interface Provider { id: number; full_name: string; email: string; company_name?
 interface Collab { id: number; from_provider: Provider; to_provider: Provider; message: string; status: string; created_at: string; package_count: number; }
 interface Perk { id: number; name: string; credit_price: number; category_name?: string; }
 interface PackagePerk { id: number; name: string; credit_price: number; }
-interface Package { id: number; name: string; description: string; perks: PackagePerk[]; total_price: number; status: string; target_employer_name?: string; providers: Provider[]; offered_at?: string; }
+interface Package { id: number; name: string; description: string; perks: PackagePerk[]; total_price: number; discount_percentage: number; discounted_price: number; status: string; target_employer_name?: string; providers: Provider[]; offered_at?: string; }
 
 type View = 'list' | 'package';
 
@@ -51,6 +51,8 @@ export default function CollaborationsPage() {
   const [selectedPerkIds, setSelectedPerkIds] = useState<number[]>([]);
   const [perkSaving, setPerkSaving] = useState(false);
   const [offering, setOffering] = useState(false);
+  const [discount, setDiscount] = useState('');
+  const [discountSaving, setDiscountSaving] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -69,7 +71,23 @@ export default function CollaborationsPage() {
     setActivePackage(pkg);
     setSelectedPerkIds(pkg.perks.map((p) => p.id));
     setEditEmployerEmail('');
+    setDiscount(pkg.discount_percentage > 0 ? String(pkg.discount_percentage) : '');
     setView('package');
+  };
+
+  const handleSaveDiscount = async () => {
+    if (!activePackage) return;
+    setDiscountSaving(true);
+    try {
+      const updated = await updatePackageDeal(activePackage.id, { discount_percentage: Number(discount) || 0 });
+      setActivePackage(updated);
+      setPackages((prev) => prev.map((p) => p.id === updated.id ? updated : p));
+      toast('Discount saved', 'success');
+    } catch {
+      toast('Could not save discount', 'error');
+    } finally {
+      setDiscountSaving(false);
+    }
   };
 
   const handleInvite = async (e: React.FormEvent) => {
@@ -220,11 +238,9 @@ export default function CollaborationsPage() {
                 {activePackage.status}
               </span>
             </div>
-            {isDraft && (
-              <button onClick={() => handleDeletePackage(activePackage.id)} className="text-[#D23B3B] hover:opacity-70">
+            <button onClick={() => handleDeletePackage(activePackage.id)} className="text-[#D23B3B] hover:opacity-70">
                 <Trash2 size={15} />
               </button>
-            )}
           </div>
 
           {/* Providers */}
@@ -326,10 +342,58 @@ export default function CollaborationsPage() {
               <span className="text-[#5B5F6B]">Perks included</span>
               <span className="font-semibold text-[#15161A]">{activePackage.perks.length}</span>
             </div>
-            <div className="flex justify-between text-sm mb-4">
-              <span className="text-[#5B5F6B]">Total credits</span>
-              <span className="font-bold text-[#3D5AFE] tabular">{activePackage.perks.reduce((s, p) => s + Number(p.credit_price), 0)} cr</span>
-            </div>
+            {(() => {
+              const original = activePackage.perks.reduce((s, p) => s + Number(p.credit_price), 0);
+              const discounted = activePackage.discounted_price ?? original;
+              const hasDiscount = activePackage.discount_percentage > 0;
+              return (
+                <>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-[#5B5F6B]">Original price</span>
+                    <span className={`tabular ${hasDiscount ? 'line-through text-[#9ca3af]' : 'font-bold text-[#3D5AFE]'}`}>{original} cr</span>
+                  </div>
+                  {hasDiscount && (
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-emerald-600 font-semibold">Discount ({activePackage.discount_percentage}% off)</span>
+                      <span className="font-bold text-emerald-600 tabular">−{(original - discounted).toFixed(0)} cr</span>
+                    </div>
+                  )}
+                  {hasDiscount && (
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="font-bold text-[#15161A]">Final price</span>
+                      <span className="font-bold text-[#3D5AFE] tabular">{discounted} cr</span>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+
+            {/* Discount setter */}
+            {isDraft && (
+              <div className="mt-3 mb-4 pt-3 border-t border-[#F7F8FA]">
+                <p className="text-xs font-semibold text-[#5B5F6B] mb-2">Bundle discount (%)</p>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={discount}
+                    onChange={(e) => setDiscount(e.target.value)}
+                    placeholder="e.g. 15"
+                    className="w-24 px-3 py-2 text-sm border border-[#E7E9EE] rounded-[8px] focus:border-[#3D5AFE] focus:ring-1 focus:ring-[#3D5AFE] outline-none"
+                  />
+                  <span className="text-sm text-[#5B5F6B]">% off the total</span>
+                  <button
+                    onClick={handleSaveDiscount}
+                    disabled={discountSaving}
+                    className="ml-auto px-3 py-2 rounded-[8px] bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 disabled:opacity-60"
+                  >
+                    {discountSaving ? '…' : 'Apply'}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {isDraft ? (
               <button
                 onClick={handleOffer}
@@ -462,6 +526,9 @@ export default function CollaborationsPage() {
                     }`}>{pkg.status}</span>
                     <button onClick={() => openPackage(pkg)} className="text-xs text-[#3D5AFE] font-semibold hover:underline">
                       Open
+                    </button>
+                    <button onClick={() => handleDeletePackage(pkg.id)} className="text-[#D23B3B] hover:opacity-70 ml-1">
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </li>

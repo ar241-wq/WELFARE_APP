@@ -81,3 +81,57 @@ class DonateView(APIView):
         )
 
         return Response({'detail': 'Credits donated anonymously.', 'amount': str(amount)})
+
+
+class GiftCreditsView(APIView):
+    permission_classes = [IsEmployee]
+
+    def post(self, request):
+        recipient_id = request.data.get('recipient_id')
+        amount = request.data.get('amount')
+        note = request.data.get('note', '').strip()
+
+        if not recipient_id or not amount:
+            return Response({'detail': 'recipient_id and amount are required.'}, status=400)
+
+        try:
+            amount = decimal.Decimal(str(amount))
+        except Exception:
+            return Response({'detail': 'Invalid amount.'}, status=400)
+
+        if amount <= 0 or amount > 500:
+            return Response({'detail': 'Amount must be between 1 and 500 credits.'}, status=400)
+
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        try:
+            recipient = User.objects.get(pk=recipient_id)
+        except User.DoesNotExist:
+            return Response({'detail': 'Recipient not found.'}, status=404)
+
+        if recipient == request.user:
+            return Response({'detail': 'You cannot gift credits to yourself.'}, status=400)
+
+        sender_wallet, _ = Wallet.objects.get_or_create(employee=request.user)
+        if sender_wallet.balance < amount:
+            return Response({'detail': 'Insufficient credits.'}, status=400)
+
+        recipient_wallet, _ = Wallet.objects.get_or_create(employee=recipient)
+
+        sender_wallet.balance -= amount
+        sender_wallet.save()
+        recipient_wallet.balance += amount
+        recipient_wallet.save()
+
+        desc_sender = f'Gift to {recipient.full_name}' + (f' — {note}' if note else '')
+        desc_recipient = f'Gift from {request.user.full_name}' + (f' — {note}' if note else '')
+
+        Transaction.objects.create(wallet=sender_wallet, amount=-amount, type='debit', description=desc_sender)
+        Transaction.objects.create(wallet=recipient_wallet, amount=amount, type='credit', description=desc_recipient)
+
+        return Response({
+            'detail': 'Credits gifted successfully.',
+            'amount': str(amount),
+            'recipient_name': recipient.full_name,
+            'new_balance': str(sender_wallet.balance),
+        })
