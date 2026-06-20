@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Company, Team, TeamMembership
+from .models import Company, Team, TeamMembership, Department, DepartmentMembership
 
 User = get_user_model()
 
@@ -39,6 +39,17 @@ class EmployeeSerializer(serializers.ModelSerializer):
     def get_team(self, obj):
         membership = obj.team_memberships.select_related('team').first()
         return membership.team.name if membership else None
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    member_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Department
+        fields = ['id', 'name', 'monthly_credits', 'member_count', 'created_at']
+
+    def get_member_count(self, obj):
+        return obj.memberships.count()
 
 
 class AllocateCreditsSerializer(serializers.Serializer):

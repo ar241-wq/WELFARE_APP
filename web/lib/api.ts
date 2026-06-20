@@ -343,4 +343,43 @@ export async function respondPackageOffer(id: number, action: 'accept' | 'reject
   return data;
 }
 
+// ─── Departments ───────────────────────────────────────────────────────────
+
+export async function getDepartments() {
+  const { data } = await api.get('/api/companies/departments/');
+  return Array.isArray(data) ? data : data?.results ?? data;
+}
+
+export async function createDepartment(payload: { name: string; monthly_credits: number }) {
+  const { data } = await api.post('/api/companies/departments/', payload);
+  return data;
+}
+
+export async function updateDepartment(id: number, payload: { name?: string; monthly_credits?: number }) {
+  const { data } = await api.patch(`/api/companies/departments/${id}/`, payload);
+  return data;
+}
+
+export async function deleteDepartment(id: number) {
+  await api.delete(`/api/companies/departments/${id}/`);
+}
+
+export async function getDepartmentDetail(id: number) {
+  const { data } = await api.get(`/api/companies/departments/${id}/`);
+  return data;
+}
+
+export async function updateDepartmentMembers(id: number, action: 'add' | 'remove', employee_ids: number[]) {
+  const { data } = await api.post(`/api/companies/departments/${id}/members/`, { action, employee_ids });
+  return data;
+}
+
+export async function allocateDepartmentCredits(
+  id: number,
+  payload: { per_employee: { employee_id: number; amount: number }[] }
+) {
+  const { data } = await api.post(`/api/companies/departments/${id}/allocate/`, payload);
+  return data;
+}
+
 export default api;

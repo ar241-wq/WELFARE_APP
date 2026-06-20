@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Users, CheckSquare, Package, Heart, Settings,
   BarChart2, List, PlusCircle, TrendingUp, QrCode, UsersRound,
-  LogOut, Menu, X, ChevronRight, Handshake,
+  LogOut, Menu, X, ChevronRight, Handshake, Building2,
 } from 'lucide-react';
 import { logout, getMe } from '@/lib/api';
 
@@ -34,6 +34,7 @@ const employerNav: NavItem[] = [
   { label: 'Bundles',      href: '/employer/bundles',      icon: Package },
   { label: 'Life Moments',    href: '/employer/life-moments', icon: Heart, care: true },
   { label: 'Teams',           href: '/employer/teams',         icon: UsersRound },
+  { label: 'Departments',     href: '/employer/departments',   icon: Building2 },
   { label: 'Package Offers',  href: '/employer/packages',      icon: Handshake },
   { label: 'Settings',        href: '/employer/settings',      icon: Settings },
 ];

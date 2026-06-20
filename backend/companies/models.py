@@ -53,3 +53,29 @@ class TeamMembership(models.Model):
 
     def __str__(self):
         return f'{self.employee.full_name} in {self.team.name}'
+
+
+class Department(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='departments')
+    name = models.CharField(max_length=255)
+    monthly_credits = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.name} — {self.company.name}'
+
+
+class DepartmentMembership(models.Model):
+    employee = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='department_memberships'
+    )
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='memberships')
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['employee', 'department']
+
+    def __str__(self):
+        return f'{self.employee.full_name} in {self.department.name}'
