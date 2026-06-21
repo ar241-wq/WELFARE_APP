@@ -25,6 +25,7 @@ export default function CatalogScreen() {
   const [topProviders, setTopProviders] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || null);
   const [search, setSearch] = useState('');
+  const [minRating, setMinRating] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -111,93 +112,116 @@ export default function CatalogScreen() {
         ))}
       </ScrollView>
 
-      {/* Suggestions */}
-      {!selectedCategory && !search && suggestions.length > 0 && (
-        <View>
-          <Text style={styles.sectionTitle}>Just for you ✨</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestRow}>
-            {suggestions.map((perk) => (
-              <TouchableOpacity
-                key={perk.id}
-                style={styles.suggestCard}
-                onPress={() => router.push(`/perk/${perk.id}`)}
-              >
-                <Text style={styles.suggestName}>{perk.name}</Text>
-                <Text style={styles.suggestProvider}>{perk.provider_name}</Text>
-                <Text style={styles.suggestPrice}>{perk.credit_price} credits</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      {internalPerks.length > 0 && !search && !selectedCategory && (
-        <View style={{ paddingHorizontal: 16 }}>
-          <Text style={styles.sectionTitle}>🏢 Your Company Perks</Text>
-          {internalPerks.map(p => (
-            <InternalPerkCard key={p.id} perk={p} onPress={() => router.push(`/internal-perk/${p.id}`)} />
+      {/* Rating Filter — tap a star to set minimum */}
+      <View style={styles.ratingFilterRow}>
+        <Text style={styles.ratingFilterLabel}>Min. rating</Text>
+        <View style={styles.starsRow}>
+          {[1, 2, 3, 4, 5].map((n) => (
+            <Pressable key={n} android_ripple={null} onPress={() => setMinRating(minRating === n ? null : n)}>
+              <Text style={[styles.starIcon, minRating && n <= minRating && styles.starIconActive]}>★</Text>
+            </Pressable>
           ))}
         </View>
-      )}
+        {minRating && (
+          <Pressable android_ripple={null} onPress={() => setMinRating(null)} style={styles.clearBtn}>
+            <Text style={styles.clearBtnText}>✕ Clear</Text>
+          </Pressable>
+        )}
+      </View>
 
-      {/* Top 3 Providers */}
-      {!search && !selectedCategory && topProviders.length > 0 && (
-        <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
-          <Text style={styles.sectionTitle}>🏆 Top Rated Providers</Text>
-          {topProviders.map((p, i) => (
-            <TopProviderCard key={p.provider_id} provider={p} rank={i + 1} />
-          ))}
-        </View>
-      )}
-
-      <Text style={styles.sectionTitle}>
-        {selectedCategory ? selectedCategory : 'All Perks'} {perks.length > 0 ? `(${perks.length})` : ''}
-      </Text>
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#6366f1" style={{ marginTop: 40 }} />
-      ) : (
-        <FlatList
-          data={perks}
-          keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.perkCard}
-              onPress={() => router.push(`/perk/${item.id}`)}
-            >
-              {item.images?.[0] ? (
-                <Image source={{ uri: imgSrc(item.images[0].image) }} style={styles.perkImage} />
-              ) : (
-                <View style={styles.perkImagePlaceholder}>
-                  <Text style={{ fontSize: 24 }}>🎁</Text>
-                </View>
-              )}
-              <View style={styles.perkLeft}>
-                <Text style={styles.perkName}>{item.name}</Text>
-                <Text style={styles.perkProvider}>{item.provider_name}</Text>
-                <View style={styles.tagRow}>
-                  <Text style={styles.categoryBadge}>{item.category_name}</Text>
-                  {item.is_featured && <Text style={styles.featuredBadge}>Featured</Text>}
-                  {item.review_count >= 10 && item.avg_rating != null && (
-                    <Text style={styles.ratingBadge}>★ {Number(item.avg_rating).toFixed(1)}</Text>
-                  )}
-                  {item.review_count >= 10 && item.reputation_tier && item.reputation_tier !== 'unranked' && (
-                    <Text style={[styles.tierBadge, tierBadgeStyle(item.reputation_tier)]}>
-                      {item.reputation_tier.toUpperCase()}
-                    </Text>
-                  )}
-                </View>
+      <FlatList
+        data={loading ? [] : perks.filter(p => {
+          if (!minRating) return true;
+          if (!p.avg_rating || p.review_count < 10) return false;
+          return Number(p.avg_rating) >= minRating - 0.5; // e.g. tap 4★ = shows 3.5+
+        })}
+        keyExtractor={(item) => String(item.id)}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
+        ListHeaderComponent={
+          <>
+            {/* Suggestions */}
+            {!selectedCategory && !search && suggestions.length > 0 && (
+              <View>
+                <Text style={styles.sectionTitle}>Just for you ✨</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestRow}>
+                  {suggestions.map((perk) => (
+                    <TouchableOpacity
+                      key={perk.id}
+                      style={styles.suggestCard}
+                      onPress={() => router.push(`/perk/${perk.id}`)}
+                    >
+                      <Text style={styles.suggestName}>{perk.name}</Text>
+                      <Text style={styles.suggestProvider}>{perk.provider_name}</Text>
+                      <Text style={styles.suggestPrice}>{perk.credit_price} credits</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
               </View>
-              <View style={styles.perkRight}>
-                <Text style={styles.price}>{item.credit_price}</Text>
-                <Text style={styles.priceLabel}>credits</Text>
+            )}
+
+            {/* Internal Perks */}
+            {internalPerks.length > 0 && !search && !selectedCategory && (
+              <View>
+                <Text style={styles.sectionTitle}>🏢 Your Company Perks</Text>
+                {internalPerks.map(p => (
+                  <InternalPerkCard key={p.id} perk={p} onPress={() => router.push(`/internal-perk/${p.id}`)} />
+                ))}
               </View>
-            </TouchableOpacity>
-          )}
-          ListEmptyComponent={<Text style={styles.empty}>No perks found.</Text>}
-        />
-      )}
+            )}
+
+            {/* Top 3 Providers */}
+            {!search && !selectedCategory && topProviders.length > 0 && (
+              <View>
+                <Text style={styles.sectionTitle}>🏆 Top Rated Providers</Text>
+                {topProviders.map((p, i) => (
+                  <TopProviderCard key={p.provider_id} provider={p} rank={i + 1} />
+                ))}
+              </View>
+            )}
+
+            <Text style={styles.sectionTitle}>
+              {selectedCategory ? selectedCategory : 'All Perks'} {perks.length > 0 ? `(${perks.length})` : ''}
+            </Text>
+
+            {loading && <ActivityIndicator size="large" color="#6366f1" style={{ marginTop: 40 }} />}
+          </>
+        }
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.perkCard}
+            onPress={() => router.push(`/perk/${item.id}`)}
+          >
+            {item.images?.[0] ? (
+              <Image source={{ uri: imgSrc(item.images[0].image) }} style={styles.perkImage} />
+            ) : (
+              <View style={styles.perkImagePlaceholder}>
+                <Text style={{ fontSize: 24 }}>🎁</Text>
+              </View>
+            )}
+            <View style={styles.perkLeft}>
+              <Text style={styles.perkName}>{item.name}</Text>
+              <Text style={styles.perkProvider}>{item.provider_name}</Text>
+              <View style={styles.tagRow}>
+                <Text style={styles.categoryBadge}>{item.category_name}</Text>
+                {item.is_featured && <Text style={styles.featuredBadge}>Featured</Text>}
+                {item.review_count >= 10 && item.avg_rating != null && (
+                  <Text style={styles.ratingBadge}>★ {Number(item.avg_rating).toFixed(1)}</Text>
+                )}
+                {item.review_count >= 10 && item.reputation_tier && item.reputation_tier !== 'unranked' && (
+                  <Text style={[styles.tierBadge, tierBadgeStyle(item.reputation_tier)]}>
+                    {item.reputation_tier.toUpperCase()}
+                  </Text>
+                )}
+              </View>
+            </View>
+            <View style={styles.perkRight}>
+              <Text style={styles.price}>{item.credit_price}</Text>
+              <Text style={styles.priceLabel}>credits</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        ListEmptyComponent={!loading ? <Text style={styles.empty}>No perks found.</Text> : null}
+      />
     </View>
   );
 }
@@ -322,6 +346,17 @@ const styles = StyleSheet.create({
     paddingVertical: 10, fontSize: 15, color: '#111827',
   },
   filterRow: { paddingHorizontal: 16, paddingVertical: 12, gap: 8, backgroundColor: '#fff' },
+  ratingFilterRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingHorizontal: 16, paddingVertical: 10,
+    backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6',
+  },
+  ratingFilterLabel: { fontSize: 12, fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5 },
+  starsRow: { flexDirection: 'row', gap: 4 },
+  starIcon: { fontSize: 26, color: '#e5e7eb' },
+  starIconActive: { color: '#f59e0b' },
+  clearBtn: { marginLeft: 'auto', backgroundColor: '#fef3c7', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 },
+  clearBtnText: { fontSize: 12, fontWeight: '700', color: '#d97706' },
   filterChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,

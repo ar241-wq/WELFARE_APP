@@ -17,12 +17,35 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        # Resolve referral code before saving
+        referral_code = request.data.get('referral_code', '').strip().upper()
+        referrer = None
+        if referral_code:
+            referrer = User.objects.filter(referral_code=referral_code).first()
+
         user = serializer.save()
+        if referrer:
+            user.referred_by = referrer
+            user.save(update_fields=['referred_by'])
 
         # Auto-create wallet for employees
         if user.role == 'employee':
-            from wallet.models import Wallet
+            from wallet.models import Wallet, Transaction
+            from decimal import Decimal
             Wallet.objects.get_or_create(employee=user)
+
+            # Award 100 credits to referrer if they're an employee
+            if referrer and referrer.role == 'employee':
+                ref_wallet, _ = Wallet.objects.get_or_create(employee=referrer)
+                ref_wallet.balance = Decimal(str(ref_wallet.balance)) + Decimal('100')
+                ref_wallet.save()
+                Transaction.objects.create(
+                    wallet=ref_wallet,
+                    amount=100,
+                    type='credit',
+                    description=f'Referral bonus — {user.full_name} joined using your code!',
+                )
 
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 

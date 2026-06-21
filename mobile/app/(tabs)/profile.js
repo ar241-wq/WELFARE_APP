@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, Alert, Image, Modal, Platform,
+  StyleSheet, Alert, Image, Modal, Platform, Clipboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -93,6 +93,19 @@ export default function ProfileScreen() {
           <View style={styles.badge}>
             <Text style={styles.badgeText}>Employee</Text>
           </View>
+          {user?.referral_code && (
+            <TouchableOpacity
+              style={styles.referralBox}
+              onPress={() => {
+                Clipboard.setString(user.referral_code);
+                Alert.alert('Copied!', 'Referral code copied to clipboard. Share it to earn 100 credits per signup!');
+              }}
+            >
+              <Text style={styles.referralLabel}>Your referral code</Text>
+              <Text style={styles.referralCode}>{user.referral_code}</Text>
+              <Text style={styles.referralHint}>Tap to copy · Earn 100 credits per signup</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.menu}>
@@ -179,6 +192,13 @@ const styles = StyleSheet.create({
   email: { fontSize: 14, color: '#6b7280', marginTop: 4 },
   badge: { marginTop: 8, backgroundColor: '#eef2ff', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },
   badgeText: { fontSize: 12, color: '#6366f1', fontWeight: '600' },
+  referralBox: {
+    marginTop: 16, backgroundColor: '#f0fdf4', borderWidth: 1.5, borderColor: '#86efac',
+    borderRadius: 16, paddingVertical: 14, paddingHorizontal: 20, alignItems: 'center', width: '80%',
+  },
+  referralLabel: { fontSize: 11, color: '#16a34a', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
+  referralCode: { fontSize: 28, fontWeight: '900', color: '#15803d', letterSpacing: 4, marginVertical: 4 },
+  referralHint: { fontSize: 11, color: '#4ade80', fontWeight: '500' },
   menu: { backgroundColor: '#fff', marginHorizontal: 16, borderRadius: 16, overflow: 'hidden' },
   menuItem: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 16,

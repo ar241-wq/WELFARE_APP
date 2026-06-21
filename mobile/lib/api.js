@@ -67,13 +67,10 @@ export async function login(email, password) {
   return data;
 }
 
-export async function register(fullName, email, password) {
-  const data = await request('POST', '/api/auth/register/', {
-    full_name: fullName,
-    email,
-    password,
-    role: 'employee',
-  }, false);
+export async function register(fullName, email, password, referralCode = '') {
+  const body = { full_name: fullName, email, password, role: 'employee' };
+  if (referralCode) body.referral_code = referralCode;
+  const data = await request('POST', '/api/auth/register/', body, false);
   return data;
 }
 
