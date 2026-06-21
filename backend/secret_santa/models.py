@@ -52,6 +52,7 @@ class SantaAssignment(models.Model):
     event = models.ForeignKey(SecretSantaEvent, on_delete=models.CASCADE, related_name='assignments')
     giver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='santa_giving')
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='santa_receiving')
+    gifted_perk = models.ForeignKey('catalog.Perk', on_delete=models.SET_NULL, null=True, blank=True, related_name='santa_gifts')
 
     class Meta:
         unique_together = ['event', 'giver']

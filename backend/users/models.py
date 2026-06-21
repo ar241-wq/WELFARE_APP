@@ -58,6 +58,7 @@ class ProviderProfile(models.Model):
     logo = models.ImageField(upload_to='provider_logos/', null=True, blank=True)
     website = models.URLField(blank=True)
     is_verified = models.BooleanField(default=False)
+    reputation_tier = models.CharField(max_length=20, default='unranked')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

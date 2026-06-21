@@ -11,7 +11,9 @@ function imgSrc(path) {
   return `${API_URL}${path}`;
 }
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getPerkById, redeemPerk, getWallet, getPerkGroupBuys, startGroupBuy, joinGroupBuy, lockInGroupBuy } from '../../lib/api';
+import { getPerkById, redeemPerk, getWallet, getPerkGroupBuys, startGroupBuy, joinGroupBuy, lockInGroupBuy, getPerkReviews } from '../../lib/api';
+
+const TIER_COLORS = { bronze: '#cd7f32', silver: '#adb5bd', gold: '#d97706', platinum: '#6b7280' };
 
 function GroupBuySection({ perkId, groupBuys, onRefresh }) {
   const [loading, setLoading] = useState(false);
@@ -192,6 +194,7 @@ export default function PerkDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [redeeming, setRedeeming] = useState(false);
   const [groupBuys, setGroupBuys] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   async function load() {
     try {
@@ -199,6 +202,7 @@ export default function PerkDetailScreen() {
       setPerk(p);
       setWallet(w);
       setGroupBuys(gbs);
+      getPerkReviews(id).then(setReviews).catch(() => {});
     } catch (e) {
       Alert.alert('Error', 'Could not load perk details.');
     } finally {
@@ -280,7 +284,22 @@ export default function PerkDetailScreen() {
             {perk.provider_verified && <Text style={styles.verified}>✓ Verified</Text>}
           </View>
 
-          <Text style={styles.category}>{perk.category_name}</Text>
+          <View style={styles.metaRow}>
+            <Text style={styles.category}>{perk.category_name}</Text>
+            {perk.review_count >= 10 && perk.avg_rating != null && (
+              <View style={styles.ratingChip}>
+                <Text style={styles.ratingChipText}>★ {Number(perk.avg_rating).toFixed(1)}</Text>
+                <Text style={styles.ratingCount}>({perk.review_count})</Text>
+              </View>
+            )}
+            {perk.review_count >= 10 && perk.reputation_tier && perk.reputation_tier !== 'unranked' && (
+              <View style={[styles.tierChip, { borderColor: TIER_COLORS[perk.reputation_tier] || '#6b7280', backgroundColor: (TIER_COLORS[perk.reputation_tier] || '#6b7280') + '18' }]}>
+                <Text style={[styles.tierChipText, { color: TIER_COLORS[perk.reputation_tier] || '#6b7280' }]}>
+                  {perk.reputation_tier.toUpperCase()}
+                </Text>
+              </View>
+            )}
+          </View>
 
           <View style={styles.priceCard}>
             <Text style={styles.priceNum}>{perk.credit_price}</Text>
@@ -309,6 +328,46 @@ export default function PerkDetailScreen() {
             </View>
           )}
         </View>
+
+        {/* Reviews Section */}
+        {reviews.length > 0 && (
+          <View style={rv.section}>
+            <View style={rv.header}>
+              <Text style={rv.title}>Reviews</Text>
+              <View style={rv.avgRow}>
+                <Text style={rv.avgNum}>{(reviews.reduce((s, r) => s + r.stars, 0) / reviews.length).toFixed(1)}</Text>
+                <Text style={rv.avgStar}>★</Text>
+                <Text style={rv.avgCount}>({reviews.length})</Text>
+              </View>
+            </View>
+            {/* Star distribution */}
+            <View style={rv.distRow}>
+              {[5,4,3,2,1].map(n => {
+                const count = reviews.filter(r => r.stars === n).length;
+                const pct = reviews.length ? count / reviews.length : 0;
+                return (
+                  <View key={n} style={rv.distItem}>
+                    <Text style={rv.distLabel}>{n}★</Text>
+                    <View style={rv.distBar}>
+                      <View style={[rv.distFill, { width: `${Math.round(pct * 100)}%` }]} />
+                    </View>
+                    <Text style={rv.distCount}>{count}</Text>
+                  </View>
+                );
+              })}
+            </View>
+            {/* Individual reviews */}
+            {reviews.slice(0, 5).map((r, i) => (
+              <View key={i} style={rv.card}>
+                <View style={rv.cardTop}>
+                  <Text style={rv.stars}>{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</Text>
+                  <Text style={rv.date}>{new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
+                </View>
+                {r.comment ? <Text style={rv.comment}>{r.comment}</Text> : null}
+              </View>
+            ))}
+          </View>
+        )}
 
         <GroupBuySection perkId={id} groupBuys={groupBuys} onRefresh={load} />
       </ScrollView>
@@ -350,7 +409,13 @@ const styles = StyleSheet.create({
   providerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
   provider: { fontSize: 15, color: '#6b7280', fontWeight: '500' },
   verified: { fontSize: 12, color: '#059669', fontWeight: '700', backgroundColor: '#d1fae5', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
-  category: { fontSize: 13, color: '#6366f1', fontWeight: '600', marginBottom: 16 },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' },
+  category: { fontSize: 13, color: '#6366f1', fontWeight: '600' },
+  ratingChip: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#fffbeb', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  ratingChipText: { fontSize: 13, color: '#f59e0b', fontWeight: '700' },
+  ratingCount: { fontSize: 11, color: '#9ca3af' },
+  tierChip: { borderWidth: 1, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  tierChipText: { fontSize: 11, fontWeight: '800' },
   priceCard: {
     flexDirection: 'row', alignItems: 'baseline', gap: 6,
     backgroundColor: '#eef2ff', padding: 16, borderRadius: 16, marginBottom: 20,
@@ -377,4 +442,25 @@ const styles = StyleSheet.create({
   },
   redeemBtnDisabled: { backgroundColor: '#d1d5db' },
   redeemText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+});
+
+const rv = StyleSheet.create({
+  section: { margin: 16, marginTop: 0 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  title: { fontSize: 18, fontWeight: '800', color: '#111' },
+  avgRow: { flexDirection: 'row', alignItems: 'baseline', gap: 3 },
+  avgNum: { fontSize: 22, fontWeight: '900', color: '#111' },
+  avgStar: { fontSize: 18, color: '#f59e0b', fontWeight: '700' },
+  avgCount: { fontSize: 13, color: '#9ca3af' },
+  distRow: { marginBottom: 16, gap: 5 },
+  distItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  distLabel: { fontSize: 12, color: '#6b7280', width: 24, textAlign: 'right' },
+  distBar: { flex: 1, height: 8, backgroundColor: '#f3f4f6', borderRadius: 99, overflow: 'hidden' },
+  distFill: { height: '100%', backgroundColor: '#f59e0b', borderRadius: 99 },
+  distCount: { fontSize: 12, color: '#9ca3af', width: 20 },
+  card: { backgroundColor: '#f9fafb', borderRadius: 14, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: '#f3f4f6' },
+  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  stars: { fontSize: 14, color: '#f59e0b', letterSpacing: 1 },
+  date: { fontSize: 11, color: '#9ca3af' },
+  comment: { fontSize: 14, color: '#4b5563', lineHeight: 20 },
 });

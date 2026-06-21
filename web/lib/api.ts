@@ -414,4 +414,63 @@ export async function resolveInternalRequest(id: number, action: 'approve' | 'de
   return data;
 }
 
+// ─── Secret Santa ──────────────────────────────────────────────────────────
+
+export async function getHRSantaEvents() {
+  const { data } = await api.get('/api/santa/hr/');
+  return Array.isArray(data) ? data : data?.results ?? data;
+}
+
+export async function createSantaEvent(payload: {
+  department_id: number;
+  title: string;
+  credit_budget: number;
+  join_deadline: string;
+  reveal_date: string;
+}) {
+  const { data } = await api.post('/api/santa/hr/', payload);
+  return data;
+}
+
+export async function getSantaEvent(id: number) {
+  const { data } = await api.get(`/api/santa/${id}/`);
+  return data;
+}
+
+export async function updateSantaEvent(id: number, payload: {
+  title?: string;
+  credit_budget?: number;
+  join_deadline?: string;
+  reveal_date?: string;
+}) {
+  const { data } = await api.patch(`/api/santa/${id}/`, payload);
+  return data;
+}
+
+export async function deleteSantaEvent(id: number) {
+  await api.delete(`/api/santa/${id}/`);
+}
+
+export async function assignSantas(id: number) {
+  const { data } = await api.post(`/api/santa/${id}/assign/`);
+  return data;
+}
+
+export async function revealSantas(id: number) {
+  const { data } = await api.post(`/api/santa/${id}/reveal/`);
+  return data;
+}
+
+// ─── Reputation ────────────────────────────────────────────────────────────
+
+export async function getProviderReputation(providerId: number) {
+  const { data } = await api.get(`/api/catalog/providers/${providerId}/reputation/`);
+  return data;
+}
+
+export async function getProviderReviews(providerId: number) {
+  const { data } = await api.get(`/api/catalog/providers/${providerId}/reviews/`);
+  return Array.isArray(data) ? data : data?.results ?? data;
+}
+
 export default api;

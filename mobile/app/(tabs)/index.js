@@ -225,7 +225,12 @@ export default function HomeScreen() {
             <View style={styles.perkInfo}>
               <Text style={styles.perkName}>{perk.name}</Text>
               <Text style={styles.perkProvider}>{perk.provider_name}</Text>
-              <Text style={styles.perkCategory}>{perk.category_name}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                <Text style={styles.perkCategory}>{perk.category_name}</Text>
+                {perk.review_count >= 10 && perk.avg_rating != null && (
+                  <Text style={styles.perkRating}>★ {Number(perk.avg_rating).toFixed(1)}</Text>
+                )}
+              </View>
             </View>
             <View style={styles.perkPrice}>
               <Text style={styles.perkPriceNum}>{perk.credit_price}</Text>
@@ -328,4 +333,5 @@ const styles = StyleSheet.create({
   perkPriceNum: { fontSize: 22, fontWeight: '800', color: '#6366f1' },
   perkPriceLabel: { fontSize: 11, color: '#6b7280', fontWeight: '500' },
   emptyText: { textAlign: 'center', color: '#9ca3af', marginTop: 20, fontSize: 14 },
+  perkRating: { fontSize: 11, fontWeight: '700', color: '#f59e0b' },
 });

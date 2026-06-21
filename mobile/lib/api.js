@@ -133,6 +133,18 @@ export async function getRedemptions() {
   return request('GET', '/api/catalog/redemptions/');
 }
 
+export async function checkReview(redemptionId) {
+  return request('GET', `/api/catalog/reviews/check/?redemption_id=${redemptionId}`);
+}
+
+export async function submitReview(redemptionId, stars, comment = '') {
+  return request('POST', '/api/catalog/reviews/', {
+    redemption_id: Number(redemptionId),
+    stars,
+    comment,
+  });
+}
+
 // ─── Approvals ────────────────────────────────────────────────────────────────
 export async function getMyRequests() {
   return request('GET', '/api/approvals/requests/');
@@ -266,6 +278,15 @@ export async function getChallengeWinNotifications() {
   return request('GET', '/api/challenges/win-notifications/');
 }
 
+// ─── Reviews & Reputation ──────────────────────────────────────────────────────
+export async function getTopProviders(limit = 3) {
+  return request('GET', `/api/catalog/providers/top/?limit=${limit}`);
+}
+
+export async function getPerkReviews(perkId) {
+  return request('GET', `/api/catalog/perks/${perkId}/reviews/`);
+}
+
 // ─── Profiles ─────────────────────────────────────────────────────────────────
 export async function getColleagueProfile(id) {
   return request('GET', `/api/auth/profile/${id}/`);
@@ -281,6 +302,7 @@ export const getSantaEvents = () => request('GET', '/api/santa/');
 export const getSantaEvent = (id) => request('GET', `/api/santa/${id}/`);
 export const joinSantaEvent = (id) => request('POST', `/api/santa/${id}/join/`);
 export const sendSantaGift = (id, amount) => request('POST', `/api/santa/${id}/send-gift/`, { amount });
+export const sendSantaGiftPerk = (id, perkId) => request('POST', `/api/santa/${id}/send-gift/`, { perk_id: perkId });
 
 // ─── Group Buying ─────────────────────────────────────────────────────────────
 export const getPerkGroupBuys = (perkId) => request('GET', `/api/group-buy/perk/${perkId}/`);

@@ -1,21 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
-  View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert,
+  View, Text, StyleSheet, ActivityIndicator, TouchableOpacity,
+  Alert, TextInput, ScrollView,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
-import { getRedemptions } from '../../lib/api';
+import { getRedemptions, checkReview, submitReview } from '../../lib/api';
+
+const POLL_INTERVAL_MS = 3000;
 
 export default function RedeemScreen() {
   const { id, perk_name, perk_price } = useLocalSearchParams();
   const router = useRouter();
   const [redemption, setRedemption] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Review prompt state
+  const [showReview, setShowReview] = useState(false);
+  const [selectedStars, setSelectedStars] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const pollRef = useRef(null);
 
+  // ── Initial load ──────────────────────────────────────────────────────────
   useEffect(() => {
-    // If perk details passed as params (from redeemPerk), use them directly
     if (perk_name) {
-      setRedemption({ id, perk_name, perk_credit_price: perk_price, status: 'pending', perk: id });
+      const initial = { id, perk_name, perk_credit_price: perk_price, status: 'pending', perk: id };
+      setRedemption(initial);
       setLoading(false);
       return;
     }
@@ -34,6 +44,54 @@ export default function RedeemScreen() {
     load();
   }, [id]);
 
+  // ── Polling for status flip ───────────────────────────────────────────────
+  useEffect(() => {
+    if (!redemption || redemption.status === 'redeemed') return;
+
+    pollRef.current = setInterval(async () => {
+      try {
+        const all = await getRedemptions();
+        const list = Array.isArray(all) ? all : all?.results || [];
+        const updated = list.find((r) => String(r.id) === String(id));
+        if (updated && updated.status === 'redeemed') {
+          clearInterval(pollRef.current);
+          setRedemption(updated);
+          // Check if already reviewed
+          const check = await checkReview(id).catch(() => ({ reviewed: false }));
+          if (!check.reviewed) {
+            setShowReview(true);
+          }
+        }
+      } catch (_) {
+        // silently ignore poll errors
+      }
+    }, POLL_INTERVAL_MS);
+
+    return () => clearInterval(pollRef.current);
+  }, [redemption?.status, id]);
+
+  // ── Handlers ──────────────────────────────────────────────────────────────
+  const handleSubmitReview = async () => {
+    if (selectedStars === 0) {
+      Alert.alert('Select a rating', 'Please tap a star before submitting.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await submitReview(id, selectedStars, comment);
+    } catch (e) {
+      // Non-fatal — still navigate home
+    } finally {
+      setSubmitting(false);
+      router.replace('/(tabs)/');
+    }
+  };
+
+  const handleSkip = () => {
+    router.replace('/(tabs)/');
+  };
+
+  // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
     return <View style={styles.loader}><ActivityIndicator size="large" color="#6366f1" /></View>;
   }
@@ -49,6 +107,56 @@ export default function RedeemScreen() {
     );
   }
 
+  // ── Review Prompt ─────────────────────────────────────────────────────────
+  if (showReview) {
+    return (
+      <ScrollView contentContainerStyle={styles.reviewContainer} keyboardShouldPersistTaps="handled">
+        <View style={styles.reviewCard}>
+          <Text style={styles.reviewCheck}>✅</Text>
+          <Text style={styles.reviewTitle}>Perk redeemed!</Text>
+          <Text style={styles.reviewSub}>How was {redemption.perk_name}?</Text>
+
+          {/* Star selector */}
+          <View style={styles.starsRow}>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <TouchableOpacity key={n} onPress={() => setSelectedStars(n)} style={styles.starBtn}>
+                <Text style={[styles.starIcon, selectedStars >= n && styles.starFilled]}>★</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Optional comment */}
+          <TextInput
+            style={styles.commentInput}
+            placeholder="Add a comment... (optional)"
+            placeholderTextColor="#9ca3af"
+            value={comment}
+            onChangeText={setComment}
+            multiline
+            numberOfLines={3}
+            maxLength={500}
+          />
+
+          <TouchableOpacity
+            style={[styles.submitBtn, selectedStars === 0 && styles.submitBtnDisabled]}
+            onPress={handleSubmitReview}
+            disabled={submitting}
+          >
+            {submitting
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.submitBtnText}>Submit Review</Text>
+            }
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.skipBtn} onPress={handleSkip}>
+            <Text style={styles.skipBtnText}>Skip</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  // ── QR Screen ─────────────────────────────────────────────────────────────
   const qrValue = `REDEMPTION:${redemption.id}`;
 
   return (
@@ -78,6 +186,9 @@ export default function RedeemScreen() {
         </View>
 
         <Text style={styles.cost}>{redemption.perk_credit_price} credits used</Text>
+        {redemption.status === 'pending' && (
+          <Text style={styles.waitingText}>Waiting for provider to scan...</Text>
+        )}
       </View>
 
       <TouchableOpacity style={styles.doneBtn} onPress={() => router.replace('/(tabs)/')}>
@@ -107,9 +218,36 @@ const styles = StyleSheet.create({
   statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
   statusText: { fontSize: 12, fontWeight: '700' },
   cost: { fontSize: 13, color: '#9ca3af', marginTop: 4 },
+  waitingText: { fontSize: 12, color: '#6b7280', marginTop: 8, fontStyle: 'italic' },
   doneBtn: {
     marginTop: 20, backgroundColor: '#6366f1', borderRadius: 14,
     paddingVertical: 16, alignItems: 'center',
   },
   doneBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  // ── Review prompt ──
+  reviewContainer: { flexGrow: 1, backgroundColor: '#f9fafb', padding: 20, justifyContent: 'center' },
+  reviewCard: {
+    backgroundColor: '#fff', borderRadius: 24, padding: 28, alignItems: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 4,
+  },
+  reviewCheck: { fontSize: 40, marginBottom: 12 },
+  reviewTitle: { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 4 },
+  reviewSub: { fontSize: 15, color: '#6b7280', marginBottom: 20 },
+  starsRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+  starBtn: { padding: 4 },
+  starIcon: { fontSize: 36, color: '#d1d5db' },
+  starFilled: { color: '#f59e0b' },
+  commentInput: {
+    width: '100%', backgroundColor: '#f3f4f6', borderRadius: 12,
+    paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, color: '#111827',
+    textAlignVertical: 'top', marginBottom: 16, minHeight: 80,
+  },
+  submitBtn: {
+    width: '100%', backgroundColor: '#6366f1', borderRadius: 14,
+    paddingVertical: 14, alignItems: 'center', marginBottom: 10,
+  },
+  submitBtnDisabled: { opacity: 0.5 },
+  submitBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  skipBtn: { paddingVertical: 10 },
+  skipBtnText: { fontSize: 14, color: '#6b7280', fontWeight: '600' },
 });

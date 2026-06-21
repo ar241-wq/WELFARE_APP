@@ -70,7 +70,7 @@ export default function ProfileScreen() {
     { icon: '🎂', label: birthdayLabel, onPress: () => setShowBirthdayPicker(true), highlight: !user?.birthday },
     { icon: '💝', label: 'Life Moments', onPress: () => router.push('/life-moments') },
     { icon: '📋', label: 'My Perk Requests', onPress: () => router.push('/request/new') },
-    { icon: '🎫', label: 'My Redemptions', onPress: () => router.push('/wallet') },
+    { icon: '🎫', label: 'My Redemptions & Reviews', onPress: () => router.push('/redemptions') },
   ];
 
   return (

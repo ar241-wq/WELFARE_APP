@@ -3,11 +3,15 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from users.permissions import IsEmployee, IsProvider
 from wallet.models import Wallet, Transaction
-from .models import Category, Perk, Redemption
-from .serializers import CategorySerializer, PerkSerializer, RedemptionSerializer
+from .models import Category, Perk, Redemption, Review, ReputationScore
+from .serializers import (
+    CategorySerializer, PerkSerializer, RedemptionSerializer,
+    ReviewSerializer, PublicReviewSerializer, ReputationScoreSerializer,
+)
 import qrcode
 import io
 import base64
@@ -25,7 +29,9 @@ class PerkListView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        qs = Perk.objects.filter(is_active=True).select_related('category', 'provider__provider_profile')
+        qs = Perk.objects.filter(is_active=True).select_related(
+            'category', 'provider__provider_profile', 'provider__reputation_score'
+        )
         category = self.request.query_params.get('category')
         max_price = self.request.query_params.get('max_price')
         search = self.request.query_params.get('search')
@@ -39,6 +45,11 @@ class PerkListView(ListAPIView):
             qs = qs.filter(name__icontains=search)
         if mine and self.request.user.role == 'provider':
             qs = Perk.objects.filter(provider=self.request.user)
+
+        # Annotate with cached rep score; new/unranked providers get 0 (still visible)
+        qs = qs.annotate(
+            rep_score=Coalesce('provider__reputation_score__composite_score', 0.0)
+        ).order_by('-is_featured', '-rep_score', '-created_at')
 
         return qs
 
@@ -273,4 +284,185 @@ class ScanRedemptionView(APIView):
             'perk_name': redemption.perk.name,
             'employee_name': redemption.employee.full_name,
             'status': 'redeemed',
+            'prompt_review': True,
+            'redemption_id': redemption.id,
         })
+
+
+# ─── Review endpoints ─────────────────────────────────────────────────────────
+
+class ReviewSubmitView(APIView):
+    """
+    POST /api/catalog/reviews/
+    Employee submits a review for a redeemed redemption.
+    """
+    permission_classes = [IsEmployee]
+
+    def post(self, request):
+        redemption_id = request.data.get('redemption_id')
+        stars = request.data.get('stars')
+        comment = request.data.get('comment', '')
+
+        if not redemption_id:
+            return Response({'detail': 'redemption_id is required.'}, status=400)
+
+        try:
+            stars = int(stars)
+        except (TypeError, ValueError):
+            return Response({'detail': 'stars must be an integer 1-5.'}, status=400)
+
+        if not (1 <= stars <= 5):
+            return Response({'detail': 'stars must be between 1 and 5.'}, status=400)
+
+        try:
+            redemption = Redemption.objects.select_related('perk__provider').get(pk=redemption_id)
+        except Redemption.DoesNotExist:
+            return Response({'detail': 'Redemption not found.'}, status=404)
+
+        # Security: only the employee who made the redemption can review
+        if redemption.employee_id != request.user.id:
+            return Response({'detail': 'You can only review your own redemptions.'}, status=403)
+
+        # Allow review on any non-cancelled redemption
+        if redemption.status == 'cancelled':
+            return Response({'detail': 'Cannot review a cancelled redemption.'}, status=400)
+
+        # Auto-stamp redeemed_at if missing (QR not yet scanned)
+        if not redemption.redeemed_at:
+            redemption.redeemed_at = timezone.now()
+            redemption.save(update_fields=['redeemed_at'])
+
+        # One review per redemption
+        if Review.objects.filter(redemption=redemption).exists():
+            return Response({'detail': 'You have already reviewed this redemption.'}, status=400)
+
+        review = Review.objects.create(
+            redemption=redemption,
+            provider=redemption.perk.provider,
+            perk=redemption.perk,
+            employee=request.user,
+            stars=stars,
+            comment=comment,
+        )
+
+        return Response(ReviewSerializer(review).data, status=201)
+
+
+class ReviewCheckView(APIView):
+    """
+    GET /api/catalog/reviews/check/?redemption_id=X
+    Returns whether the employee has already reviewed this redemption.
+    """
+    permission_classes = [IsEmployee]
+
+    def get(self, request):
+        redemption_id = request.query_params.get('redemption_id')
+        if not redemption_id:
+            return Response({'detail': 'redemption_id is required.'}, status=400)
+        try:
+            redemption = Redemption.objects.get(pk=redemption_id, employee=request.user)
+        except Redemption.DoesNotExist:
+            return Response({'detail': 'Redemption not found.'}, status=404)
+
+        reviewed = Review.objects.filter(redemption=redemption).exists()
+        return Response({
+            'reviewed': reviewed,
+            'status': redemption.status,
+        })
+
+
+class ProviderReviewListView(ListAPIView):
+    """
+    GET /api/catalog/providers/<provider_id>/reviews/
+    Public (authenticated) — anonymous reviews only.
+    """
+    serializer_class = PublicReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        provider_id = self.kwargs['provider_id']
+        return Review.objects.filter(
+            provider_id=provider_id
+        ).select_related('perk').order_by('-created_at')
+
+
+class TopProvidersView(APIView):
+    """GET /api/catalog/providers/top/ — top 3 providers by composite score."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        limit = int(request.query_params.get('limit', 3))
+        scores = ReputationScore.objects.filter(
+            review_count__gte=10,
+            composite_score__isnull=False,
+        ).select_related('provider__provider_profile').order_by('-composite_score')[:limit]
+
+        result = []
+        for rep in scores:
+            provider = rep.provider
+            try:
+                company_name = provider.provider_profile.company_name or provider.full_name
+                logo = provider.provider_profile.logo.url if provider.provider_profile.logo else None
+            except Exception:
+                company_name = provider.full_name
+                logo = None
+
+            perks = Perk.objects.filter(provider=provider, is_active=True)
+            result.append({
+                'provider_id': provider.id,
+                'company_name': company_name,
+                'logo': request.build_absolute_uri(logo) if logo else None,
+                'tier': rep.tier,
+                'composite_score': round(rep.composite_score, 1),
+                'avg_stars': round(rep.avg_stars, 2) if rep.avg_stars else None,
+                'review_count': rep.review_count,
+                'perk_count': perks.count(),
+                'top_perk': perks.first().name if perks.exists() else None,
+            })
+
+        return Response(result)
+
+
+class PerkReviewListView(APIView):
+    """GET /api/catalog/perks/<pk>/reviews/ — recent reviews for a specific perk."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        reviews = Review.objects.filter(perk_id=pk).order_by('-created_at')[:20]
+        data = [{
+            'stars': r.stars,
+            'comment': r.comment,
+            'created_at': r.created_at.isoformat(),
+        } for r in reviews]
+        return Response(data)
+
+
+class ProviderReputationView(APIView):
+    """
+    GET /api/catalog/providers/<provider_id>/reputation/
+    Returns cached ReputationScore. Never triggers recomputation.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, provider_id):
+        try:
+            rep = ReputationScore.objects.get(provider_id=provider_id)
+        except ReputationScore.DoesNotExist:
+            # Provider has no score yet — return unranked stub
+            return Response({
+                'tier': 'unranked',
+                'composite_score': None,
+                'avg_stars': None,
+                'review_count': 0,
+                'redemption_count': 0,
+                'repeat_rate': 0,
+                'consistency_score': 0,
+                'score_breakdown': {},
+                'gap_to_next': {},
+                'reviews_needed': 10,
+            })
+
+        data = ReputationScoreSerializer(rep).data
+        if rep.review_count < 10:
+            data['reviews_needed'] = max(0, 10 - rep.review_count)
+        return Response(data)

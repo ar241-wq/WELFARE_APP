@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Category(models.Model):
@@ -64,3 +65,63 @@ class Redemption(models.Model):
 
     def __str__(self):
         return f'{self.employee.full_name} — {self.perk.name}'
+
+
+class Review(models.Model):
+    redemption = models.OneToOneField(
+        Redemption,
+        on_delete=models.CASCADE,
+        related_name='review'
+    )
+    provider = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='received_reviews'
+    )
+    perk = models.ForeignKey(
+        Perk,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    employee = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='written_reviews'
+    )
+    stars = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    comment = models.TextField(blank=True, max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Review #{self.id} — {self.perk.name} ({self.stars}★)'
+
+
+class ReputationScore(models.Model):
+    TIER_CHOICES = [
+        ('unranked', 'Unranked'),
+        ('bronze', 'Bronze'),
+        ('silver', 'Silver'),
+        ('gold', 'Gold'),
+        ('platinum', 'Platinum'),
+    ]
+
+    provider = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reputation_score'
+    )
+    composite_score = models.FloatField(null=True, blank=True)
+    tier = models.CharField(max_length=20, choices=TIER_CHOICES, default='unranked')
+    avg_stars = models.FloatField(null=True, blank=True)
+    review_count = models.IntegerField(default=0)
+    redemption_count = models.IntegerField(default=0)
+    repeat_rate = models.FloatField(default=0.0)
+    consistency_score = models.FloatField(default=0.0)
+    score_breakdown = models.JSONField(default=dict)
+    gap_to_next = models.JSONField(default=dict)
+    last_calculated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'ReputationScore — {self.provider.email} ({self.tier})'

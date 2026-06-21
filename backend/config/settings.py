@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     'users',
     'companies',
     'wallet',
-    'catalog',
+    'catalog.apps.CatalogConfig',
     'approvals',
     'life_moments',
     'analytics',

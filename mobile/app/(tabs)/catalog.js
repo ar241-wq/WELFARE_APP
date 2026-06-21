@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getCategories, getPerks, getSuggestions, getInternalPerks } from '../../lib/api';
+import { getCategories, getPerks, getSuggestions, getInternalPerks, getTopProviders } from '../../lib/api';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
 function imgSrc(path) {
@@ -22,6 +22,7 @@ export default function CatalogScreen() {
   const [perks, setPerks] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [internalPerks, setInternalPerks] = useState([]);
+  const [topProviders, setTopProviders] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || null);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,7 @@ export default function CatalogScreen() {
     loadCategories();
     loadSuggestions();
     loadInternalPerks();
+    getTopProviders().then(setTopProviders).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -138,6 +140,16 @@ export default function CatalogScreen() {
         </View>
       )}
 
+      {/* Top 3 Providers */}
+      {!search && !selectedCategory && topProviders.length > 0 && (
+        <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+          <Text style={styles.sectionTitle}>🏆 Top Rated Providers</Text>
+          {topProviders.map((p, i) => (
+            <TopProviderCard key={p.provider_id} provider={p} rank={i + 1} />
+          ))}
+        </View>
+      )}
+
       <Text style={styles.sectionTitle}>
         {selectedCategory ? selectedCategory : 'All Perks'} {perks.length > 0 ? `(${perks.length})` : ''}
       </Text>
@@ -167,6 +179,14 @@ export default function CatalogScreen() {
                 <View style={styles.tagRow}>
                   <Text style={styles.categoryBadge}>{item.category_name}</Text>
                   {item.is_featured && <Text style={styles.featuredBadge}>Featured</Text>}
+                  {item.review_count >= 10 && item.avg_rating != null && (
+                    <Text style={styles.ratingBadge}>★ {Number(item.avg_rating).toFixed(1)}</Text>
+                  )}
+                  {item.review_count >= 10 && item.reputation_tier && item.reputation_tier !== 'unranked' && (
+                    <Text style={[styles.tierBadge, tierBadgeStyle(item.reputation_tier)]}>
+                      {item.reputation_tier.toUpperCase()}
+                    </Text>
+                  )}
                 </View>
               </View>
               <View style={styles.perkRight}>
@@ -180,6 +200,72 @@ export default function CatalogScreen() {
       )}
     </View>
   );
+}
+
+const RANK_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
+const RANK_LABELS = ['1st', '2nd', '3rd'];
+
+function TopProviderCard({ provider, rank }) {
+  const tierColor = TIER_COLORS[provider.tier] || '#6b7280';
+  const rankColor = RANK_COLORS[rank - 1] || '#9ca3af';
+  return (
+    <View style={tp.card}>
+      <View style={[tp.rankBadge, { backgroundColor: rankColor }]}>
+        <Text style={tp.rankTxt}>{RANK_LABELS[rank - 1]}</Text>
+      </View>
+      <View style={tp.avatar}>
+        <Text style={{ fontSize: 22 }}>🏪</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={tp.name}>{provider.company_name}</Text>
+          <View style={[tp.tierChip, { borderColor: tierColor, backgroundColor: tierColor + '18' }]}>
+            <Text style={[tp.tierTxt, { color: tierColor }]}>{provider.tier.toUpperCase()}</Text>
+          </View>
+        </View>
+        <View style={tp.meta}>
+          <Text style={tp.stars}>{'★'.repeat(Math.round(provider.avg_stars || 0))}{'☆'.repeat(5 - Math.round(provider.avg_stars || 0))}</Text>
+          <Text style={tp.score}>{Number(provider.avg_stars || 0).toFixed(1)}</Text>
+          <Text style={tp.dot}>·</Text>
+          <Text style={tp.reviews}>{provider.review_count} reviews</Text>
+          <Text style={tp.dot}>·</Text>
+          <Text style={tp.perks}>{provider.perk_count} perks</Text>
+        </View>
+        {provider.top_perk && <Text style={tp.topPerk} numberOfLines={1}>✦ {provider.top_perk}</Text>}
+      </View>
+      <Text style={[tp.score2, { color: rankColor }]}>{provider.composite_score}</Text>
+    </View>
+  );
+}
+
+const tp = StyleSheet.create({
+  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, padding: 14, marginBottom: 10, borderWidth: 1.5, borderColor: '#e5e7eb', gap: 12 },
+  rankBadge: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center', shrink: 0 },
+  rankTxt: { fontSize: 11, fontWeight: '900', color: '#fff' },
+  avatar: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
+  name: { fontSize: 14, fontWeight: '800', color: '#111827', flexShrink: 1 },
+  tierChip: { borderWidth: 1, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6 },
+  tierTxt: { fontSize: 10, fontWeight: '800' },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 3 },
+  stars: { fontSize: 11, color: '#f59e0b' },
+  score: { fontSize: 12, fontWeight: '700', color: '#111827' },
+  dot: { fontSize: 11, color: '#d1d5db' },
+  reviews: { fontSize: 11, color: '#6b7280' },
+  perks: { fontSize: 11, color: '#6b7280' },
+  topPerk: { fontSize: 11, color: '#6366f1', fontWeight: '600', marginTop: 3 },
+  score2: { fontSize: 20, fontWeight: '900', marginLeft: 4 },
+});
+
+const TIER_COLORS = {
+  bronze: '#cd7f32',
+  silver: '#adb5bd',
+  gold: '#d97706',
+  platinum: '#6b7280',
+};
+
+function tierBadgeStyle(tier) {
+  const color = TIER_COLORS[tier] || '#6b7280';
+  return { color, borderColor: color, backgroundColor: color + '18' };
 }
 
 function InternalPerkCard({ perk, onPress }) {
@@ -275,6 +361,14 @@ const styles = StyleSheet.create({
   featuredBadge: {
     fontSize: 11, color: '#d97706', fontWeight: '600',
     backgroundColor: '#fef3c7', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6,
+  },
+  ratingBadge: {
+    fontSize: 11, color: '#f59e0b', fontWeight: '700',
+    backgroundColor: '#fffbeb', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6,
+  },
+  tierBadge: {
+    fontSize: 10, fontWeight: '800',
+    paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, borderWidth: 1,
   },
   perkRight: { alignItems: 'center', marginLeft: 12 },
   price: { fontSize: 20, fontWeight: '800', color: '#6366f1' },

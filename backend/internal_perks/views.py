@@ -49,7 +49,7 @@ class InternalPerkListView(APIView):
             description=description,
             icon=request.data.get('icon', '🎁'),
             credit_cost=request.data.get('credit_cost', 0),
-            is_free=request.data.get('is_free', True),
+            is_free=request.data.get('is_free', False),
             available_slots=request.data.get('available_slots') or None,
             requires_approval=request.data.get('requires_approval', True),
         )
