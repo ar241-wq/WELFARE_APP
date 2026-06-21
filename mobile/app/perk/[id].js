@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  StyleSheet, ActivityIndicator, Alert, Image,
+  StyleSheet, ActivityIndicator, Alert, Image, TextInput,
 } from 'react-native';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
@@ -11,7 +11,7 @@ function imgSrc(path) {
   return `${API_URL}${path}`;
 }
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getPerkById, redeemPerk, getWallet, getPerkGroupBuys, startGroupBuy, joinGroupBuy, lockInGroupBuy, getPerkReviews } from '../../lib/api';
+import { getPerkById, redeemPerk, getWallet, getPerkGroupBuys, startGroupBuy, joinGroupBuy, lockInGroupBuy, getPerkReviews, getRedemptions, checkReview, submitReview } from '../../lib/api';
 
 const TIER_COLORS = { bronze: '#cd7f32', silver: '#adb5bd', gold: '#d97706', platinum: '#6b7280' };
 
@@ -195,6 +195,12 @@ export default function PerkDetailScreen() {
   const [redeeming, setRedeeming] = useState(false);
   const [groupBuys, setGroupBuys] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [myRedemptionId, setMyRedemptionId] = useState(null);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewStars, setReviewStars] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   async function load() {
     try {
@@ -203,6 +209,16 @@ export default function PerkDetailScreen() {
       setWallet(w);
       setGroupBuys(gbs);
       getPerkReviews(id).then(setReviews).catch(() => {});
+      // Check if the user has redeemed this perk and if they've reviewed it
+      getRedemptions().then(list => {
+        const mine = list.find(r => String(r.perk) === String(id) && r.status !== 'cancelled');
+        if (mine) {
+          setMyRedemptionId(mine.id);
+          checkReview(mine.id)
+            .then(d => setAlreadyReviewed(d.reviewed))
+            .catch(() => {});
+        }
+      }).catch(() => {});
     } catch (e) {
       Alert.alert('Error', 'Could not load perk details.');
     } finally {
@@ -213,6 +229,26 @@ export default function PerkDetailScreen() {
   useEffect(() => {
     load();
   }, [id]);
+
+  async function handleSubmitPerkReview() {
+    if (reviewStars === 0) {
+      Alert.alert('Select a rating', 'Please tap a star to rate.');
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      await submitReview(myRedemptionId, reviewStars, reviewComment);
+      setAlreadyReviewed(true);
+      setShowReviewForm(false);
+      setReviewStars(0);
+      setReviewComment('');
+      getPerkReviews(id).then(setReviews).catch(() => {});
+    } catch (e) {
+      Alert.alert('Error', e.message || 'Could not submit review.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  }
 
   async function handleRedeem() {
     if (!perk || !wallet) return;
@@ -232,7 +268,7 @@ export default function PerkDetailScreen() {
               const redemption = await redeemPerk(perk.id);
               router.replace({
                 pathname: `/redeem/${redemption.id}`,
-                params: { perk_name: perk.name, perk_price: perk.credit_price },
+                params: { perk_name: perk.name, perk_price: perk.credit_price, perk_id: perk.id },
               });
             } catch (err) {
               Alert.alert('Failed', err.message || 'Could not redeem perk.');
@@ -327,18 +363,74 @@ export default function PerkDetailScreen() {
           )}
         </View>
 
-        {/* Reviews Section */}
-        {reviews.length > 0 && (
-          <View style={rv.section}>
-            <View style={rv.header}>
-              <Text style={rv.title}>Reviews</Text>
+        {/* Reviews Section — always visible */}
+        <View style={rv.section}>
+          <View style={rv.header}>
+            <Text style={rv.title}>Reviews</Text>
+            {reviews.length > 0 && (
               <View style={rv.avgRow}>
                 <Text style={rv.avgNum}>{(reviews.reduce((s, r) => s + r.stars, 0) / reviews.length).toFixed(1)}</Text>
                 <Text style={rv.avgStar}>★</Text>
                 <Text style={rv.avgCount}>({reviews.length})</Text>
               </View>
+            )}
+          </View>
+
+          {/* Write a review — show if user has redeemed and not yet reviewed */}
+          {myRedemptionId && !alreadyReviewed && !showReviewForm && (
+            <TouchableOpacity style={rv.writeBtn} onPress={() => setShowReviewForm(true)}>
+              <Text style={rv.writeBtnTxt}>★  Write a Review</Text>
+            </TouchableOpacity>
+          )}
+          {myRedemptionId && alreadyReviewed && (
+            <View style={rv.reviewedTag}>
+              <Text style={rv.reviewedTxt}>✓ You reviewed this perk</Text>
             </View>
-            {/* Star distribution */}
+          )}
+
+          {/* Inline review form */}
+          {showReviewForm && (
+            <View style={rv.form}>
+              <Text style={rv.formTitle}>Rate your experience</Text>
+              <View style={rv.starsRow}>
+                {[1,2,3,4,5].map(n => (
+                  <TouchableOpacity key={n} onPress={() => setReviewStars(n)} style={rv.starBtn}>
+                    <Text style={[rv.starIcon, reviewStars >= n && rv.starFilled]}>{reviewStars >= n ? '★' : '☆'}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              {reviewStars > 0 && (
+                <Text style={rv.starsLabel}>{['','Terrible','Bad','OK','Good','Excellent'][reviewStars]}</Text>
+              )}
+              <TextInput
+                style={rv.formInput}
+                placeholder="Add a comment (optional)…"
+                placeholderTextColor="#9ca3af"
+                value={reviewComment}
+                onChangeText={setReviewComment}
+                multiline
+                numberOfLines={3}
+                maxLength={500}
+              />
+              <View style={rv.formBtns}>
+                <TouchableOpacity style={rv.cancelBtn} onPress={() => { setShowReviewForm(false); setReviewStars(0); setReviewComment(''); }}>
+                  <Text style={rv.cancelTxt}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[rv.submitBtn, reviewStars === 0 && rv.submitDisabled]}
+                  onPress={handleSubmitPerkReview}
+                  disabled={reviewStars === 0 || submittingReview}
+                >
+                  {submittingReview
+                    ? <ActivityIndicator size="small" color="#fff" />
+                    : <Text style={rv.submitTxt}>Submit</Text>}
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* Star distribution */}
+          {reviews.length > 0 && (
             <View style={rv.distRow}>
               {[5,4,3,2,1].map(n => {
                 const count = reviews.filter(r => r.stars === n).length;
@@ -354,18 +446,22 @@ export default function PerkDetailScreen() {
                 );
               })}
             </View>
-            {/* Individual reviews */}
-            {reviews.slice(0, 5).map((r, i) => (
-              <View key={i} style={rv.card}>
-                <View style={rv.cardTop}>
-                  <Text style={rv.stars}>{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</Text>
-                  <Text style={rv.date}>{new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
-                </View>
-                {r.comment ? <Text style={rv.comment}>{r.comment}</Text> : null}
+          )}
+
+          {/* Individual reviews */}
+          {reviews.length === 0 && !myRedemptionId && (
+            <Text style={rv.empty}>No reviews yet. Redeem this perk to be the first!</Text>
+          )}
+          {reviews.slice(0, 5).map((r, i) => (
+            <View key={i} style={rv.card}>
+              <View style={rv.cardTop}>
+                <Text style={rv.stars}>{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</Text>
+                <Text style={rv.date}>{new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</Text>
               </View>
-            ))}
-          </View>
-        )}
+              {r.comment ? <Text style={rv.comment}>{r.comment}</Text> : null}
+            </View>
+          ))}
+        </View>
 
         <GroupBuySection perkId={id} groupBuys={groupBuys} onRefresh={load} />
       </ScrollView>
@@ -451,6 +547,45 @@ const rv = StyleSheet.create({
   avgNum: { fontSize: 22, fontWeight: '900', color: '#111' },
   avgStar: { fontSize: 18, color: '#f59e0b', fontWeight: '700' },
   avgCount: { fontSize: 13, color: '#9ca3af' },
+
+  writeBtn: {
+    backgroundColor: '#EDF2FF', borderRadius: 12, paddingVertical: 12,
+    alignItems: 'center', marginBottom: 14, borderWidth: 1.5, borderColor: '#C7D7FF',
+  },
+  writeBtnTxt: { fontSize: 14, fontWeight: '700', color: '#1C3D5A' },
+  reviewedTag: {
+    backgroundColor: '#d1fae5', borderRadius: 10, paddingVertical: 9,
+    paddingHorizontal: 14, alignSelf: 'flex-start', marginBottom: 14,
+  },
+  reviewedTxt: { fontSize: 13, fontWeight: '700', color: '#059669' },
+
+  form: {
+    backgroundColor: '#F8F9FB', borderRadius: 16, padding: 16,
+    marginBottom: 16, borderWidth: 1, borderColor: '#E8EAED',
+  },
+  formTitle: { fontSize: 15, fontWeight: '800', color: '#0A1520', marginBottom: 12 },
+  starsRow: { flexDirection: 'row', gap: 6, marginBottom: 4 },
+  starBtn: { padding: 2 },
+  starIcon: { fontSize: 32, color: '#d1d5db' },
+  starFilled: { color: '#f59e0b' },
+  starsLabel: { fontSize: 12, color: '#6b7280', fontWeight: '600', marginBottom: 12 },
+  formInput: {
+    backgroundColor: '#fff', borderRadius: 12, borderWidth: 1.5, borderColor: '#E8EAED',
+    padding: 12, fontSize: 14, color: '#111827', textAlignVertical: 'top',
+    minHeight: 80, marginBottom: 12,
+  },
+  formBtns: { flexDirection: 'row', gap: 10 },
+  cancelBtn: {
+    flex: 1, paddingVertical: 12, borderRadius: 10,
+    borderWidth: 1.5, borderColor: '#E8EAED', alignItems: 'center',
+  },
+  cancelTxt: { fontSize: 14, fontWeight: '600', color: '#6b7280' },
+  submitBtn: { flex: 2, backgroundColor: '#1C3D5A', borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
+  submitDisabled: { backgroundColor: '#d1d5db' },
+  submitTxt: { fontSize: 14, fontWeight: '800', color: '#fff' },
+
+  empty: { fontSize: 13, color: '#9ca3af', textAlign: 'center', paddingVertical: 20 },
+
   distRow: { marginBottom: 16, gap: 5 },
   distItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   distLabel: { fontSize: 12, color: '#6b7280', width: 24, textAlign: 'right' },

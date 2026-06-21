@@ -221,6 +221,8 @@ class PackageDealDetailView(APIView):
             pkg.total_price = request.data['total_price']
         if 'discount_percentage' in request.data:
             pkg.discount_percentage = request.data['discount_percentage']
+            pkg.from_provider_confirmed = False
+            pkg.to_provider_confirmed = False
 
         # Target employer by email
         employer_email = request.data.get('target_employer_email')
@@ -231,9 +233,8 @@ class PackageDealDetailView(APIView):
             except User.DoesNotExist:
                 return Response({'detail': 'Employer not found.'}, status=404)
 
-        # Update perks
+        # Update perks — resets confirmations so both must re-agree
         perk_ids = request.data.get('perk_ids')
-        changed = False
         if perk_ids is not None:
             collab = pkg.collaboration
             valid_perks = Perk.objects.filter(
@@ -241,13 +242,10 @@ class PackageDealDetailView(APIView):
                 provider__in=[collab.from_provider, collab.to_provider]
             )
             pkg.perks.set(valid_perks)
-            changed = True
+            pkg.from_provider_confirmed = False
+            pkg.to_provider_confirmed = False
 
         if 'total_price' in request.data:
-            changed = True
-
-        # Any change resets both confirmations so both must re-agree
-        if changed:
             pkg.from_provider_confirmed = False
             pkg.to_provider_confirmed = False
 
@@ -383,7 +381,13 @@ class RedeemPackageView(APIView):
         if not perks:
             return Response({'detail': 'This package has no perks.'}, status=400)
 
-        total_cost = sum(p.credit_price for p in perks)
+        from decimal import Decimal, ROUND_HALF_UP
+        base_cost = sum(p.credit_price for p in perks)
+        if pkg.discount_percentage and pkg.discount_percentage > 0:
+            multiplier = Decimal('1') - (Decimal(str(pkg.discount_percentage)) / Decimal('100'))
+            total_cost = (Decimal(str(base_cost)) * multiplier).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        else:
+            total_cost = Decimal(str(base_cost))
 
         try:
             wallet = request.user.wallet
@@ -395,15 +399,16 @@ class RedeemPackageView(APIView):
                 'detail': f'Insufficient credits. Need {total_cost}, have {wallet.balance}.'
             }, status=400)
 
-        # Deduct balance
+        # Deduct balance (with discount applied)
         wallet.balance -= total_cost
         wallet.save()
 
+        discount_note = f' ({pkg.discount_percentage}% discount applied)' if pkg.discount_percentage else ''
         Transaction.objects.create(
             wallet=wallet,
             amount=total_cost,
             type='debit',
-            description=f'Package: {pkg.name}',
+            description=f'Package: {pkg.name}{discount_note}',
             reference_id=f'pkg_{pkg.id}',
         )
 
@@ -425,6 +430,7 @@ class RedeemPackageView(APIView):
         return Response({
             'message': f'Successfully redeemed package "{pkg.name}".',
             'credits_spent': float(total_cost),
+            'discount_applied': float(pkg.discount_percentage) if pkg.discount_percentage else 0,
             'new_balance': float(wallet.balance),
             'redemptions': redemptions,
         })

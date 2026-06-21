@@ -184,6 +184,11 @@ class ChallengeWinNotificationView(APIView):
             'department_name': n.department_name,
             'amount': str(n.amount),
         } for n in notifications]
-        # Mark all seen
-        notifications.update(seen=True)
         return Response(data)
+
+    def post(self, request):
+        from .models import ChallengeWinNotification
+        ChallengeWinNotification.objects.filter(
+            user=request.user, seen=False
+        ).update(seen=True)
+        return Response({'detail': 'marked seen'})

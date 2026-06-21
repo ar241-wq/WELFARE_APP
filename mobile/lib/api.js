@@ -172,6 +172,10 @@ export async function getBirthdayGiftsReceived() {
   return request('GET', '/api/wallet/birthday-gifts/received/');
 }
 
+export async function markBirthdayGiftsSeen() {
+  return request('POST', '/api/wallet/birthday-gifts/received/');
+}
+
 export async function markLifeEvent(eventType, note = '') {
   return request('POST', '/api/life-moments/', { event_type: eventType, note });
 }
@@ -275,6 +279,10 @@ export async function getChallengeWinNotifications() {
   return request('GET', '/api/challenges/win-notifications/');
 }
 
+export async function markChallengeWinsSeen() {
+  return request('POST', '/api/challenges/win-notifications/');
+}
+
 // ─── Reviews & Reputation ──────────────────────────────────────────────────────
 export async function getTopProviders(limit = 3) {
   return request('GET', `/api/catalog/providers/top/?limit=${limit}`);
@@ -300,6 +308,8 @@ export const getSantaEvent = (id) => request('GET', `/api/santa/${id}/`);
 export const joinSantaEvent = (id) => request('POST', `/api/santa/${id}/join/`);
 export const sendSantaGift = (id, amount) => request('POST', `/api/santa/${id}/send-gift/`, { amount });
 export const sendSantaGiftPerk = (id, perkId) => request('POST', `/api/santa/${id}/send-gift/`, { perk_id: perkId });
+export const getSantaGiftNotifications = () => request('GET', '/api/santa/gifts/notifications/');
+export const markSantaGiftsSeen = () => request('POST', '/api/santa/gifts/notifications/');
 
 // ─── Group Buying ─────────────────────────────────────────────────────────────
 export const getPerkGroupBuys = (perkId) => request('GET', `/api/group-buy/perk/${perkId}/`);

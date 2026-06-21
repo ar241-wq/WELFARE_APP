@@ -32,7 +32,7 @@ export default function NewLifeEventScreen() {
       Alert.alert(
         'Life Event Marked',
         'Your HR manager has been notified and will prepare a care package for you. Your colleagues may also send you care credits.',
-        [{ text: 'Thank you', onPress: () => router.replace('/life-moments/index') }]
+        [{ text: 'Thank you', onPress: () => router.replace('/life-moments') }]
       );
     } catch (err) {
       Alert.alert('Error', err.message || 'Could not mark life event.');

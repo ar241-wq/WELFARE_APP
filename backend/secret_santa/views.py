@@ -85,6 +85,11 @@ class SantaEventDetailView(APIView):
         event = self._get_event(pk)
         if not event:
             return Response({'detail': 'Not found.'}, status=404)
+        # Auto-mark gift as seen when receiver opens a revealed event
+        if event.status == 'revealed':
+            SantaAssignment.objects.filter(
+                event=event, receiver=request.user, gift_seen=False
+            ).update(gift_seen=True)
         return Response(SecretSantaEventSerializer(event, context={'request': request}).data)
 
     def patch(self, request, pk):
@@ -231,6 +236,42 @@ class SantaSendGiftView(APIView):
             )
             SantaParticipant.objects.filter(event=event, user=request.user).update(gift_sent=True)
             return Response({'detail': f'🎁 Sent {amount} credits to {assignment.receiver.full_name}!', 'gift_sent': True})
+
+
+class SantaGiftNotificationsView(APIView):
+    """
+    GET  — return unseen gifts received (event revealed, gifted_perk set, gift_seen=False)
+    POST — mark all as seen
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        assignments = SantaAssignment.objects.filter(
+            receiver=request.user,
+            gift_seen=False,
+            gifted_perk__isnull=False,
+            event__status='revealed',
+        ).select_related('event', 'giver', 'gifted_perk')
+
+        data = []
+        for a in assignments:
+            data.append({
+                'assignment_id': a.id,
+                'event_id': a.event.id,
+                'event_title': a.event.title,
+                'giver_name': a.giver.full_name,
+                'perk_name': a.gifted_perk.name,
+                'perk_description': a.gifted_perk.description,
+                'perk_category': a.gifted_perk.category.name if a.gifted_perk.category else '',
+            })
+        return Response(data)
+
+    def post(self, request):
+        SantaAssignment.objects.filter(
+            receiver=request.user,
+            gift_seen=False,
+        ).update(gift_seen=True)
+        return Response({'detail': 'marked seen'})
 
 
 class SantaRevealView(APIView):

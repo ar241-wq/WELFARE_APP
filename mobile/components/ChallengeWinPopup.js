@@ -3,6 +3,7 @@ import {
   View, Text, Modal, TouchableOpacity, StyleSheet,
   Animated, Dimensions, ScrollView,
 } from 'react-native';
+import { markChallengeWinsSeen } from '../lib/api';
 
 const { width } = Dimensions.get('window');
 
@@ -40,6 +41,7 @@ function FloatingEmoji({ emoji, startX, delay }) {
 }
 
 export default function ChallengeWinPopup({ wins, onClose }) {
+  const handleClose = () => { markChallengeWinsSeen().catch(() => {}); onClose(); };
   const scaleAnim = useRef(new Animated.Value(0.6)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
   const shineAnim = useRef(new Animated.Value(-1)).current;
@@ -70,7 +72,7 @@ export default function ChallengeWinPopup({ wins, onClose }) {
   const shineX = shineAnim.interpolate({ inputRange: [-1, 2], outputRange: [-300, 600] });
 
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible transparent animationType="fade" onRequestClose={handleClose}>
       <View style={styles.overlay}>
         {/* Particles */}
         <View style={styles.particleWrap} pointerEvents="none">
@@ -114,7 +116,7 @@ export default function ChallengeWinPopup({ wins, onClose }) {
             ))}
           </ScrollView>
 
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose} activeOpacity={0.85}>
+          <TouchableOpacity style={styles.closeBtn} onPress={handleClose} activeOpacity={0.85}>
             <Text style={styles.closeTxt}>Claim Your Victory! 🎊</Text>
           </TouchableOpacity>
         </Animated.View>

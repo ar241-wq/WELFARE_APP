@@ -473,4 +473,24 @@ export async function getProviderReviews(providerId: number) {
   return Array.isArray(data) ? data : data?.results ?? data;
 }
 
+// ─── Challenges ────────────────────────────────────────────────────────────
+
+export async function getChallenges() {
+  const { data } = await api.get('/api/challenges/');
+  return Array.isArray(data) ? data : data?.results ?? [];
+}
+
+export async function createChallenge(payload: {
+  title: string; description: string; reward_credits: number;
+  deadline: string; challenge_type: string; target_metric?: string;
+}) {
+  const { data } = await api.post('/api/challenges/', payload);
+  return data;
+}
+
+export async function distributeChallengePrize(id: number, departmentId: number) {
+  const { data } = await api.post(`/api/challenges/${id}/distribute/`, { department_id: departmentId });
+  return data;
+}
+
 export default api;

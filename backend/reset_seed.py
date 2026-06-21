@@ -83,13 +83,12 @@ User.objects.exclude(email__in=[
     'mia@pulse.com', 'ethan@pulse.com', 'sofia@pulse.com',
 ]).exclude(is_superuser=True).delete()
 
-# Reset passwords and birthdays for all existing users
+# Reset passwords for all existing users
 for u in User.objects.exclude(is_superuser=True):
     u.set_password('password123')
-    u.birthday = None
     u.save()
 
-print("  ✓ Passwords reset to 'password123', birthdays cleared")
+print("  ✓ Passwords reset to 'password123'")
 
 # ── REBUILD COMPANIES & DEPARTMENTS ──────────────────────────
 print("\n[3/6] Rebuilding companies and departments...")
@@ -129,20 +128,24 @@ dept_green_ops = Department.objects.create(name='Operations', company=company_gr
 dept_pulse_content = Department.objects.create(name='Content', company=company_pulse)
 
 # Employees + wallets
+# birthday uses year 1900 (dummy) — only month+day are used for matching
+from datetime import date as _date
+today = _date.today()
 EMPLOYEES = [
-    ('liam@novatech.com',   'Liam Johnson',   company_nova,  dept_eng,          500),
-    ('emma@novatech.com',   'Emma Rodriguez', company_nova,  dept_eng,          500),
-    ('noah@novatech.com',   'Noah Williams',  company_nova,  dept_design,       500),
-    ('olivia@novatech.com', 'Olivia Brown',   company_nova,  dept_design,       500),
-    ('james@greenleaf.com', 'James Taylor',   company_green, dept_green_ops,    400),
-    ('ava@greenleaf.com',   'Ava Martinez',   company_green, dept_green_ops,    400),
-    ('lucas@greenleaf.com', 'Lucas Anderson', company_green, dept_green_ops,    400),
-    ('mia@pulse.com',       'Mia Chen',       company_pulse, dept_pulse_content,450),
-    ('ethan@pulse.com',     'Ethan Kim',      company_pulse, dept_pulse_content,450),
-    ('sofia@pulse.com',     'Sofia Davis',    company_pulse, dept_pulse_content,450),
+    # email, name, company, dept, balance, birthday (month, day)
+    ('liam@novatech.com',   'Liam Johnson',   company_nova,  dept_eng,          500, (today.month, today.day)),   # birthday TODAY — triggers popup
+    ('emma@novatech.com',   'Emma Rodriguez', company_nova,  dept_eng,          500, (today.month, today.day)),   # birthday TODAY
+    ('noah@novatech.com',   'Noah Williams',  company_nova,  dept_design,       500, (3, 15)),
+    ('olivia@novatech.com', 'Olivia Brown',   company_nova,  dept_design,       500, (7, 4)),
+    ('james@greenleaf.com', 'James Taylor',   company_green, dept_green_ops,    400, (11, 28)),
+    ('ava@greenleaf.com',   'Ava Martinez',   company_green, dept_green_ops,    400, (2, 14)),
+    ('lucas@greenleaf.com', 'Lucas Anderson', company_green, dept_green_ops,    400, (8, 20)),
+    ('mia@pulse.com',       'Mia Chen',       company_pulse, dept_pulse_content,450, (5, 1)),
+    ('ethan@pulse.com',     'Ethan Kim',      company_pulse, dept_pulse_content,450, (10, 31)),
+    ('sofia@pulse.com',     'Sofia Davis',    company_pulse, dept_pulse_content,450, (1, 7)),
 ]
 
-for email, name, company, dept, balance in EMPLOYEES:
+for email, name, company, dept, balance, bday in EMPLOYEES:
     emp, _ = User.objects.get_or_create(
         email=email,
         defaults={'full_name': name, 'role': 'employee', 'company': company, 'is_verified': True}
@@ -150,7 +153,7 @@ for email, name, company, dept, balance in EMPLOYEES:
     emp.full_name = name
     emp.company = company
     emp.is_verified = True
-    emp.birthday = None
+    emp.birthday = _date(1900, bday[0], bday[1])
     emp.set_password('password123')
     emp.save()
 

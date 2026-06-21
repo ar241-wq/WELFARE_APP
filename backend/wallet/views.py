@@ -192,7 +192,10 @@ class BirthdayGiftView(APIView):
 
 
 class BirthdayGiftsReceivedView(APIView):
-    """GET /api/wallet/birthday-gifts/received/ — unseen birthday gifts for the logged-in user."""
+    """
+    GET  — return unseen birthday gifts (does NOT mark as seen)
+    POST — mark all unseen birthday gifts as seen
+    """
     permission_classes = [IsEmployee]
 
     def get(self, request):
@@ -206,6 +209,8 @@ class BirthdayGiftsReceivedView(APIView):
                 'from_avatar': request.build_absolute_uri(avatar.url) if avatar else None,
                 'amount': float(g.amount),
             })
-        # Mark as seen
-        gifts.update(seen=True)
         return Response(result)
+
+    def post(self, request):
+        BirthdayGift.objects.filter(to_user=request.user, seen=False).update(seen=True)
+        return Response({'detail': 'marked seen'})
