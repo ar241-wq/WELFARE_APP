@@ -41,3 +41,4 @@ npm-debug.log*
 
 # Memory files
 project_hackathon26.md
+backend/.env

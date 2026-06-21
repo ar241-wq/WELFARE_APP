@@ -170,11 +170,18 @@ export default function CatalogScreen() {
             {!search && !selectedCategory && topProviders.length > 0 && (
               <View>
                 <Text style={styles.sectionTitle}>Top Rated Providers</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingBottom: 4 }}>
-                  {topProviders.map((p, i) => (
-                    <TopProviderCard key={p.provider_id} provider={p} rank={i + 1} />
-                  ))}
-                </ScrollView>
+                <FlatList
+                  data={topProviders}
+                  keyExtractor={(p) => String(p.provider_id)}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  scrollEnabled
+                  nestedScrollEnabled
+                  contentContainerStyle={{ gap: 10, paddingBottom: 6 }}
+                  renderItem={({ item, index }) => (
+                    <TopProviderCard provider={item} rank={index + 1} />
+                  )}
+                />
               </View>
             )}
 
