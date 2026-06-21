@@ -24,6 +24,9 @@ from community.models import Post, PostView, Like
 from challenges.models import Challenge, ChallengeEntry, ChallengeWinNotification
 from internal_perks.models import InternalPerk, InternalPerkRedemption
 from group_buying.models import GroupBuy, GroupBuyMember
+from companies.models import Team, TeamMembership
+from secret_santa.models import SecretSantaEvent, SantaParticipant, SantaAssignment
+from collaborations.models import Collaboration, PackageDeal
 
 User = get_user_model()
 
@@ -47,6 +50,23 @@ except: pass
 try:
     ChallengeWinNotification.objects.all().delete()
     ChallengeEntry.objects.all().delete()
+    Challenge.objects.all().delete()
+except: pass
+
+try:
+    TeamMembership.objects.all().delete()
+    Team.objects.all().delete()
+except: pass
+
+try:
+    SantaAssignment.objects.all().delete()
+    SantaParticipant.objects.all().delete()
+    SecretSantaEvent.objects.all().delete()
+except: pass
+
+try:
+    PackageDeal.objects.all().delete()
+    Collaboration.objects.all().delete()
 except: pass
 
 try:
@@ -321,6 +341,284 @@ for provider in providers:
     )
     print(f"  {provider.full_name:20} — {tier:8} | score={composite} | avg={avg_stars:.1f}★ | {review_count_p} reviews")
 
+# ── SEED TEAMS ───────────────────────────────────────────────
+print("\n[7/10] Seeding teams...")
+
+liam    = User.objects.get(email='liam@novatech.com')
+emma    = User.objects.get(email='emma@novatech.com')
+noah    = User.objects.get(email='noah@novatech.com')
+olivia  = User.objects.get(email='olivia@novatech.com')
+james   = User.objects.get(email='james@greenleaf.com')
+ava     = User.objects.get(email='ava@greenleaf.com')
+lucas   = User.objects.get(email='lucas@greenleaf.com')
+mia     = User.objects.get(email='mia@pulse.com')
+ethan   = User.objects.get(email='ethan@pulse.com')
+sofia   = User.objects.get(email='sofia@pulse.com')
+
+# NovaTech teams
+team_backend = Team.objects.create(name='Backend Squad', company=company_nova, manager=employer_novatech)
+team_product = Team.objects.create(name='Product & Design', company=company_nova, manager=employer_novatech)
+TeamMembership.objects.create(employee=liam, team=team_backend)
+TeamMembership.objects.create(employee=emma, team=team_backend)
+TeamMembership.objects.create(employee=noah, team=team_product)
+TeamMembership.objects.create(employee=olivia, team=team_product)
+
+# GreenLeaf team
+team_green_ops = Team.objects.create(name='Sustainability Ops', company=company_green, manager=employer_greenleaf)
+TeamMembership.objects.create(employee=james, team=team_green_ops)
+TeamMembership.objects.create(employee=ava, team=team_green_ops)
+TeamMembership.objects.create(employee=lucas, team=team_green_ops)
+
+# Pulse team
+team_pulse = Team.objects.create(name='Content Creators', company=company_pulse, manager=employer_pulse)
+TeamMembership.objects.create(employee=mia, team=team_pulse)
+TeamMembership.objects.create(employee=ethan, team=team_pulse)
+TeamMembership.objects.create(employee=sofia, team=team_pulse)
+
+print("  ✓ 3 teams created across NovaTech, GreenLeaf, Pulse")
+
+# ── SEED CHALLENGES ───────────────────────────────────────────
+print("\n[8/10] Seeding challenges...")
+
+from datetime import date as _date
+
+# Active challenges
+ch1 = Challenge.objects.create(
+    company=company_nova,
+    created_by=employer_novatech,
+    title='AI Tool Adoption Sprint',
+    description='Be the first department to integrate and demonstrate 3 AI tools into your daily workflow. Submit a short report with screenshots.',
+    challenge_type='ai_adoption',
+    target_metric='Integrate 3 AI tools into daily workflow',
+    reward_credits=Decimal('2000'),
+    status='active',
+    deadline=timezone.now() + timedelta(days=14),
+)
+ch2 = Challenge.objects.create(
+    company=company_nova,
+    created_by=employer_novatech,
+    title='Q3 Code Quality Challenge',
+    description='Reduce bug count in your sprint by 30% compared to last quarter. Tracked via Jira ticket velocity.',
+    challenge_type='kpi',
+    target_metric='Reduce sprint bugs by 30%',
+    reward_credits=Decimal('1500'),
+    status='active',
+    deadline=timezone.now() + timedelta(days=21),
+)
+ch3 = Challenge.objects.create(
+    company=company_green,
+    created_by=employer_greenleaf,
+    title='Green Innovation Pitch',
+    description='Submit the most impactful sustainability idea for Q3. Winning team gets credits + company-wide recognition.',
+    challenge_type='innovation',
+    target_metric='Best sustainability idea submission',
+    reward_credits=Decimal('1200'),
+    status='active',
+    deadline=timezone.now() + timedelta(days=10),
+)
+ch4 = Challenge.objects.create(
+    company=company_pulse,
+    created_by=employer_pulse,
+    title='Content Velocity Race',
+    description='Publish the highest number of approved content pieces this month. Quality-checked by editors.',
+    challenge_type='first_to',
+    target_metric='Most approved content pieces in July',
+    reward_credits=Decimal('800'),
+    status='active',
+    deadline=timezone.now() + timedelta(days=7),
+)
+
+# One completed challenge with winner + notifications
+from decimal import Decimal as D
+ch5 = Challenge.objects.create(
+    company=company_nova,
+    created_by=employer_novatech,
+    title='Onboarding Excellence Award',
+    description='Best onboarding experience rating from new hires. Engineering team wins!',
+    challenge_type='custom',
+    target_metric='Highest new-hire satisfaction score',
+    reward_credits=Decimal('1000'),
+    status='completed',
+    winner_department=dept_eng,
+    deadline=timezone.now() - timedelta(days=2),
+)
+# Distribute 1000 credits / 2 members = 500 each, create notifications
+each_win = Decimal('500.00')
+for winner in [liam, emma]:
+    w, _ = Wallet.objects.get_or_create(employee=winner)
+    w.balance += each_win
+    w.save()
+    Transaction.objects.create(
+        wallet=w, amount=each_win, type='credit',
+        description=f'Challenge prize (Engineering won): {ch5.title}'
+    )
+    ChallengeWinNotification.objects.create(
+        user=winner, challenge=ch5,
+        department_name='Engineering', amount=each_win, seen=False,
+    )
+
+# Seed a few entries for active challenges
+for emp in [liam, emma]:
+    ChallengeEntry.objects.create(
+        challenge=ch1, employee=emp,
+        submission='We integrated ChatGPT, GitHub Copilot, and Notion AI into our sprints.'
+    )
+for emp in [noah, olivia]:
+    ChallengeEntry.objects.create(
+        challenge=ch2, employee=emp,
+        submission='Reduced bugs from 24 to 15 this sprint via better PR reviews.'
+    )
+
+print("  ✓ 4 active challenges + 1 completed challenge with win notifications")
+
+# ── SEED SECRET SANTA ─────────────────────────────────────────
+print("\n[9/10] Seeding Secret Santa...")
+
+from datetime import datetime
+
+# NovaTech Engineering santa — status=assigned (assignments locked)
+santa_nova = SecretSantaEvent.objects.create(
+    department=dept_eng,
+    created_by=employer_novatech,
+    title='NovaTech Engineering Secret Santa 🎅',
+    credit_budget=Decimal('100'),
+    join_deadline=timezone.now() + timedelta(days=3),
+    reveal_date=timezone.now() + timedelta(days=10),
+    status='open',
+)
+for emp in [liam, emma]:
+    SantaParticipant.objects.create(event=santa_nova, user=emp)
+santa_nova.assign_santas()  # locks assignments, sets status='assigned'
+
+# GreenLeaf Operations santa — open for joining
+santa_green = SecretSantaEvent.objects.create(
+    department=dept_green_ops,
+    created_by=employer_greenleaf,
+    title='GreenLeaf Holiday Secret Santa 🎄',
+    credit_budget=Decimal('75'),
+    join_deadline=timezone.now() + timedelta(days=5),
+    reveal_date=timezone.now() + timedelta(days=14),
+    status='open',
+)
+for emp in [james, ava, lucas]:
+    SantaParticipant.objects.create(event=santa_green, user=emp)
+santa_green.assign_santas()
+
+# Pick a perk for the NovaTech assignment (gift sent)
+wellness_perk = Perk.objects.filter(provider__email='care@mindspace.com').first()
+if wellness_perk:
+    assign = SantaAssignment.objects.filter(event=santa_nova).first()
+    if assign:
+        assign.gifted_perk = wellness_perk
+        assign.gift_seen = False
+        assign.save()
+
+print("  ✓ 2 Secret Santa events created with participants and assignments")
+
+# ── SEED PACKAGE DEALS ────────────────────────────────────────
+print("\n[10/10] Seeding package deals (collaborations)...")
+
+zenfit   = User.objects.get(email='hello@zenfit.com')
+boltgym  = User.objects.get(email='info@boltgym.com')
+mealcraft = User.objects.get(email='team@mealcraft.com')
+skillvault = User.objects.get(email='hi@skillvault.com')
+mindspace = User.objects.get(email='care@mindspace.com')
+wanderpass = User.objects.get(email='go@wanderpass.com')
+
+# Collaboration 1: ZenFit + BoltGym → NovaTech
+collab1, _ = Collaboration.objects.get_or_create(
+    from_provider=zenfit, to_provider=boltgym,
+    defaults={'message': 'Let\'s bundle wellness and fitness for NovaTech!', 'status': 'accepted'}
+)
+yoga_perk    = Perk.objects.get(name='Monthly Yoga Unlimited')
+gym_perk     = Perk.objects.get(name='Bolt Gym Monthly Pass')
+hiit_perk    = Perk.objects.get(name='Group HIIT Classes Bundle')
+pkg1 = PackageDeal.objects.create(
+    collaboration=collab1,
+    name='Total Wellness Bundle',
+    description='Yoga + gym access + HIIT classes — the ultimate fitness package for your team. Includes unlimited monthly yoga, full gym access, and 4 weekly HIIT group sessions.',
+    target_employer=employer_novatech,
+    total_price=Decimal('360'),
+    discount_percentage=Decimal('10'),
+    status='offered',
+    from_provider_confirmed=True,
+    to_provider_confirmed=True,
+    created_by=zenfit,
+    offered_at=timezone.now() - timedelta(days=1),
+)
+pkg1.perks.set([yoga_perk, gym_perk, hiit_perk])
+
+# Collaboration 2: MealCraft + SkillVault → GreenLeaf
+collab2, _ = Collaboration.objects.get_or_create(
+    from_provider=mealcraft, to_provider=skillvault,
+    defaults={'message': 'Healthy body, sharp mind package for GreenLeaf.', 'status': 'accepted'}
+)
+meal_perk    = Perk.objects.get(name='Healthy Lunch Plan')
+learn_perk   = Perk.objects.get(name='All-Access Learning Pass')
+lang_perk    = Perk.objects.get(name='Language Learning — 3 Mo')
+pkg2 = PackageDeal.objects.create(
+    collaboration=collab2,
+    name='Nourish & Grow Package',
+    description='Feed your mind and body — healthy lunches delivered plus full access to SkillVault\'s learning library and language courses.',
+    target_employer=employer_greenleaf,
+    total_price=Decimal('250'),
+    discount_percentage=Decimal('15'),
+    status='offered',
+    from_provider_confirmed=True,
+    to_provider_confirmed=True,
+    created_by=mealcraft,
+    offered_at=timezone.now() - timedelta(hours=6),
+)
+pkg2.perks.set([meal_perk, learn_perk, lang_perk])
+
+# Collaboration 3: MindSpace + WanderPass → Pulse Digital
+collab3, _ = Collaboration.objects.get_or_create(
+    from_provider=mindspace, to_provider=wanderpass,
+    defaults={'message': 'Mental wellness + travel rewards for Pulse Digital.', 'status': 'accepted'}
+)
+therapy_perk  = Perk.objects.get(name='Therapy Session')
+sleep_perk    = Perk.objects.get(name='Sleep Improvement Program')
+lounge_perk   = Perk.objects.get(name='Airport Lounge Pass')
+pkg3 = PackageDeal.objects.create(
+    collaboration=collab3,
+    name='Recharge & Explore Bundle',
+    description='Balance mental wellbeing with travel perks — therapy sessions and sleep coaching paired with airport lounge access for your next work trip.',
+    target_employer=employer_pulse,
+    total_price=Decimal('235'),
+    discount_percentage=Decimal('12'),
+    status='offered',
+    from_provider_confirmed=True,
+    to_provider_confirmed=True,
+    created_by=mindspace,
+    offered_at=timezone.now() - timedelta(hours=3),
+)
+pkg3.perks.set([therapy_perk, sleep_perk, lounge_perk])
+
+# One already-accepted package (NovaTech, a previous deal)
+collab4, _ = Collaboration.objects.get_or_create(
+    from_provider=skillvault, to_provider=wanderpass,
+    defaults={'message': 'Learning + travel perks bundle.', 'status': 'accepted'}
+)
+cert_perk   = Perk.objects.get(name='Professional Certification')
+hotel_perk  = Perk.objects.get(name='Hotel Night Voucher')
+pkg4 = PackageDeal.objects.create(
+    collaboration=collab4,
+    name='Level Up & Get Away',
+    description='Earn a professional certification then celebrate with a hotel night — the ultimate reward package for high performers.',
+    target_employer=employer_novatech,
+    total_price=Decimal('430'),
+    discount_percentage=Decimal('8'),
+    status='accepted',
+    from_provider_confirmed=True,
+    to_provider_confirmed=True,
+    created_by=skillvault,
+    offered_at=timezone.now() - timedelta(days=5),
+    responded_at=timezone.now() - timedelta(days=3),
+)
+pkg4.perks.set([cert_perk, hotel_perk])
+
+print("  ✓ 4 package deals created (3 pending, 1 accepted) across 3 employers")
+
 print("\n" + "=" * 60)
 print("RESET COMPLETE")
 print("=" * 60)
@@ -331,6 +629,10 @@ print("              james@greenleaf.com | mia@pulse.com")
 print("  Providers:  hello@zenfit.com | info@boltgym.com | team@mealcraft.com")
 print("              hi@skillvault.com | care@mindspace.com | go@wanderpass.com")
 print("\nAll employee wallets restored:")
-print("  NovaTech employees: 500 credits each")
+print("  NovaTech employees: 500 credits each (+500 win bonus for Liam & Emma)")
 print("  GreenLeaf employees: 400 credits each")
 print("  Pulse employees: 450 credits each")
+print("\nChallenges: 4 active + 1 completed (Engineering won, notifications pending)")
+print("Teams: Backend Squad, Product & Design (Nova) | Sustainability Ops (Green) | Content Creators (Pulse)")
+print("Secret Santa: 2 events (NovaTech Eng assigned, GreenLeaf Ops assigned)")
+print("Package Deals: 3 offered + 1 accepted")
