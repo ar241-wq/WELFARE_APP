@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, Pressable,
   StyleSheet, ActivityIndicator, RefreshControl, Alert,
   Animated, Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Heart, Trophy, Sparkles, Gift, ChevronRight, Zap } from 'lucide-react-native';
@@ -139,6 +139,24 @@ export default function HomeScreen() {
   }
 
   useEffect(() => { load(); }, []);
+
+  // Re-check notifications every time the home tab comes into focus
+  useFocusEffect(useCallback(() => {
+    async function checkNotifications() {
+      const [cwins, bgifts, sgifts] = await Promise.all([
+        getChallengeWinNotifications().catch(() => []),
+        getBirthdayGiftsReceived().catch(() => []),
+        getSantaGiftNotifications().catch(() => []),
+      ]);
+      const wlist = Array.isArray(cwins) ? cwins : [];
+      if (wlist.length > 0) { setChallengeWins(wlist); setShowChallengeWin(true); }
+      const glist = Array.isArray(bgifts) ? bgifts : [];
+      if (glist.length > 0) { setBirthdayGifts(glist); setShowBirthdayGifts(true); }
+      const slist = Array.isArray(sgifts) ? sgifts : [];
+      if (slist.length > 0) { setSantaGifts(slist); setShowSantaGifts(true); }
+    }
+    checkNotifications();
+  }, []));
 
   const handleDonate = (event) => {
     Alert.alert(
