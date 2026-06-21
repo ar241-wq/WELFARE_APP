@@ -101,7 +101,9 @@ export default function HomeScreen() {
   async function load() {
     try {
       const [w, f, c, feed, bdays, bgifts, cwins, sgifts, chals] = await Promise.all([
-        getWallet(), getFeaturedPerks(), getCategories(),
+        getWallet().catch(() => null),
+        getFeaturedPerks().catch(() => []),
+        getCategories().catch(() => []),
         getCompanyFeed().catch(() => []),
         getBirthdaysToday().catch(() => []),
         getBirthdayGiftsReceived().catch(() => []),
