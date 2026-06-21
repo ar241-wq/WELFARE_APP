@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Heart, Trophy, Sparkles, Gift, ChevronRight } from 'lucide-react-native';
 import {
   getWallet, getFeaturedPerks, getCategories, getCompanyFeed, donateCredits,
   getBirthdaysToday, getBirthdayGiftsReceived, getChallengeWinNotifications,
@@ -13,11 +14,6 @@ import { useAuth } from '../../context/AuthContext';
 import BirthdayPopup from '../../components/BirthdayPopup';
 import BirthdayGiftsPopup from '../../components/BirthdayGiftsPopup';
 import ChallengeWinPopup from '../../components/ChallengeWinPopup';
-
-const EVENT_ICONS = {
-  new_baby: '🍼', medical: '🏥', relocation: '📦',
-  bereavement: '🌹', burnout: '😮‍💨',
-};
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -68,7 +64,7 @@ export default function HomeScreen() {
 
   const handleDonate = (event) => {
     Alert.alert(
-      `Support ${event.employee_name} 💝`,
+      `Support ${event.employee_name}`,
       `${event.employee_name} is going through ${event.event_type_display}. Send anonymous care credits?`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -82,7 +78,7 @@ export default function HomeScreen() {
   const sendDonation = async (eventId, amount) => {
     try {
       await donateCredits(eventId, amount);
-      Alert.alert('Sent! 💝', 'Your anonymous care credits have been sent.');
+      Alert.alert('Sent', 'Your anonymous care credits have been sent.');
       load();
     } catch (err) {
       Alert.alert('Error', err.message || 'Could not send credits.');
@@ -94,7 +90,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#1C3D5A" />
       </View>
     );
   }
@@ -113,22 +109,23 @@ export default function HomeScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 24 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor="#1C3D5A" />}
       >
+        {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
           <View>
-            <Text style={styles.greeting}>Good morning, {firstName} 👋</Text>
+            <Text style={styles.greeting}>Good morning, {firstName}</Text>
             <Text style={styles.subGreeting}>Ready to explore your perks?</Text>
           </View>
           <TouchableOpacity onPress={() => router.push('/life-moments')} style={styles.heartBtn}>
-            <Text style={{ fontSize: 22 }}>💝</Text>
+            <Heart size={20} color="#5B5E66" strokeWidth={1.75} />
           </TouchableOpacity>
         </View>
 
         {/* Wallet Card */}
         {wallet && (
           <TouchableOpacity style={styles.walletCard} onPress={() => router.push('/wallet')}>
-            <Text style={styles.walletLabel}>Your Credit Balance</Text>
+            <Text style={styles.walletLabel}>Credit Balance</Text>
             <Text style={styles.walletBalance}>{wallet.balance}</Text>
             <Text style={styles.walletCredits}>credits available</Text>
             {wallet.expires_at && (
@@ -142,11 +139,11 @@ export default function HomeScreen() {
         {/* Company Life Events Feed */}
         {companyFeed.length > 0 && (
           <View style={styles.feedSection}>
-            <Text style={styles.feedTitle}>Your Team Needs Support 💙</Text>
+            <Text style={styles.feedTitle}>Team Support</Text>
             {companyFeed.map((event) => (
               <View key={event.id} style={styles.feedCard}>
                 <View style={styles.feedLeft}>
-                  <Text style={styles.feedIcon}>{EVENT_ICONS[event.event_type] || '❤️'}</Text>
+                  <View style={styles.feedDot} />
                   <View style={{ flex: 1 }}>
                     <TouchableOpacity onPress={() => router.push(`/profile/${event.employee_id}`)}>
                       <Text style={styles.feedName}>{event.employee_name}</Text>
@@ -158,7 +155,7 @@ export default function HomeScreen() {
                   </View>
                 </View>
                 <TouchableOpacity style={styles.feedDonateBtn} onPress={() => handleDonate(event)}>
-                  <Text style={styles.feedDonateTxt}>Send Care 💝</Text>
+                  <Text style={styles.feedDonateTxt}>Send Care</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -166,36 +163,39 @@ export default function HomeScreen() {
         )}
 
         {/* Challenges Card */}
-        <TouchableOpacity style={styles.challengeCard} onPress={() => router.push('/challenges')}>
-          <View style={styles.aiLeft}>
-            <Text style={styles.challengeTitle}>🏆  Challenges</Text>
-            <Text style={styles.challengeSub}>Compete with your team for bonus credits</Text>
+        <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/challenges')}>
+          <View style={[styles.actionIcon, { backgroundColor: '#F7F7F8' }]}>
+            <Trophy size={18} color="#1C3D5A" strokeWidth={1.75} />
           </View>
-          <View style={styles.aiChevron}>
-            <Text style={{ color: '#d97706', fontSize: 20 }}>›</Text>
+          <View style={styles.actionLeft}>
+            <Text style={styles.actionTitle}>Challenges</Text>
+            <Text style={styles.actionSub}>Compete with your team for bonus credits</Text>
           </View>
+          <ChevronRight size={16} color="#8E9099" strokeWidth={1.75} />
         </TouchableOpacity>
 
         {/* AI Assistant Card */}
-        <TouchableOpacity style={styles.aiCard} onPress={() => router.push('/ai-assistant')}>
-          <View style={styles.aiLeft}>
-            <Text style={styles.aiTitle}>✦  Wellness AI</Text>
-            <Text style={styles.aiSub}>Ask me what to redeem today</Text>
+        <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/ai-assistant')}>
+          <View style={[styles.actionIcon, { backgroundColor: '#F7F7F8' }]}>
+            <Sparkles size={18} color="#1C3D5A" strokeWidth={1.75} />
           </View>
-          <View style={styles.aiChevron}>
-            <Text style={{ color: '#6366f1', fontSize: 20 }}>›</Text>
+          <View style={styles.actionLeft}>
+            <Text style={styles.actionTitle}>Wellness AI</Text>
+            <Text style={styles.actionSub}>Ask me what to redeem today</Text>
           </View>
+          <ChevronRight size={16} color="#8E9099" strokeWidth={1.75} />
         </TouchableOpacity>
 
         {/* Secret Santa Card */}
-        <TouchableOpacity style={styles.santaCard} onPress={() => router.push('/santa')}>
-          <View style={styles.aiLeft}>
-            <Text style={styles.santaTitle}>🎅  Secret Santa</Text>
-            <Text style={styles.santaSub}>Gift exchange with your team</Text>
+        <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/santa')}>
+          <View style={[styles.actionIcon, { backgroundColor: '#F7F7F8' }]}>
+            <Gift size={18} color="#1C3D5A" strokeWidth={1.75} />
           </View>
-          <View style={styles.aiChevron}>
-            <Text style={{ color: '#fff', fontSize: 20 }}>›</Text>
+          <View style={styles.actionLeft}>
+            <Text style={styles.actionTitle}>Secret Santa</Text>
+            <Text style={styles.actionSub}>Gift exchange with your team</Text>
           </View>
+          <ChevronRight size={16} color="#8E9099" strokeWidth={1.75} />
         </TouchableOpacity>
 
         {/* Categories */}
@@ -205,7 +205,7 @@ export default function HomeScreen() {
             <Pressable
               key={cat.id}
               android_ripple={null}
-              style={styles.categoryChip}
+              style={({ pressed }) => [styles.categoryChip, pressed && { opacity: 0.7 }]}
               onPress={() => router.push({ pathname: '/(tabs)/catalog', params: { category: cat.name } })}
             >
               <Text style={styles.categoryIcon}>{cat.icon}</Text>
@@ -225,7 +225,7 @@ export default function HomeScreen() {
             <View style={styles.perkInfo}>
               <Text style={styles.perkName}>{perk.name}</Text>
               <Text style={styles.perkProvider}>{perk.provider_name}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
                 <Text style={styles.perkCategory}>{perk.category_name}</Text>
                 {perk.review_count >= 10 && perk.avg_rating != null && (
                   <Text style={styles.perkRating}>★ {Number(perk.avg_rating).toFixed(1)}</Text>
@@ -248,90 +248,94 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F7F7F8' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
+  // Header
   header: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start',
-    paddingHorizontal: 20, paddingBottom: 16, backgroundColor: '#fff',
+    paddingHorizontal: 20, paddingBottom: 16, backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1, borderBottomColor: '#EEEFF2',
   },
-  greeting: { fontSize: 22, fontWeight: '700', color: '#111827' },
-  subGreeting: { fontSize: 14, color: '#6b7280', marginTop: 4 },
+  greeting: { fontSize: 20, fontWeight: '700', color: '#0A0A0B', letterSpacing: -0.3 },
+  subGreeting: { fontSize: 13, color: '#8E9099', marginTop: 3 },
   heartBtn: { padding: 8 },
+
+  // Wallet card — deep navy, no glow
   walletCard: {
-    margin: 16, padding: 24, borderRadius: 20,
-    backgroundColor: '#6366f1',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 16, elevation: 8,
+    margin: 16, padding: 24, borderRadius: 16,
+    backgroundColor: '#1C3D5A',
+    shadowColor: '#0A0A0B', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 12, elevation: 4,
   },
-  walletLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: '500' },
-  walletBalance: { color: '#fff', fontSize: 52, fontWeight: '800', marginTop: 4 },
-  walletCredits: { color: 'rgba(255,255,255,0.8)', fontSize: 16, marginTop: 4 },
+  walletLabel: { color: 'rgba(255,255,255,0.65)', fontSize: 13, fontWeight: '500' },
+  walletBalance: { color: '#FFFFFF', fontSize: 48, fontWeight: '700', marginTop: 4, letterSpacing: -1 },
+  walletCredits: { color: 'rgba(255,255,255,0.65)', fontSize: 14, marginTop: 2 },
   expireBadge: {
-    marginTop: 12, backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, alignSelf: 'flex-start',
+    marginTop: 14, backgroundColor: 'rgba(255,255,255,0.12)',
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, alignSelf: 'flex-start',
   },
-  expireText: { color: '#fff', fontSize: 12, fontWeight: '600' },
-  feedSection: { marginHorizontal: 16, marginTop: 16 },
-  feedTitle: { fontSize: 16, fontWeight: '800', color: '#111827', marginBottom: 10 },
+  expireText: { color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: '500' },
+
+  // Feed section
+  feedSection: { marginHorizontal: 16, marginTop: 8, marginBottom: 4 },
+  feedTitle: { fontSize: 13, fontWeight: '600', color: '#8E9099', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
   feedCard: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: '#fff', borderRadius: 16, padding: 14, marginBottom: 8,
-    borderWidth: 1.5, borderColor: '#fce7f3',
+    backgroundColor: '#FFFFFF', borderRadius: 12, padding: 14, marginBottom: 6,
+    borderWidth: 1, borderColor: '#EEEFF2',
   },
   feedLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: 12 },
-  feedIcon: { fontSize: 28 },
-  feedName: { fontSize: 14, fontWeight: '700', color: '#111827' },
-  feedType: { fontSize: 12, color: '#6b7280', marginTop: 1 },
-  feedDonations: { fontSize: 11, color: '#ec4899', fontWeight: '600', marginTop: 3 },
+  feedDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#1C3D5A' },
+  feedName: { fontSize: 14, fontWeight: '600', color: '#0A0A0B' },
+  feedType: { fontSize: 12, color: '#8E9099', marginTop: 1 },
+  feedDonations: { fontSize: 11, color: '#5B5E66', fontWeight: '500', marginTop: 3 },
   feedDonateBtn: {
-    backgroundColor: '#fdf2f8', borderWidth: 1.5, borderColor: '#f9a8d4',
-    paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12,
+    backgroundColor: '#F7F7F8', borderWidth: 1, borderColor: '#D4D6DC',
+    paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8,
   },
-  feedDonateTxt: { fontSize: 12, fontWeight: '700', color: '#ec4899' },
-  challengeCard: {
-    marginHorizontal: 16, marginBottom: 8, padding: 16,
-    backgroundColor: '#fffbeb', borderRadius: 16,
-    flexDirection: 'row', alignItems: 'center',
-    borderWidth: 1.5, borderColor: '#fde68a',
+  feedDonateTxt: { fontSize: 12, fontWeight: '600', color: '#1C3D5A' },
+
+  // Action cards (challenges, AI, santa) — unified style
+  actionCard: {
+    marginHorizontal: 16, marginBottom: 6, padding: 14,
+    backgroundColor: '#FFFFFF', borderRadius: 12,
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    borderWidth: 1, borderColor: '#EEEFF2',
   },
-  challengeTitle: { fontSize: 15, fontWeight: '800', color: '#92400e' },
-  challengeSub: { fontSize: 13, color: '#d97706', marginTop: 2 },
-  aiCard: {
-    marginHorizontal: 16, marginBottom: 8, padding: 16,
-    backgroundColor: '#eef2ff', borderRadius: 16,
-    flexDirection: 'row', alignItems: 'center',
-    borderWidth: 1.5, borderColor: '#c7d2fe',
+  actionIcon: {
+    width: 36, height: 36, borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center',
   },
-  aiLeft: { flex: 1 },
-  aiTitle: { fontSize: 15, fontWeight: '800', color: '#4338ca' },
-  aiSub: { fontSize: 13, color: '#6366f1', marginTop: 2 },
-  aiChevron: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
-  santaCard: {
-    marginHorizontal: 16, marginBottom: 8, padding: 16,
-    backgroundColor: '#1a0533', borderRadius: 16,
-    flexDirection: 'row', alignItems: 'center',
-  },
-  santaTitle: { fontSize: 15, fontWeight: '800', color: '#fff' },
-  santaSub: { fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 2 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#111827', marginHorizontal: 16, marginTop: 16, marginBottom: 12 },
-  categoryRow: { paddingHorizontal: 16, gap: 10 },
+  actionLeft: { flex: 1 },
+  actionTitle: { fontSize: 14, fontWeight: '600', color: '#0A0A0B' },
+  actionSub: { fontSize: 12, color: '#8E9099', marginTop: 1 },
+
+  // Section title
+  sectionTitle: { fontSize: 13, fontWeight: '600', color: '#8E9099', marginHorizontal: 16, marginTop: 20, marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 },
+
+  // Categories
+  categoryRow: { paddingHorizontal: 16, gap: 8 },
   categoryChip: {
-    alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: '#fff', borderRadius: 16, borderWidth: 1.5, borderColor: '#e5e7eb', minWidth: 80,
+    alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10,
+    backgroundColor: '#FFFFFF', borderRadius: 10, borderWidth: 1, borderColor: '#EEEFF2', minWidth: 72,
   },
-  categoryIcon: { fontSize: 24, marginBottom: 4 },
-  categoryName: { fontSize: 11, fontWeight: '600', color: '#374151' },
+  categoryIcon: { fontSize: 20, marginBottom: 4 },
+  categoryName: { fontSize: 11, fontWeight: '500', color: '#5B5E66' },
+
+  // Perk cards
   perkCard: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    marginHorizontal: 16, marginBottom: 10, padding: 16,
-    backgroundColor: '#fff', borderRadius: 16, borderWidth: 1.5, borderColor: '#e5e7eb',
+    marginHorizontal: 16, marginBottom: 6, padding: 14,
+    backgroundColor: '#FFFFFF', borderRadius: 12, borderWidth: 1, borderColor: '#EEEFF2',
   },
   perkInfo: { flex: 1 },
-  perkName: { fontSize: 15, fontWeight: '700', color: '#111827' },
-  perkProvider: { fontSize: 13, color: '#6b7280', marginTop: 2 },
-  perkCategory: { fontSize: 11, color: '#6366f1', fontWeight: '600', marginTop: 4 },
-  perkPrice: { alignItems: 'center', marginLeft: 12 },
-  perkPriceNum: { fontSize: 22, fontWeight: '800', color: '#6366f1' },
-  perkPriceLabel: { fontSize: 11, color: '#6b7280', fontWeight: '500' },
-  emptyText: { textAlign: 'center', color: '#9ca3af', marginTop: 20, fontSize: 14 },
-  perkRating: { fontSize: 11, fontWeight: '700', color: '#f59e0b' },
+  perkName: { fontSize: 14, fontWeight: '600', color: '#0A0A0B' },
+  perkProvider: { fontSize: 12, color: '#8E9099', marginTop: 2 },
+  perkCategory: { fontSize: 11, color: '#5B5E66', fontWeight: '500' },
+  perkPrice: { alignItems: 'flex-end', marginLeft: 12 },
+  perkPriceNum: { fontSize: 20, fontWeight: '700', color: '#1C3D5A' },
+  perkPriceLabel: { fontSize: 11, color: '#8E9099', fontWeight: '500' },
+  perkRating: { fontSize: 11, fontWeight: '600', color: '#8E9099' },
+
+  emptyText: { textAlign: 'center', color: '#8E9099', marginTop: 20, fontSize: 14 },
 });

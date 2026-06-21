@@ -100,9 +100,9 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12,
     paddingHorizontal: 14, paddingVertical: 13, fontSize: 15,
-    color: '#111827', backgroundColor: '#f9fafb', marginBottom: 16,
+    color: '#111827', backgroundColor: '#F7F7F8', marginBottom: 16,
   },
   multiline: { textAlignVertical: 'top', minHeight: 90 },
-  submitBtn: { backgroundColor: '#6366f1', borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
+  submitBtn: { backgroundColor: '#1C3D5A', borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
   submitText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });

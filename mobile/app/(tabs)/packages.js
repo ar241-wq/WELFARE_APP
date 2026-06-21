@@ -4,6 +4,7 @@ import {
   StyleSheet, ActivityIndicator, RefreshControl, Alert, Modal, Pressable,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Package } from 'lucide-react-native';
 import { getCompanyPackages, redeemPackage, getWallet } from '../../lib/api';
 
 export default function PackagesScreen() {
@@ -67,7 +68,7 @@ export default function PackagesScreen() {
   if (loading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#1C3D5A" />
       </View>
     );
   }
@@ -77,7 +78,7 @@ export default function PackagesScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 40 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor="#6366f1" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor="#1C3D5A" />}
       >
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
@@ -85,7 +86,7 @@ export default function PackagesScreen() {
           <Text style={styles.subtitle}>Special deals your company unlocked for you</Text>
           {balance !== null && (
             <View style={styles.balancePill}>
-              <Text style={styles.balanceText}>💳 {balance} credits available</Text>
+              <Text style={styles.balanceText}>{balance} credits available</Text>
             </View>
           )}
         </View>
@@ -93,7 +94,6 @@ export default function PackagesScreen() {
         <View style={styles.content}>
           {packages.length === 0 ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyIcon}>🎁</Text>
               <Text style={styles.emptyTitle}>No packages yet</Text>
               <Text style={styles.emptyText}>
                 When your employer accepts a special provider deal, it will appear here exclusively for your company.
@@ -119,7 +119,7 @@ export default function PackagesScreen() {
                   {/* Card header */}
                   <View style={styles.cardHeader}>
                     <View style={styles.cardIcon}>
-                      <Text style={{ fontSize: 20 }}>📦</Text>
+                      <Package size={18} color="#1C3D5A" strokeWidth={1.75} />
                     </View>
                     <View style={styles.cardInfo}>
                       <Text style={styles.cardName}>{pkg.name}</Text>
@@ -171,12 +171,12 @@ export default function PackagesScreen() {
                       {discount > 0 && (
                         <View style={[styles.totalRow, { borderTopWidth: 1, borderTopColor: '#e5e7eb', marginTop: 4, paddingTop: 8 }]}>
                           <Text style={[styles.totalLabel, { fontWeight: '800', color: '#111827' }]}>You pay</Text>
-                          <Text style={[styles.totalValue, { color: '#6366f1', fontSize: 18 }]}>{finalPrice} credits</Text>
+                          <Text style={[styles.totalValue, { color: '#1C3D5A', fontSize: 18 }]}>{finalPrice} credits</Text>
                         </View>
                       )}
 
                       <View style={styles.exclusiveBadge}>
-                        <Text style={styles.exclusiveText}>🔒 Exclusive to your company</Text>
+                        <Text style={styles.exclusiveText}>Exclusive to your company</Text>
                       </View>
 
                       {/* Redeem button */}
@@ -210,7 +210,6 @@ export default function PackagesScreen() {
       <Modal visible={!!successModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalIcon}>🎉</Text>
             <Text style={styles.modalTitle}>Package Redeemed!</Text>
             <Text style={styles.modalSub}>
               {successModal?.message}
@@ -235,7 +234,7 @@ export default function PackagesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F7F7F8' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: {
     backgroundColor: '#fff',
@@ -248,13 +247,14 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 13, color: '#6b7280', marginTop: 4 },
   balancePill: {
     marginTop: 10,
-    backgroundColor: '#eef2ff',
-    borderRadius: 20,
+    backgroundColor: '#EEEFF2',
+    borderRadius: 8,
     paddingVertical: 6,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     alignSelf: 'flex-start',
+    borderWidth: 1, borderColor: '#D4D6DC',
   },
-  balanceText: { fontSize: 13, fontWeight: '700', color: '#6366f1' },
+  balanceText: { fontSize: 13, fontWeight: '600', color: '#5B5E66' },
   content: { padding: 16, gap: 12 },
   empty: {
     alignItems: 'center',
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#eef2ff',
+    backgroundColor: '#E8EDF2',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   cardName: { fontSize: 15, fontWeight: '700', color: '#111827' },
   cardProviders: { fontSize: 12, color: '#6b7280', marginTop: 2 },
   cardRight: { alignItems: 'flex-end' },
-  cardCredits: { fontSize: 18, fontWeight: '800', color: '#6366f1' },
+  cardCredits: { fontSize: 18, fontWeight: '800', color: '#1C3D5A' },
   cardCreditsLabel: { fontSize: 11, color: '#6b7280' },
   cardChevron: { fontSize: 10, color: '#9ca3af', marginTop: 4 },
   expanded: {
@@ -331,12 +331,12 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#1C3D5A',
   },
   perkInfo: { flex: 1 },
   perkName: { fontSize: 14, fontWeight: '600', color: '#111827' },
   perkCategory: { fontSize: 11, color: '#9ca3af', marginTop: 1 },
-  perkPrice: { fontSize: 14, fontWeight: '700', color: '#6366f1' },
+  perkPrice: { fontSize: 14, fontWeight: '700', color: '#1C3D5A' },
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -350,16 +350,17 @@ const styles = StyleSheet.create({
   cardOriginalPrice: { fontSize: 11, color: '#9ca3af', textDecorationLine: 'line-through', textAlign: 'right' },
   exclusiveBadge: {
     marginTop: 12,
-    backgroundColor: '#eef2ff',
+    backgroundColor: '#F7F7F8',
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 12,
     alignItems: 'center',
+    borderWidth: 1, borderColor: '#EEEFF2',
   },
-  exclusiveText: { fontSize: 12, fontWeight: '600', color: '#6366f1' },
+  exclusiveText: { fontSize: 12, fontWeight: '500', color: '#5B5E66' },
   redeemBtn: {
     marginTop: 14,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#1C3D5A',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
@@ -395,10 +396,10 @@ const styles = StyleSheet.create({
   modalIcon: { fontSize: 48, marginBottom: 12 },
   modalTitle: { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 8 },
   modalSub: { fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 21, marginBottom: 12 },
-  modalBalance: { fontSize: 18, fontWeight: '800', color: '#6366f1', marginBottom: 8 },
+  modalBalance: { fontSize: 18, fontWeight: '800', color: '#1C3D5A', marginBottom: 8 },
   modalQrHint: { fontSize: 12, color: '#9ca3af', textAlign: 'center', marginBottom: 20 },
   modalBtn: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#1C3D5A',
     borderRadius: 12,
     paddingVertical: 13,
     paddingHorizontal: 40,

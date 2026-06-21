@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import { Camera, Eye, Lock } from 'lucide-react-native';
 import {
   getCommunityCategories, getCommunityPosts, getMyInstants,
   createPost, likePost, deletePost, markInstantViewed, getMe, sendMessage,
@@ -65,7 +66,7 @@ function InstantStack({ posts, onOpen }) {
             blurRadius={22}
           />
         ) : (
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: '#c7d2fe' }]} />
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: '#D4D6DC' }]} />
         )}
 
         {/* Dark overlay */}
@@ -74,7 +75,7 @@ function InstantStack({ posts, onOpen }) {
         {/* Centre tap hint */}
         <View style={st.tapHintWrap}>
           <View style={st.eyeCircle}>
-            <Text style={{ fontSize: 32 }}>👁</Text>
+            <Eye size={28} color="#0A0A0B" strokeWidth={1.75} />
           </View>
           <Text style={st.tapLabel}>Tap to open</Text>
           <Text style={st.tapSub}>Disappears once you see it</Text>
@@ -85,7 +86,7 @@ function InstantStack({ posts, onOpen }) {
           <View style={st.footerAvatar}>
             {posts[0].author_avatar
               ? <Image source={{ uri: ru(posts[0].author_avatar) }} style={{ width: '100%', height: '100%' }} />
-              : <Text style={{ color: '#6366f1', fontWeight: '800', fontSize: 15 }}>{(posts[0].author_name || '?')[0]}</Text>
+              : <Text style={{ color: '#1C3D5A', fontWeight: '800', fontSize: 15 }}>{(posts[0].author_name || '?')[0]}</Text>
             }
           </View>
           <View style={{ flex: 1, marginLeft: 10 }}>
@@ -122,12 +123,12 @@ const st = StyleSheet.create({
   cardBack1: {
     position: 'absolute', zIndex: 2,
     transform: [{ translateY: 14 }, { scaleX: 0.93 }],
-    backgroundColor: '#c7d2fe', opacity: 0.75,
+    backgroundColor: '#D4D6DC', opacity: 0.75,
   },
   cardBack2: {
     position: 'absolute', zIndex: 1,
     transform: [{ translateY: 26 }, { scaleX: 0.86 }],
-    backgroundColor: '#a5b4fc', opacity: 0.5,
+    backgroundColor: '#EEEFF2', opacity: 0.5,
   },
   overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.38)' },
   tapHintWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 80 },
@@ -145,7 +146,7 @@ const st = StyleSheet.create({
   },
   footerAvatar: {
     width: 38, height: 38, borderRadius: 19, overflow: 'hidden',
-    backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#EEEFF2', alignItems: 'center', justifyContent: 'center',
     borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)',
   },
   footerName: { color: '#fff', fontWeight: '800', fontSize: 14 },
@@ -154,8 +155,8 @@ const st = StyleSheet.create({
   expiryTxt: { color: '#fff', fontWeight: '700', fontSize: 12 },
   countBadge: {
     marginTop: 20, width: 36, height: 36, borderRadius: 18,
-    backgroundColor: '#6366f1', alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#6366f1', shadowOpacity: 0.4, shadowRadius: 8,
+    backgroundColor: '#1C3D5A', alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#1C3D5A', shadowOpacity: 0.4, shadowRadius: 8,
   },
   countTxt: { color: '#fff', fontWeight: '900', fontSize: 14 },
 });
@@ -227,8 +228,8 @@ function InstantViewer({ post, onClose, me }) {
       {/* Background photo */}
       {post.image_url
         ? <Image source={{ uri: ru(post.image_url) }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-        : <View style={[StyleSheet.absoluteFill, { backgroundColor: '#1a0533', alignItems: 'center', justifyContent: 'center' }]}>
-            <Text style={{ fontSize: 80 }}>📸</Text>
+        : <View style={[StyleSheet.absoluteFill, { backgroundColor: '#0A0A0B', alignItems: 'center', justifyContent: 'center' }]}>
+            <Camera size={60} color="rgba(255,255,255,0.2)" strokeWidth={1.25} />
           </View>
       }
 
@@ -255,7 +256,7 @@ function InstantViewer({ post, onClose, me }) {
             <View style={iv.headAv}>
               {post.author_avatar
                 ? <Image source={{ uri: ru(post.author_avatar) }} style={{ width: 40, height: 40 }} />
-                : <Text style={{ color: '#6366f1', fontWeight: '800', fontSize: 17 }}>{(post.author_name || '?')[0]}</Text>
+                : <Text style={{ color: '#1C3D5A', fontWeight: '800', fontSize: 17 }}>{(post.author_name || '?')[0]}</Text>
               }
             </View>
             <View style={{ flex: 1, marginLeft: 10 }}>
@@ -286,7 +287,7 @@ function InstantViewer({ post, onClose, me }) {
                     onPress={() => { setReplyMode(true); setTimeout(() => inputRef.current?.focus(), 50); }}
                     activeOpacity={0.85}
                   >
-                    <Text style={iv.replyTxt}>💬  Reply to {post.author_name?.split(' ')[0]}</Text>
+                    <Text style={iv.replyTxt}>Reply to {post.author_name?.split(' ')[0]}</Text>
                   </TouchableOpacity>
                   <View style={iv.reactRow}>
                     {REACTIONS.map(e => (
@@ -342,7 +343,7 @@ const iv = StyleSheet.create({
   root: { ...StyleSheet.absoluteFillObject, zIndex: 999, backgroundColor: '#000' },
   col: { ...StyleSheet.absoluteFillObject, flexDirection: 'column' },
   head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 10 },
-  headAv: { width: 40, height: 40, borderRadius: 20, overflow: 'hidden', backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.55)' },
+  headAv: { width: 40, height: 40, borderRadius: 20, overflow: 'hidden', backgroundColor: '#EEEFF2', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.55)' },
   headName: { color: '#fff', fontWeight: '800', fontSize: 15 },
   headMeta: { color: 'rgba(255,255,255,0.58)', fontSize: 12, marginTop: 1 },
   expiryPill: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)', marginRight: 8 },
@@ -359,12 +360,12 @@ const iv = StyleSheet.create({
   replyTxt: { color: '#fff', fontWeight: '700', fontSize: 15 },
   reactRow: { flexDirection: 'row', justifyContent: 'center', gap: 10 },
   reactBtn: { width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
-  reactOn: { backgroundColor: 'rgba(99,102,241,0.65)', borderColor: '#6366f1' },
+  reactOn: { backgroundColor: 'rgba(99,102,241,0.65)', borderColor: '#1C3D5A' },
   sentPop: { position: 'absolute', top: '45%', left: 0, right: 0, alignItems: 'center' },
   sentTxt: { backgroundColor: 'rgba(99,102,241,0.85)', color: '#fff', fontWeight: '800', fontSize: 18, paddingHorizontal: 28, paddingVertical: 12, borderRadius: 99 },
   replyInputRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   replyInput: { flex: 1, height: 46, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 99, paddingHorizontal: 18, color: '#fff', fontSize: 15, borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)' },
-  sendBtn: { height: 46, paddingHorizontal: 20, borderRadius: 99, backgroundColor: '#6366f1', alignItems: 'center', justifyContent: 'center' },
+  sendBtn: { height: 46, paddingHorizontal: 20, borderRadius: 99, backgroundColor: '#1C3D5A', alignItems: 'center', justifyContent: 'center' },
   sendTxt: { color: '#fff', fontWeight: '800', fontSize: 14 },
 });
 
@@ -378,7 +379,7 @@ function MyInstantRow({ myPosts, onAdd, onViewMine }) {
           : null
         }
         <View style={[StyleSheet.absoluteFill, { backgroundColor: myPosts[0] ? 'rgba(0,0,0,0.35)' : 'transparent', borderRadius: 99 }]} />
-        <Text style={{ fontSize: 26 }}>📷</Text>
+        <Camera size={22} color="#FFFFFF" strokeWidth={1.75} />
       </TouchableOpacity>
       <View style={{ flex: 1, marginLeft: 14 }}>
         <Text style={mr.title}>{myPosts.length > 0 ? `You sent ${myPosts.length} instant${myPosts.length > 1 ? 's' : ''}` : 'Share an instant'}</Text>
@@ -394,11 +395,11 @@ function MyInstantRow({ myPosts, onAdd, onViewMine }) {
 }
 const mr = StyleSheet.create({
   wrap: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginTop: 16, marginBottom: 4, backgroundColor: '#fff', borderRadius: 22, padding: 14, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
-  addBtn: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  addBtn: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#1C3D5A', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   title: { fontSize: 15, fontWeight: '800', color: '#111', marginBottom: 3 },
   sub: { fontSize: 12, color: '#a3a3a3' },
-  viewBtn: { backgroundColor: '#eef2ff', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 99 },
-  viewBtnTxt: { color: '#6366f1', fontWeight: '800', fontSize: 13 },
+  viewBtn: { backgroundColor: '#EEEFF2', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 99 },
+  viewBtnTxt: { color: '#1C3D5A', fontWeight: '800', fontSize: 13 },
 });
 
 // ─── Snap creation modal ──────────────────────────────────────────────────────
@@ -459,12 +460,12 @@ const sm = StyleSheet.create({
   panel: { backgroundColor: 'rgba(8,6,22,0.85)', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 16, paddingTop: 22, paddingBottom: 36 },
   label: { color: 'rgba(255,255,255,0.5)', fontWeight: '800', fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 10 },
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 99, backgroundColor: 'rgba(255,255,255,0.1)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
-  chipOn: { backgroundColor: '#6366f1', borderColor: '#6366f1' },
+  chipOn: { backgroundColor: '#1C3D5A', borderColor: '#1C3D5A' },
   chipTxt: { color: 'rgba(255,255,255,0.65)', fontWeight: '600', fontSize: 13 },
   chipTxtOn: { color: '#fff' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   input: { flex: 1, height: 46, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 99, paddingHorizontal: 18, color: '#fff', fontSize: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)' },
-  sendBtn: { height: 46, paddingHorizontal: 24, borderRadius: 99, backgroundColor: '#6366f1', alignItems: 'center', justifyContent: 'center' },
+  sendBtn: { height: 46, paddingHorizontal: 24, borderRadius: 99, backgroundColor: '#1C3D5A', alignItems: 'center', justifyContent: 'center' },
   sendTxt: { color: '#fff', fontWeight: '800', fontSize: 14 },
 });
 
@@ -474,7 +475,7 @@ function WellnessGate() {
   return (
     <SafeAreaView style={wg.root}>
       <View style={wg.card}>
-        <View style={wg.icon}><Text style={{ fontSize: 40 }}>🔒</Text></View>
+        <View style={wg.icon}><Lock size={28} color="#1C3D5A" strokeWidth={1.75} /></View>
         <Text style={wg.title}>Wellness Instants</Text>
         <Text style={wg.sub}>Redeem a perk to unlock Instants — raw, unfiltered moments shared with colleagues who share your wellness interests. Disappears once seen.</Text>
         <TouchableOpacity style={wg.btn} onPress={() => router.push('/(tabs)/catalog')}>
@@ -485,13 +486,13 @@ function WellnessGate() {
   );
 }
 const wg = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center', padding: 24 },
-  card: { backgroundColor: '#fff', borderRadius: 32, padding: 32, alignItems: 'center', width: '100%', shadowColor: '#6366f1', shadowOpacity: 0.13, shadowRadius: 30, shadowOffset: { width: 0, height: 10 }, elevation: 8 },
-  icon: { width: 84, height: 84, borderRadius: 42, backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center', marginBottom: 18 },
-  title: { fontSize: 22, fontWeight: '900', color: '#111', marginBottom: 10 },
-  sub: { fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 22, marginBottom: 24 },
-  btn: { backgroundColor: '#6366f1', paddingHorizontal: 32, paddingVertical: 15, borderRadius: 99 },
-  btnTxt: { color: '#fff', fontWeight: '800', fontSize: 15 },
+  root: { flex: 1, backgroundColor: '#F7F7F8', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  card: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 32, alignItems: 'center', width: '100%', shadowColor: '#0A0A0B', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 4 }, elevation: 4, borderWidth: 1, borderColor: '#EEEFF2' },
+  icon: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#EEEFF2', alignItems: 'center', justifyContent: 'center', marginBottom: 18 },
+  title: { fontSize: 20, fontWeight: '700', color: '#0A0A0B', marginBottom: 10, letterSpacing: -0.2 },
+  sub: { fontSize: 14, color: '#8E9099', textAlign: 'center', lineHeight: 22, marginBottom: 24 },
+  btn: { backgroundColor: '#1C3D5A', paddingHorizontal: 28, paddingVertical: 13, borderRadius: 10 },
+  btnTxt: { color: '#FFFFFF', fontWeight: '600', fontSize: 14 },
 });
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -565,7 +566,7 @@ export default function InstantsScreen() {
     setInstants(prev => prev.filter(p => p.id !== post.id));
   };
 
-  if (loading && hasAccess === null) return <View style={s.center}><ActivityIndicator size="large" color="#6366f1" /></View>;
+  if (loading && hasAccess === null) return <View style={s.center}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
   if (hasAccess === false) return <WellnessGate />;
 
   return (
@@ -581,13 +582,13 @@ export default function InstantsScreen() {
             </Text>
           </View>
           <TouchableOpacity style={s.camBtn} onPress={openCamera} activeOpacity={0.85}>
-            <Text style={{ fontSize: 22 }}>📷</Text>
+            <Camera size={20} color="#FFFFFF" strokeWidth={1.75} />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
 
       <ScrollView
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1C3D5A" />}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 48 }}
       >
@@ -599,7 +600,7 @@ export default function InstantsScreen() {
         />
 
         {loading ? (
-          <ActivityIndicator style={{ marginTop: 60 }} color="#6366f1" />
+          <ActivityIndicator style={{ marginTop: 60 }} color="#1C3D5A" />
         ) : instants.length > 0 ? (
           <>
             <Text style={s.stackLabel}>
@@ -609,11 +610,10 @@ export default function InstantsScreen() {
           </>
         ) : (
           <View style={s.empty}>
-            <Text style={{ fontSize: 52, marginBottom: 14 }}>📭</Text>
             <Text style={s.emptyTitle}>All caught up</Text>
             <Text style={s.emptySub}>No new instants. Be first — tap the camera to share a moment with your community.</Text>
             <TouchableOpacity style={[wg.btn, { marginTop: 20 }]} onPress={openCamera}>
-              <Text style={wg.btnTxt}>📷  Take an Instant</Text>
+              <Text style={wg.btnTxt}>Take an Instant</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -646,12 +646,12 @@ export default function InstantsScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#fafafa' },
+  root: { flex: 1, backgroundColor: '#F7F7F8' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#f0f0f0' },
   title: { fontSize: 28, fontWeight: '900', color: '#111', letterSpacing: -1 },
   sub: { fontSize: 12, color: '#a3a3a3', fontWeight: '600', marginTop: 1 },
-  camBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#6366f1', alignItems: 'center', justifyContent: 'center', shadowColor: '#6366f1', shadowOpacity: 0.38, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  camBtn: { width: 44, height: 44, borderRadius: 10, backgroundColor: '#1C3D5A', alignItems: 'center', justifyContent: 'center' },
   stackLabel: { textAlign: 'center', fontSize: 13, color: '#a3a3a3', fontWeight: '600', marginTop: 20, marginBottom: 4 },
   empty: { alignItems: 'center', paddingTop: 56, paddingHorizontal: 32 },
   emptyTitle: { fontSize: 20, fontWeight: '800', color: '#111', marginBottom: 8 },

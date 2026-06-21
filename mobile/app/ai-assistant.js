@@ -62,7 +62,7 @@ function MessageBubble({ item }) {
     return (
       <View style={styles.botRow}>
         <View style={styles.avatarCircle}>
-          <Text style={styles.avatarIcon}>✦</Text>
+          <Text style={styles.avatarIcon}>AI</Text>
         </View>
         <View style={styles.botColumn}>
           <Text style={styles.senderLabel}>Wellness AI</Text>
@@ -105,7 +105,7 @@ export default function AIAssistantScreen() {
         const welcome = {
           id: 'welcome',
           role: 'bot',
-          text: `Hey ${name}! I'm your wellness coach. Ask me anything — what perks to redeem, how to use your credits, or just tell me how you're feeling today 💜`,
+          text: `Hey ${name}! I'm your wellness coach. Ask me anything — what perks to redeem, how to use your credits, or just tell me how you're feeling today `,
           ts: Date.now(),
         };
         setMessages([welcome]);
@@ -115,7 +115,7 @@ export default function AIAssistantScreen() {
           {
             id: 'welcome',
             role: 'bot',
-            text: "Hey! I'm your wellness coach. Ask me anything — what perks to redeem, how to use your credits, or just tell me how you're feeling today 💜",
+            text: "Hey! I'm your wellness coach. Ask me anything — what perks to redeem, how to use your credits, or just tell me how you're feeling today ",
             ts: Date.now(),
           },
         ]);
@@ -231,7 +231,7 @@ export default function AIAssistantScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f5f3ff' },
+  root: { flex: 1, backgroundColor: '#F7F7F8' },
 
   // Header
   header: {
@@ -244,10 +244,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e5e7eb',
   },
   backBtn: { width: 40, alignItems: 'flex-start' },
-  backIcon: { fontSize: 30, color: '#6366f1', lineHeight: 34 },
+  backIcon: { fontSize: 30, color: '#1C3D5A', lineHeight: 34 },
   headerCenter: { flex: 1, alignItems: 'center' },
   headerTitle: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  headerSub: { fontSize: 11, color: '#6366f1', fontWeight: '500', marginTop: 1 },
+  headerSub: { fontSize: 11, color: '#1C3D5A', fontWeight: '500', marginTop: 1 },
 
   // List
   list: { flex: 1 },
@@ -259,15 +259,15 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#1C3D5A',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
     marginTop: 16,
   },
-  avatarIcon: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  avatarIcon: { color: '#fff', fontSize: 10, fontWeight: '700', letterSpacing: -0.5 },
   botColumn: { flex: 1 },
-  senderLabel: { fontSize: 11, color: '#6366f1', fontWeight: '700', marginBottom: 4 },
+  senderLabel: { fontSize: 11, color: '#1C3D5A', fontWeight: '700', marginBottom: 4 },
   botBubble: {
     backgroundColor: '#fff',
     borderRadius: 20,
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   userRow: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 16 },
   userColumn: { alignItems: 'flex-end', maxWidth: '80%' },
   userBubble: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#1C3D5A',
     borderRadius: 20,
     borderTopRightRadius: 4,
     paddingHorizontal: 14,
@@ -313,19 +313,19 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   dotsRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#6366f1' },
+  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#1C3D5A' },
 
   // Quick prompts
   promptsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
   promptChip: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: '#eef2ff',
+    backgroundColor: '#EEEFF2',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#c7d2fe',
+    borderColor: '#D4D6DC',
   },
-  promptText: { fontSize: 13, color: '#4338ca', fontWeight: '600' },
+  promptText: { fontSize: 13, color: '#1C3D5A', fontWeight: '600' },
 
   // Input bar
   inputBar: {
@@ -342,23 +342,23 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 40,
     maxHeight: 100,
-    backgroundColor: '#f5f3ff',
+    backgroundColor: '#F7F7F8',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
     fontSize: 14,
     color: '#111827',
     borderWidth: 1,
-    borderColor: '#c7d2fe',
+    borderColor: '#D4D6DC',
   },
   sendBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#1C3D5A',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sendBtnDisabled: { backgroundColor: '#c7d2fe' },
+  sendBtnDisabled: { backgroundColor: '#D4D6DC' },
   sendIcon: { color: '#fff', fontSize: 18, fontWeight: '700' },
 });

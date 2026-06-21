@@ -38,7 +38,7 @@ export default function DonateScreen() {
     setSubmitting(true);
     try {
       await donateCredits(eventId, num);
-      Alert.alert('Sent Anonymously 💝', `Your ${num} credits have been sent. Your colleague will only see "Your team sent you a care package."`, [
+      Alert.alert('Sent Anonymously', `Your ${num} credits have been sent. Your colleague will only see "Your team sent you a care package."`, [
         { text: 'Done', onPress: () => router.back() },
       ]);
     } catch (err) {
@@ -48,12 +48,11 @@ export default function DonateScreen() {
     }
   }
 
-  if (loading) return <View style={styles.loader}><ActivityIndicator size="large" color="#6366f1" /></View>;
+  if (loading) return <View style={styles.loader}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
       <View style={styles.hero}>
-        <Text style={styles.heroIcon}>🤝</Text>
         <Text style={styles.heroTitle}>Send care credits anonymously</Text>
         <Text style={styles.heroText}>
           Your name will never be shown. Your colleague will only see that their team showed up for them.
@@ -105,20 +104,20 @@ export default function DonateScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  hero: { alignItems: 'center', paddingVertical: 24, backgroundColor: '#fdf2f8', borderRadius: 20, marginBottom: 20 },
+  hero: { alignItems: 'center', paddingVertical: 24, backgroundColor: '#F7F7F8', borderRadius: 20, marginBottom: 20 },
   heroIcon: { fontSize: 48, marginBottom: 12 },
   heroTitle: { fontSize: 18, fontWeight: '800', color: '#111827', textAlign: 'center', marginBottom: 8, paddingHorizontal: 16 },
   heroText: { fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 20, paddingHorizontal: 20 },
-  infoCard: { backgroundColor: '#f9fafb', borderRadius: 14, padding: 16, marginBottom: 16 },
+  infoCard: { backgroundColor: '#F7F7F8', borderRadius: 14, padding: 16, marginBottom: 16 },
   infoEvent: { fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 4 },
   infoStats: { fontSize: 13, color: '#6b7280' },
-  infoTotal: { fontSize: 13, color: '#6366f1', fontWeight: '600', marginTop: 2 },
+  infoTotal: { fontSize: 13, color: '#1C3D5A', fontWeight: '600', marginTop: 2 },
   balanceText: { fontSize: 14, color: '#6b7280', marginBottom: 16 },
   balanceBold: { fontWeight: '700', color: '#111827' },
   quickLabel: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 10 },
   quickRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
   quickBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, borderWidth: 1.5, borderColor: '#e5e7eb', alignItems: 'center' },
-  quickBtnActive: { backgroundColor: '#6366f1', borderColor: '#6366f1' },
+  quickBtnActive: { backgroundColor: '#1C3D5A', borderColor: '#1C3D5A' },
   quickText: { fontSize: 15, fontWeight: '700', color: '#374151' },
   quickTextActive: { color: '#fff' },
   customLabel: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 8 },
@@ -127,6 +126,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 14, fontSize: 18, fontWeight: '700',
     color: '#111827', marginBottom: 20, textAlign: 'center',
   },
-  sendBtn: { backgroundColor: '#6366f1', borderRadius: 14, paddingVertical: 16, alignItems: 'center' },
+  sendBtn: { backgroundColor: '#1C3D5A', borderRadius: 14, paddingVertical: 16, alignItems: 'center' },
   sendText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });

@@ -209,7 +209,7 @@ export default function SantaDetailScreen() {
     }
   };
 
-  if (loading || !event) return <View style={s.center}><ActivityIndicator size="large" color="#6366f1" /></View>;
+  if (loading || !event) return <View style={s.center}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
 
   const assignment = event.my_assignment;
   const giftReceived = event.my_gift_received;
@@ -219,8 +219,7 @@ export default function SantaDetailScreen() {
     if (!assignment) {
       return (
         <View style={[s.center, { backgroundColor: '#0f0a1e', paddingHorizontal: 32 }]}>
-          <Text style={{ fontSize: 48, marginBottom: 16 }}>🎄</Text>
-          <Text style={s.missedTitle}>You didn't join in time</Text>
+            <Text style={s.missedTitle}>You didn't join in time</Text>
           <Text style={s.missedSub}>Assignments are locked. Join the next one!</Text>
           <TouchableOpacity style={s.outlineBtn} onPress={() => router.back()}>
             <Text style={s.outlineBtnTxt}>Go back</Text>
@@ -241,7 +240,7 @@ export default function SantaDetailScreen() {
             <Text style={s.sentTitle}>Gift sent!</Text>
             <Text style={s.sentSub}>
               You gifted{' '}
-              <Text style={{ color: '#a5b4fc', fontWeight: '900' }}>{assignment.receiver_name}</Text>
+              <Text style={{ color: 'rgba(255,255,255,0.6)', fontWeight: '900' }}>{assignment.receiver_name}</Text>
             </Text>
             {perkName && (
               <View style={s.sentPerkBadge}>
@@ -268,7 +267,6 @@ export default function SantaDetailScreen() {
             <Text style={s.backLabel}>{event.title}</Text>
           </TouchableOpacity>
 
-          <Text style={s.starsRow}>✨ ⭐ ✨ ⭐ ✨</Text>
 
           {/* Who you got */}
           <Animated.View style={[s.missionCard, { transform: [{ scale: cardScale }] }]}>
@@ -300,7 +298,7 @@ export default function SantaDetailScreen() {
             <TouchableOpacity style={s.sendBtn} onPress={handleSend} disabled={sending}>
               {sending
                 ? <ActivityIndicator color="#fff" />
-                : <Text style={s.sendBtnTxt}>🎁 Gift "{selectedPerk.name}"</Text>
+                : <Text style={s.sendBtnTxt}>Gift "{selectedPerk.name}"</Text>
               }
             </TouchableOpacity>
           </View>
@@ -321,7 +319,6 @@ export default function SantaDetailScreen() {
               <Text style={s.backArrow}>←</Text>
               <Text style={s.backLabel}>{event.title}</Text>
             </TouchableOpacity>
-            <Text style={s.starsRow}>🎉 🎄 🎉 🎄 🎉</Text>
             <Text style={[s.missionLabel, { textAlign: 'center', marginBottom: 8 }]}>You got a gift!</Text>
             <GiftReveal giftReceived={giftReceived} onDone={() => fireConfetti()} />
 
@@ -332,7 +329,7 @@ export default function SantaDetailScreen() {
                 <Text style={s.sentSummaryName}>{assignment.receiver_name}</Text>
                 {assignment.gifted_perk_name && (
                   <View style={s.sentPerkBadge}>
-                    <Text style={s.sentPerkBadgeTxt}>🎁 {assignment.gifted_perk_name}</Text>
+                    <Text style={s.sentPerkBadgeTxt}>{assignment.gifted_perk_name}</Text>
                   </View>
                 )}
               </View>
@@ -356,7 +353,6 @@ export default function SantaDetailScreen() {
             <Text style={s.backLabel}>{event.title}</Text>
           </TouchableOpacity>
           <View style={{ alignItems: 'center', marginBottom: 28 }}>
-            <Text style={{ fontSize: 56, marginBottom: 10 }}>🎉</Text>
             <Text style={s.revealTitle}>The Big Reveal!</Text>
             <Text style={s.revealSub}>Here's who had whom</Text>
           </View>
@@ -366,7 +362,7 @@ export default function SantaDetailScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={s.revealGiver}>{a.giver_name}</Text>
                   {a.gifted_perk_name && (
-                    <Text style={s.revealPerk}>🎁 {a.gifted_perk_name}</Text>
+                    <Text style={s.revealPerk}>{a.gifted_perk_name}</Text>
                   )}
                 </View>
                 <Text style={s.revealArrow}>→</Text>
@@ -381,13 +377,12 @@ export default function SantaDetailScreen() {
 
   // ── OPEN ─────────────────────────────────────────────────────────────────
   return (
-    <ScrollView style={[s.root, { backgroundColor: '#f9fafb' }]} contentContainerStyle={{ padding: 20, paddingTop: insets.top + 20, paddingBottom: 60 }}>
+    <ScrollView style={[s.root, { backgroundColor: '#F7F7F8' }]} contentContainerStyle={{ padding: 20, paddingTop: insets.top + 20, paddingBottom: 60 }}>
       <TouchableOpacity onPress={() => router.back()} style={s.backRow}>
-        <Text style={[s.backArrow, { color: '#6366f1' }]}>←</Text>
+        <Text style={[s.backArrow, { color: '#1C3D5A' }]}>←</Text>
         <Text style={[s.backLabel, { color: '#111' }]}>{event.title}</Text>
       </TouchableOpacity>
       <View style={s.openHero}>
-        <Text style={{ fontSize: 52 }}>🎄</Text>
         <Text style={s.openTitle}>{event.title}</Text>
         <Text style={s.openDept}>{event.department_name}</Text>
         <View style={s.budgetPill}><Text style={s.budgetTxt}>{event.credit_budget} credits budget</Text></View>
@@ -418,19 +413,19 @@ const rv = StyleSheet.create({
   container: { alignItems: 'center', paddingVertical: 20 },
   boxWrap: { alignItems: 'center' },
   lid: {
-    width: 120, height: 36, backgroundColor: '#6366f1', borderRadius: 10,
+    width: 120, height: 36, backgroundColor: '#1C3D5A', borderRadius: 10,
     alignItems: 'center', justifyContent: 'center', marginBottom: 4,
     zIndex: 10,
   },
   lidEmoji: { fontSize: 22 },
   box: {
-    width: 120, height: 120, backgroundColor: '#4f46e5', borderRadius: 16,
+    width: 120, height: 120, backgroundColor: '#162D42', borderRadius: 16,
     alignItems: 'center', justifyContent: 'center',
     borderWidth: 2, borderColor: 'rgba(255,255,255,0.15)',
   },
   boxEmoji: { fontSize: 52 },
   tapBtn: {
-    marginTop: 20, backgroundColor: '#6366f1', borderRadius: 14,
+    marginTop: 20, backgroundColor: '#1C3D5A', borderRadius: 14,
     paddingHorizontal: 28, paddingVertical: 14,
   },
   tapBtnTxt: { color: '#fff', fontWeight: '900', fontSize: 16 },
@@ -468,14 +463,14 @@ const s = StyleSheet.create({
     borderRadius: 16, padding: 14, marginBottom: 10, gap: 14,
     borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.08)',
   },
-  perkCardSelected: { borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.18)' },
+  perkCardSelected: { borderColor: '#1C3D5A', backgroundColor: 'rgba(28,61,90,0.25)' },
   perkThumb: { width: 72, height: 72, borderRadius: 12 },
   perkThumbPlaceholder: { backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center' },
   perkInfo: { flex: 1, justifyContent: 'center', gap: 4 },
   perkName: { color: '#fff', fontWeight: '800', fontSize: 14 },
   perkDesc: { color: 'rgba(255,255,255,0.38)', fontSize: 12, lineHeight: 17 },
   perkPriceRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 2 },
-  perkPrice: { color: '#a5b4fc', fontWeight: '700', fontSize: 13 },
+  perkPrice: { color: 'rgba(255,255,255,0.6)', fontWeight: '700', fontSize: 13 },
   perkSelectedBadge: { color: '#6ee7b7', fontWeight: '800', fontSize: 12 },
 
   noPerks: { alignItems: 'center', padding: 28, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 16 },
@@ -487,15 +482,15 @@ const s = StyleSheet.create({
     borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)',
   },
   sendBtn: {
-    backgroundColor: '#6366f1', borderRadius: 16, paddingVertical: 17, alignItems: 'center',
-    shadowColor: '#6366f1', shadowOpacity: 0.5, shadowRadius: 16, elevation: 6,
+    backgroundColor: '#1C3D5A', borderRadius: 16, paddingVertical: 17, alignItems: 'center',
+    shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 8, elevation: 4,
   },
   sendBtnTxt: { color: '#fff', fontWeight: '900', fontSize: 16 },
 
   sentTitle: { fontSize: 28, fontWeight: '900', color: '#fff', marginBottom: 10, textAlign: 'center' },
   sentSub: { fontSize: 15, color: 'rgba(255,255,255,0.55)', textAlign: 'center', lineHeight: 22 },
-  sentPerkBadge: { marginTop: 16, backgroundColor: 'rgba(99,102,241,0.25)', borderRadius: 99, paddingHorizontal: 20, paddingVertical: 10, borderWidth: 1, borderColor: 'rgba(99,102,241,0.5)' },
-  sentPerkBadgeTxt: { color: '#a5b4fc', fontWeight: '800', fontSize: 14 },
+  sentPerkBadge: { marginTop: 16, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 99, paddingHorizontal: 20, paddingVertical: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  sentPerkBadgeTxt: { color: 'rgba(255,255,255,0.75)', fontWeight: '800', fontSize: 14 },
 
   outlineBtn: { marginTop: 28, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 32, alignItems: 'center' },
   outlineBtnTxt: { color: 'rgba(255,255,255,0.5)', fontWeight: '700', fontSize: 14 },
@@ -505,12 +500,12 @@ const s = StyleSheet.create({
 
   revealTitle: { fontSize: 26, fontWeight: '900', color: '#fff', marginBottom: 4 },
   revealSub: { fontSize: 14, color: 'rgba(255,255,255,0.4)' },
-  revealCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 20, padding: 20, borderWidth: 1.5, borderColor: 'rgba(253,230,138,0.3)' },
+  revealCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 20, padding: 20, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)' },
   revealRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', gap: 8 },
   revealGiver: { fontWeight: '700', color: '#fff', fontSize: 14 },
-  revealPerk: { fontSize: 11, color: '#a5b4fc', fontWeight: '600', marginTop: 2 },
+  revealPerk: { fontSize: 11, color: 'rgba(255,255,255,0.45)', fontWeight: '600', marginTop: 2 },
   revealArrow: { fontSize: 16, color: 'rgba(255,255,255,0.3)', paddingHorizontal: 8 },
-  revealReceiver: { flex: 1, fontWeight: '700', color: '#a5b4fc', fontSize: 14, textAlign: 'right' },
+  revealReceiver: { flex: 1, fontWeight: '700', color: 'rgba(255,255,255,0.75)', fontSize: 14, textAlign: 'right' },
 
   sentSummary: { marginTop: 24, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 18, padding: 20, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   sentSummaryLabel: { color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6 },
@@ -518,9 +513,9 @@ const s = StyleSheet.create({
 
   openHero: { alignItems: 'center', marginBottom: 20, backgroundColor: '#fff', borderRadius: 24, padding: 24, borderWidth: 1.5, borderColor: '#e5e7eb' },
   openTitle: { fontSize: 20, fontWeight: '900', color: '#111', marginTop: 8, textAlign: 'center' },
-  openDept: { fontSize: 13, color: '#6366f1', fontWeight: '700', marginTop: 4 },
-  budgetPill: { marginTop: 10, backgroundColor: '#eef2ff', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 99 },
-  budgetTxt: { color: '#6366f1', fontWeight: '800', fontSize: 13 },
+  openDept: { fontSize: 13, color: '#5B5E66', fontWeight: '700', marginTop: 4 },
+  budgetPill: { marginTop: 10, backgroundColor: '#EEEFF2', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 99 },
+  budgetTxt: { color: '#1C3D5A', fontWeight: '800', fontSize: 13 },
   statsRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
   statBox: { flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: 12, alignItems: 'center', borderWidth: 1.5, borderColor: '#e5e7eb' },
   statNum: { fontSize: 13, fontWeight: '800', color: '#111', textAlign: 'center' },

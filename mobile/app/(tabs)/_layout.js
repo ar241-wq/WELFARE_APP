@@ -1,73 +1,73 @@
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { Home, ShoppingBag, CreditCard, Package, Camera, MessageSquare, User } from 'lucide-react-native';
 
-function Icon({ emoji, focused }) {
-  return <Text style={{ fontSize: focused ? 22 : 20, opacity: focused ? 1 : 0.5 }}>{emoji}</Text>;
-}
+const NAVY = '#1C3D5A';
+const GRAY = '#8E9099';
 
 export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#6366f1',
-        tabBarInactiveTintColor: '#9ca3af',
+        tabBarActiveTintColor: NAVY,
+        tabBarInactiveTintColor: GRAY,
         tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopColor: '#f3f4f6',
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
+          borderTopColor: '#EEEFF2',
           paddingBottom: 4,
           height: 60,
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '500' },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ focused }) => <Icon emoji="🏠" focused={focused} />,
+          tabBarIcon: ({ color, size }) => <Home color={color} size={size - 2} strokeWidth={1.75} />,
         }}
       />
       <Tabs.Screen
         name="catalog"
         options={{
           title: 'Catalog',
-          tabBarIcon: ({ focused }) => <Icon emoji="🛍️" focused={focused} />,
+          tabBarIcon: ({ color, size }) => <ShoppingBag color={color} size={size - 2} strokeWidth={1.75} />,
         }}
       />
       <Tabs.Screen
         name="wallet"
         options={{
           title: 'Wallet',
-          tabBarIcon: ({ focused }) => <Icon emoji="💳" focused={focused} />,
+          tabBarIcon: ({ color, size }) => <CreditCard color={color} size={size - 2} strokeWidth={1.75} />,
         }}
       />
       <Tabs.Screen
         name="packages"
         options={{
           title: 'Packages',
-          tabBarIcon: ({ focused }) => <Icon emoji="📦" focused={focused} />,
+          tabBarIcon: ({ color, size }) => <Package color={color} size={size - 2} strokeWidth={1.75} />,
         }}
       />
       <Tabs.Screen
         name="community"
         options={{
           title: 'Instants',
-          tabBarIcon: ({ focused }) => <Icon emoji="📸" focused={focused} />,
+          tabBarIcon: ({ color, size }) => <Camera color={color} size={size - 2} strokeWidth={1.75} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
           title: 'Messages',
-          tabBarIcon: ({ focused }) => <Icon emoji="💬" focused={focused} />,
+          tabBarIcon: ({ color, size }) => <MessageSquare color={color} size={size - 2} strokeWidth={1.75} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ focused }) => <Icon emoji="👤" focused={focused} />,
+          tabBarIcon: ({ color, size }) => <User color={color} size={size - 2} strokeWidth={1.75} />,
         }}
       />
     </Tabs>

@@ -39,7 +39,7 @@ export default function InternalPerkScreen() {
     }
   };
 
-  if (loading || !perk) return <View style={s.center}><ActivityIndicator size="large" color="#6366f1" /></View>;
+  if (loading || !perk) return <View style={s.center}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
 
   const alreadyRequested = perk.has_requested;
   const statusColor = perk.my_request_status === 'approved' ? '#10b981' : perk.my_request_status === 'denied' ? '#ef4444' : '#f59e0b';
@@ -75,7 +75,7 @@ export default function InternalPerkScreen() {
         {alreadyRequested && (
           <View style={[s.statusCard, { borderColor: statusColor, backgroundColor: statusColor + '11' }]}>
             <Text style={[s.statusTitle, { color: statusColor }]}>
-              {perk.my_request_status === 'pending' ? '⏳ Request Pending' : perk.my_request_status === 'approved' ? '✅ Approved!' : '❌ Denied'}
+              {perk.my_request_status === 'pending' ? 'Request Pending' : perk.my_request_status === 'approved' ? 'Approved' : 'Denied'}
             </Text>
             <Text style={s.statusSub}>
               {perk.my_request_status === 'pending' ? 'Your HR team will review and get back to you.' : perk.my_request_status === 'approved' ? 'Your request has been approved. Enjoy!' : 'This request was not approved this time.'}
@@ -100,7 +100,7 @@ export default function InternalPerkScreen() {
               {requesting
                 ? <ActivityIndicator color="#fff" />
                 : <Text style={s.btnTxt}>
-                    {perk.requires_approval ? '📬 Request This Perk' : '✅ Redeem Now'}
+                    {perk.requires_approval ? 'Request This Perk' : 'Redeem Now'}
                   </Text>
               }
             </TouchableOpacity>
@@ -115,16 +115,16 @@ export default function InternalPerkScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f9fafb' },
+  root: { flex: 1, backgroundColor: '#F7F7F8' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  hero: { alignItems: 'center', backgroundColor: '#fff', borderRadius: 24, padding: 28, marginBottom: 16, borderWidth: 1.5, borderColor: '#e0e7ff' },
+  hero: { alignItems: 'center', backgroundColor: '#fff', borderRadius: 24, padding: 28, marginBottom: 16, borderWidth: 1.5, borderColor: '#EEEFF2' },
   title: { fontSize: 22, fontWeight: '900', color: '#111', marginTop: 12, textAlign: 'center' },
-  company: { fontSize: 14, color: '#6366f1', fontWeight: '700', marginTop: 4 },
+  company: { fontSize: 14, color: '#1C3D5A', fontWeight: '700', marginTop: 4 },
   costRow: { flexDirection: 'row', gap: 10, marginTop: 14, flexWrap: 'wrap', justifyContent: 'center' },
   freeBadge: { backgroundColor: '#dcfce7', borderRadius: 99, paddingHorizontal: 16, paddingVertical: 8 },
   freeTxt: { color: '#16a34a', fontWeight: '800', fontSize: 14 },
-  costBadge: { backgroundColor: '#eef2ff', borderRadius: 99, paddingHorizontal: 16, paddingVertical: 8 },
-  costTxt: { color: '#6366f1', fontWeight: '800', fontSize: 14 },
+  costBadge: { backgroundColor: '#EEEFF2', borderRadius: 99, paddingHorizontal: 16, paddingVertical: 8 },
+  costTxt: { color: '#1C3D5A', fontWeight: '800', fontSize: 14 },
   slotBadge: { backgroundColor: '#fef3c7', borderRadius: 99, paddingHorizontal: 16, paddingVertical: 8 },
   slotTxt: { color: '#d97706', fontWeight: '700', fontSize: 14 },
   descCard: { backgroundColor: '#fff', borderRadius: 16, padding: 18, marginBottom: 16, borderWidth: 1.5, borderColor: '#e5e7eb' },
@@ -136,7 +136,7 @@ const s = StyleSheet.create({
   form: { backgroundColor: '#fff', borderRadius: 16, padding: 18, borderWidth: 1.5, borderColor: '#e5e7eb' },
   noteLabel: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 8 },
   noteInput: { borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, padding: 12, fontSize: 14, color: '#111', textAlignVertical: 'top', minHeight: 80, marginBottom: 16 },
-  btn: { backgroundColor: '#6366f1', borderRadius: 14, paddingVertical: 15, alignItems: 'center' },
+  btn: { backgroundColor: '#1C3D5A', borderRadius: 14, paddingVertical: 15, alignItems: 'center' },
   btnTxt: { color: '#fff', fontWeight: '800', fontSize: 15 },
   approvalNote: { fontSize: 12, color: '#9ca3af', textAlign: 'center', marginTop: 10 },
 });

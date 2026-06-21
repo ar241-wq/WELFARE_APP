@@ -34,7 +34,7 @@ export default function ColleagueProfileScreen() {
   }, [id]);
 
   if (loading) {
-    return <View style={styles.loader}><ActivityIndicator size="large" color="#6366f1" /></View>;
+    return <View style={styles.loader}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
   }
   if (!profile) {
     return <View style={styles.loader}><Text style={{ color: '#6b7280' }}>Profile not found.</Text></View>;
@@ -64,7 +64,7 @@ export default function ColleagueProfileScreen() {
           <Text style={styles.name}>{profile.full_name}</Text>
           {profile.department && (
             <View style={styles.deptPill}>
-              <Text style={styles.deptPillTxt}>🏢 {profile.department}</Text>
+              <Text style={styles.deptPillTxt}>{profile.department}</Text>
             </View>
           )}
           {profile.birthday_month && (
@@ -107,7 +107,7 @@ export default function ColleagueProfileScreen() {
             onPress={() => router.push(`/chat/${profile.id}`)}
             activeOpacity={0.85}
           >
-            <Text style={styles.msgTxt}>💬 Send a Message</Text>
+            <Text style={styles.msgTxt}>Send a Message</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -116,10 +116,10 @@ export default function ColleagueProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F7F7F8' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   topBar: { paddingHorizontal: 16, paddingBottom: 8, backgroundColor: '#fff' },
-  backTxt: { fontSize: 17, color: '#6366f1', fontWeight: '600' },
+  backTxt: { fontSize: 17, color: '#1C3D5A', fontWeight: '600' },
 
   hero: {
     backgroundColor: '#fff', alignItems: 'center',
@@ -129,16 +129,16 @@ const styles = StyleSheet.create({
   avatar: { width: 90, height: 90, borderRadius: 45, marginBottom: 4 },
   avatarFallback: {
     width: 90, height: 90, borderRadius: 45, marginBottom: 4,
-    backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 2, borderColor: '#c7d2fe',
+    backgroundColor: '#EEEFF2', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: '#D4D6DC',
   },
-  avatarLetter: { fontSize: 36, fontWeight: '800', color: '#6366f1' },
+  avatarLetter: { fontSize: 36, fontWeight: '800', color: '#1C3D5A' },
   name: { fontSize: 22, fontWeight: '900', color: '#111827' },
   deptPill: {
-    backgroundColor: '#eff6ff', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6,
-    borderWidth: 1.5, borderColor: '#bfdbfe',
+    backgroundColor: '#EEEFF2', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6,
+    borderWidth: 1.5, borderColor: '#D4D6DC',
   },
-  deptPillTxt: { fontSize: 13, fontWeight: '700', color: '#1d4ed8' },
+  deptPillTxt: { fontSize: 13, fontWeight: '700', color: '#1C3D5A' },
   birthday: { fontSize: 13, color: '#9ca3af' },
 
   statsRow: {
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   statBox: { flex: 1, alignItems: 'center', paddingVertical: 18 },
   statBorder: { borderLeftWidth: 1, borderLeftColor: '#e5e7eb' },
-  statNum: { fontSize: 26, fontWeight: '900', color: '#6366f1' },
+  statNum: { fontSize: 26, fontWeight: '900', color: '#1C3D5A' },
   statLabel: { fontSize: 12, color: '#9ca3af', fontWeight: '600', marginTop: 2 },
 
   section: { marginHorizontal: 16, marginTop: 20 },
@@ -163,8 +163,8 @@ const styles = StyleSheet.create({
   eventDate: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
 
   msgBtn: {
-    backgroundColor: '#6366f1', borderRadius: 16, paddingVertical: 16, alignItems: 'center',
-    shadowColor: '#6366f1', shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
+    backgroundColor: '#1C3D5A', borderRadius: 16, paddingVertical: 16, alignItems: 'center',
+    shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
   },
   msgTxt: { color: '#fff', fontSize: 16, fontWeight: '800' },
 });
