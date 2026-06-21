@@ -111,56 +111,60 @@ export default function CatalogScreen() {
         ))}
       </ScrollView>
 
-      {/* Suggestions */}
-      {!selectedCategory && !search && suggestions.length > 0 && (
-        <View>
-          <Text style={styles.sectionTitle}>Just for you ✨</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestRow}>
-            {suggestions.map((perk) => (
-              <TouchableOpacity
-                key={perk.id}
-                style={styles.suggestCard}
-                onPress={() => router.push(`/perk/${perk.id}`)}
-              >
-                <Text style={styles.suggestName}>{perk.name}</Text>
-                <Text style={styles.suggestProvider}>{perk.provider_name}</Text>
-                <Text style={styles.suggestPrice}>{perk.credit_price} credits</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      )}
+      {loading && <ActivityIndicator size="large" color="#6366f1" style={{ marginTop: 40 }} />}
 
-      {internalPerks.length > 0 && !search && !selectedCategory && (
-        <View style={{ paddingHorizontal: 16 }}>
-          <Text style={styles.sectionTitle}>🏢 Your Company Perks</Text>
-          {internalPerks.map(p => (
-            <InternalPerkCard key={p.id} perk={p} onPress={() => router.push(`/internal-perk/${p.id}`)} />
-          ))}
-        </View>
-      )}
-
-      {/* Top 3 Providers */}
-      {!search && !selectedCategory && topProviders.length > 0 && (
-        <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
-          <Text style={styles.sectionTitle}>🏆 Top Rated Providers</Text>
-          {topProviders.map((p, i) => (
-            <TopProviderCard key={p.provider_id} provider={p} rank={i + 1} />
-          ))}
-        </View>
-      )}
-
-      <Text style={styles.sectionTitle}>
-        {selectedCategory ? selectedCategory : 'All Perks'} {perks.length > 0 ? `(${perks.length})` : ''}
-      </Text>
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#6366f1" style={{ marginTop: 40 }} />
-      ) : (
+      {!loading && (
         <FlatList
           data={perks}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
+          ListHeaderComponent={
+            <>
+              {/* Suggestions */}
+              {!selectedCategory && !search && suggestions.length > 0 && (
+                <View>
+                  <Text style={styles.sectionTitle}>Just for you ✨</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestRow}>
+                    {suggestions.map((perk) => (
+                      <TouchableOpacity
+                        key={perk.id}
+                        style={styles.suggestCard}
+                        onPress={() => router.push(`/perk/${perk.id}`)}
+                      >
+                        <Text style={styles.suggestName}>{perk.name}</Text>
+                        <Text style={styles.suggestProvider}>{perk.provider_name}</Text>
+                        <Text style={styles.suggestPrice}>{perk.credit_price} credits</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Internal Perks */}
+              {internalPerks.length > 0 && !search && !selectedCategory && (
+                <View>
+                  <Text style={styles.sectionTitle}>🏢 Your Company Perks</Text>
+                  {internalPerks.map(p => (
+                    <InternalPerkCard key={p.id} perk={p} onPress={() => router.push(`/internal-perk/${p.id}`)} />
+                  ))}
+                </View>
+              )}
+
+              {/* Top 3 Providers */}
+              {!search && !selectedCategory && topProviders.length > 0 && (
+                <View>
+                  <Text style={styles.sectionTitle}>🏆 Top Rated Providers</Text>
+                  {topProviders.map((p, i) => (
+                    <TopProviderCard key={p.provider_id} provider={p} rank={i + 1} />
+                  ))}
+                </View>
+              )}
+
+              <Text style={styles.sectionTitle}>
+                {selectedCategory ? selectedCategory : 'All Perks'} {perks.length > 0 ? `(${perks.length})` : ''}
+              </Text>
+            </>
+          }
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.perkCard}
