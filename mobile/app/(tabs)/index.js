@@ -116,11 +116,15 @@ export default function HomeScreen() {
       setCategories(Array.isArray(c) ? c : c?.results || []);
       setCompanyFeed(Array.isArray(feed) ? feed : []);
       const blist = Array.isArray(bdays) ? bdays : [];
-      setBirthdays(blist);
       if (blist.length > 0) {
-        const todayKey = `birthday_seen_${new Date().toISOString().slice(0, 10)}`;
-        const alreadySeen = await AsyncStorage.getItem(todayKey).catch(() => null);
-        if (!alreadySeen) setShowBirthday(true);
+        const today = new Date().toISOString().slice(0, 10);
+        const unseen = [];
+        for (const person of blist) {
+          const key = `birthday_seen_${person.id}_${today}`;
+          const seen = await AsyncStorage.getItem(key).catch(() => null);
+          if (!seen) unseen.push(person);
+        }
+        if (unseen.length > 0) { setBirthdays(unseen); setShowBirthday(true); }
       }
       const glist = Array.isArray(bgifts) ? bgifts : [];
       if (glist.length > 0) { setBirthdayGifts(glist); setShowBirthdayGifts(true); }
@@ -201,8 +205,8 @@ export default function HomeScreen() {
     <>
       {showBirthday && birthdays.length > 0 && (
         <BirthdayPopup people={birthdays} onClose={() => {
-          const todayKey = `birthday_seen_${new Date().toISOString().slice(0, 10)}`;
-          AsyncStorage.setItem(todayKey, '1').catch(() => {});
+          const today = new Date().toISOString().slice(0, 10);
+          birthdays.forEach(p => AsyncStorage.setItem(`birthday_seen_${p.id}_${today}`, '1').catch(() => {}));
           setShowBirthday(false);
         }} />
       )}

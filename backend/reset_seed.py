@@ -153,9 +153,9 @@ from datetime import date as _date
 today = _date.today()
 EMPLOYEES = [
     # email, name, company, dept, balance, birthday (month, day)
-    ('liam@novatech.com',   'Liam Johnson',   company_nova,  dept_eng,          500, (today.month, today.day)),   # birthday TODAY — triggers popup
-    ('emma@novatech.com',   'Emma Rodriguez', company_nova,  dept_eng,          500, (today.month, today.day)),   # birthday TODAY
-    ('noah@novatech.com',   'Noah Williams',  company_nova,  dept_design,       500, (3, 15)),
+    ('liam@novatech.com',   'Liam Johnson',   company_nova,  dept_eng,          500, (4, 10)),
+    ('emma@novatech.com',   'Emma Rodriguez', company_nova,  dept_eng,          500, (9, 22)),
+    ('noah@novatech.com',   'Noah Williams',  company_nova,  dept_design,       500, (today.month, today.day)),   # 🎂 birthday TODAY — triggers popup
     ('olivia@novatech.com', 'Olivia Brown',   company_nova,  dept_design,       500, (7, 4)),
     ('james@greenleaf.com', 'James Taylor',   company_green, dept_green_ops,    400, (11, 28)),
     ('ava@greenleaf.com',   'Ava Martinez',   company_green, dept_green_ops,    400, (2, 14)),
@@ -342,6 +342,23 @@ for provider in providers:
     print(f"  {provider.full_name:20} — {tier:8} | score={composite} | avg={avg_stars:.1f}★ | {review_count_p} reviews")
 
 # ── SEED TEAMS ───────────────────────────────────────────────
+# ── SEED BIRTHDAY GIFTS (pre-seeded so Noah's popup fires on demo) ───────────
+noah_user = User.objects.get(email='noah@novatech.com')
+liam_user = User.objects.get(email='liam@novatech.com')
+emma_user = User.objects.get(email='emma@novatech.com')
+olivia_user = User.objects.get(email='olivia@novatech.com')
+
+for sender, amount in [(liam_user, 100), (emma_user, 200), (olivia_user, 50)]:
+    BirthdayGift.objects.create(from_user=sender, to_user=noah_user, amount=Decimal(str(amount)), seen=False)
+    sender_wallet = Wallet.objects.get(employee=sender)
+    sender_wallet.balance -= Decimal(str(amount))
+    sender_wallet.save()
+    noah_wallet = Wallet.objects.get(employee=noah_user)
+    noah_wallet.balance += Decimal(str(amount))
+    noah_wallet.save()
+
+print("  ✓ 3 birthday gifts pre-seeded for Noah (350 credits total, popup ready)")
+
 print("\n[7/10] Seeding teams...")
 
 liam    = User.objects.get(email='liam@novatech.com')
@@ -629,9 +646,11 @@ print("              james@greenleaf.com | mia@pulse.com")
 print("  Providers:  hello@zenfit.com | info@boltgym.com | team@mealcraft.com")
 print("              hi@skillvault.com | care@mindspace.com | go@wanderpass.com")
 print("\nAll employee wallets restored:")
-print("  NovaTech employees: 500 credits each (+500 win bonus for Liam & Emma)")
+print("  NovaTech employees: 500 cr base (+500 win bonus Liam & Emma, -350 gifted to Noah)")
 print("  GreenLeaf employees: 400 credits each")
 print("  Pulse employees: 450 credits each")
+print("\n🎂 Birthday: Noah Williams (noah@novatech.com) — popup fires for Liam, Emma, Olivia")
+print("   Noah opens app → sees BirthdayGiftsPopup with 350 credits from 3 colleagues")
 print("\nChallenges: 4 active + 1 completed (Engineering won, notifications pending)")
 print("Teams: Backend Squad, Product & Design (Nova) | Sustainability Ops (Green) | Content Creators (Pulse)")
 print("Secret Santa: 2 events (NovaTech Eng assigned, GreenLeaf Ops assigned)")
