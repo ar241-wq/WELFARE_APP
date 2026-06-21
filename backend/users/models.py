@@ -46,6 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    birthday = models.DateField(null=True, blank=True)
     referral_code = models.CharField(max_length=8, unique=True, default=generate_referral_code)
     referred_by = models.ForeignKey(
         'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals'

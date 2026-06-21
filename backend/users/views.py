@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from .serializers import RegisterSerializer, UserSerializer, CustomTokenObtainPairSerializer, UpdateProfileSerializer
+from .models import ProviderProfile
 
 User = get_user_model()
 
@@ -82,6 +84,57 @@ class AvatarUploadView(APIView):
         user.avatar = image
         user.save()
         return Response(UserSerializer(user).data)
+
+
+class BirthdayTodayView(APIView):
+    """GET /api/auth/birthday-today/ — colleagues with birthday today (same month+day)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        today = timezone.now().date()
+        colleagues = User.objects.filter(
+            role='employee',
+            birthday__month=today.month,
+            birthday__day=today.day,
+        ).exclude(pk=request.user.pk)
+        return Response([{
+            'id': u.id,
+            'full_name': u.full_name,
+            'avatar': request.build_absolute_uri(u.avatar.url) if u.avatar else None,
+        } for u in colleagues])
+
+
+class ColleagueProfileView(APIView):
+    """GET /api/auth/profile/<id>/"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=404)
+        from companies.models import DepartmentMembership
+        dept = DepartmentMembership.objects.filter(employee=user).select_related('department').first()
+        from life_moments.models import LifeEvent
+        event_objs = LifeEvent.objects.filter(employee=user, is_active=True)
+        events = [
+            {'id': e.id, 'event_type': e.event_type, 'event_type_display': e.get_event_type_display(), 'note': e.note, 'created_at': e.created_at}
+            for e in event_objs
+        ]
+        from wallet.models import Transaction
+        credits_received = Transaction.objects.filter(
+            wallet__employee=user, type__in=['credit', 'donation']
+        ).count()
+        return Response({
+            'id': user.id,
+            'full_name': user.full_name,
+            'avatar': request.build_absolute_uri(user.avatar.url) if user.avatar else None,
+            'department': dept.department.name if dept else None,
+            'birthday_month': user.birthday.month if user.birthday else None,
+            'birthday_day': user.birthday.day if user.birthday else None,
+            'life_events': events,
+            'credits_received': credits_received,
+        })
 
 
 class LogoUploadView(APIView):

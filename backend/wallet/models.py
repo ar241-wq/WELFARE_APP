@@ -37,6 +37,24 @@ class Transaction(models.Model):
         return f'{self.type} {self.amount} — {self.wallet.employee.full_name}'
 
 
+class BirthdayGift(models.Model):
+    from_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='birthday_gifts_sent'
+    )
+    to_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='birthday_gifts_received'
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    seen = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.from_user.full_name} → {self.to_user.full_name}: {self.amount} credits'
+
+
 class CreditAllocation(models.Model):
     company = models.ForeignKey('companies.Company', on_delete=models.CASCADE)
     employee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

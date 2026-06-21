@@ -64,11 +64,11 @@ export default function ColleagueProfileScreen() {
           <Text style={styles.name}>{profile.full_name}</Text>
           {profile.department && (
             <View style={styles.deptPill}>
-              <Text style={styles.deptPillTxt}>🏢 {profile.department.name}</Text>
+              <Text style={styles.deptPillTxt}>🏢 {profile.department}</Text>
             </View>
           )}
-          {profile.birthday && (
-            <Text style={styles.birthday}>🎂 Birthday: {profile.birthday}</Text>
+          {profile.birthday_month && (
+            <Text style={styles.birthday}>🎂 Birthday: {new Date(0, profile.birthday_month - 1).toLocaleString('default', { month: 'long' })} {profile.birthday_day}</Text>
           )}
         </View>
 
@@ -104,7 +104,7 @@ export default function ColleagueProfileScreen() {
         <View style={styles.section}>
           <TouchableOpacity
             style={styles.msgBtn}
-            onPress={() => router.push(`/chat/dm/${profile.id}`)}
+            onPress={() => router.push(`/chat/${profile.id}`)}
             activeOpacity={0.85}
           >
             <Text style={styles.msgTxt}>💬 Send a Message</Text>

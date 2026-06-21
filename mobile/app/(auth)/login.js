@@ -26,7 +26,12 @@ export default function LoginScreen() {
       signIn(data.user);
       router.replace('/(tabs)/');
     } catch (err) {
-      Alert.alert('Login Failed', 'Invalid email or password. Please try again.');
+      const isAuthError = err.message === '401' || (err.message && err.message.toLowerCase().includes('account'));
+      if (isAuthError) {
+        Alert.alert('Login Failed', 'Invalid email or password. Please try again.');
+      } else {
+        Alert.alert('Connection Error', 'Could not reach the server. Make sure the backend is running and your IP in .env is correct.');
+      }
     } finally {
       setLoading(false);
     }

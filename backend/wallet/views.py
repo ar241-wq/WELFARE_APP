@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from users.permissions import IsEmployee
-from .models import Wallet, Transaction
+from .models import Wallet, Transaction, BirthdayGift
 from .serializers import WalletSerializer, TransactionSerializer, DonateSerializer
 import decimal
 
@@ -135,3 +135,77 @@ class GiftCreditsView(APIView):
             'recipient_name': recipient.full_name,
             'new_balance': str(sender_wallet.balance),
         })
+
+
+class BirthdayGiftView(APIView):
+    """POST /api/wallet/birthday-gift/ — send birthday credits to a colleague."""
+    permission_classes = [IsEmployee]
+
+    def post(self, request):
+        recipient_id = request.data.get('recipient_id')
+        amount = request.data.get('amount', 10)
+
+        if not recipient_id:
+            return Response({'detail': 'recipient_id is required.'}, status=400)
+
+        try:
+            amount = decimal.Decimal(str(amount))
+        except Exception:
+            return Response({'detail': 'Invalid amount.'}, status=400)
+
+        if amount <= 0 or amount > 500:
+            return Response({'detail': 'Amount must be between 1 and 500 credits.'}, status=400)
+
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        try:
+            recipient = User.objects.get(pk=recipient_id, role='employee')
+        except User.DoesNotExist:
+            return Response({'detail': 'Recipient not found.'}, status=404)
+
+        if recipient == request.user:
+            return Response({'detail': 'You cannot gift to yourself.'}, status=400)
+
+        sender_wallet, _ = Wallet.objects.get_or_create(employee=request.user)
+        if sender_wallet.balance < amount:
+            return Response({'detail': 'Insufficient credits.'}, status=400)
+
+        recipient_wallet, _ = Wallet.objects.get_or_create(employee=recipient)
+
+        sender_wallet.balance -= amount
+        sender_wallet.save()
+        recipient_wallet.balance += amount
+        recipient_wallet.save()
+
+        Transaction.objects.create(
+            wallet=sender_wallet, amount=-amount, type='debit',
+            description=f'Birthday gift to {recipient.full_name} 🎂'
+        )
+        Transaction.objects.create(
+            wallet=recipient_wallet, amount=amount, type='credit',
+            description=f'Birthday gift from {request.user.full_name} 🎂'
+        )
+
+        BirthdayGift.objects.create(from_user=request.user, to_user=recipient, amount=amount)
+
+        return Response({'detail': 'Birthday gift sent!', 'amount': str(amount)})
+
+
+class BirthdayGiftsReceivedView(APIView):
+    """GET /api/wallet/birthday-gifts/received/ — unseen birthday gifts for the logged-in user."""
+    permission_classes = [IsEmployee]
+
+    def get(self, request):
+        gifts = BirthdayGift.objects.filter(to_user=request.user, seen=False).select_related('from_user')
+        result = []
+        for g in gifts:
+            avatar = g.from_user.avatar
+            result.append({
+                'id': g.id,
+                'from_name': g.from_user.full_name,
+                'from_avatar': request.build_absolute_uri(avatar.url) if avatar else None,
+                'amount': float(g.amount),
+            })
+        # Mark as seen
+        gifts.update(seen=True)
+        return Response(result)

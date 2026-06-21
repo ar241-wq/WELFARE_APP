@@ -9,6 +9,7 @@ from catalog.models import Perk
 from wallet.models import Wallet, Transaction
 from .models import LifeEvent, CarePackage, CreditDonation
 from .serializers import LifeEventSerializer, ApproveCarePackageSerializer
+from rest_framework.permissions import IsAuthenticated
 import decimal
 
 
@@ -162,3 +163,37 @@ class DonateToEventView(APIView):
         )
 
         return Response({'detail': 'Credits donated anonymously.', 'amount': str(amount)})
+
+
+class CompanyFeedView(APIView):
+    """GET /api/life-moments/company-feed/ — active life events from colleagues in the same company."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        company = getattr(user, 'company', None)
+        if company:
+            events = LifeEvent.objects.filter(
+                employee__company=company,
+                is_active=True,
+            ).exclude(employee=user).select_related('employee').order_by('-created_at')[:20]
+        else:
+            events = LifeEvent.objects.none()
+
+        result = []
+        for e in events:
+            emp = e.employee
+            avatar = emp.avatar
+            total_donations = sum(d.amount for d in e.donations.all())
+            result.append({
+                'id': e.id,
+                'event_type': e.event_type,
+                'event_type_display': e.get_event_type_display(),
+                'note': e.note,
+                'created_at': e.created_at,
+                'employee_id': emp.id,
+                'employee_name': emp.full_name,
+                'employee_avatar': request.build_absolute_uri(avatar.url) if avatar else None,
+                'total_donations': float(total_donations),
+            })
+        return Response(result)
