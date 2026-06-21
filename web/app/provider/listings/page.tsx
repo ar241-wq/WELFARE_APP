@@ -38,7 +38,7 @@ const categoryColor: Record<string, string> = {
 };
 
 function imageUrl(src: string) {
-  if (!src) return '';
+  if (!src) return null;
   if (src.startsWith('http') || src.startsWith('data:')) return src;
   return `${API_URL}${src}`;
 }
@@ -209,10 +209,10 @@ export default function ListingsPage() {
                 <div className={`group bg-white rounded-[12px] border shadow-[0_1px_2px_rgba(21,22,26,.04),0_4px_16px_rgba(21,22,26,.06)] overflow-hidden transition-all duration-[220ms] hover:shadow-[0_8px_32px_rgba(21,22,26,.10)] ${perk.is_active ? 'border-[#E7E9EE]' : 'border-[#E7E9EE] opacity-70'}`}>
                   {/* Image */}
                   <div className="relative h-44 bg-[#F7F8FA] overflow-hidden">
-                    {perk.images?.[0] ? (
+                    {perk.images?.[0] && imageUrl(perk.images[0].image) ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={imageUrl(perk.images[0].image)}
+                        src={imageUrl(perk.images[0].image)!}
                         alt={perk.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[400ms]"
                       />
@@ -282,7 +282,7 @@ export default function ListingsPage() {
                 {(editPerk.images || []).map((img) => (
                   <div key={img.id} className="relative w-20 h-20 rounded-[8px] overflow-hidden border border-[#E7E9EE] group">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={imageUrl(img.image)} alt="perk" className="w-full h-full object-cover" />
+                    {imageUrl(img.image) && <img src={imageUrl(img.image)!} alt="perk" className="w-full h-full object-cover" />}
                     <button
                       onClick={() => handleDeleteImage(img.id)}
                       disabled={deletingImg === img.id}
