@@ -25,7 +25,7 @@ export default function CarePackageScreen() {
     load();
   }, [eventId]);
 
-  if (loading) return <View style={styles.loader}><ActivityIndicator size="large" color="#6366f1" /></View>;
+  if (loading) return <View style={styles.loader}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
   if (!event?.care_package) return <View style={styles.loader}><Text>Care package not found.</Text></View>;
 
   const pkg = event.care_package;
@@ -34,7 +34,6 @@ export default function CarePackageScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
       <View style={styles.hero}>
-        <Text style={styles.heroIcon}>💝</Text>
         <Text style={styles.heroTitle}>Your team sent you a care package</Text>
         <Text style={styles.heroText}>
           Your company and colleagues have come together to support you during this time.
@@ -82,8 +81,7 @@ export default function CarePackageScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  hero: { alignItems: 'center', paddingVertical: 32, backgroundColor: '#fdf2f8', borderRadius: 20, marginBottom: 24 },
-  heroIcon: { fontSize: 56, marginBottom: 12 },
+  hero: { alignItems: 'center', paddingVertical: 32, backgroundColor: '#F7F7F8', borderRadius: 20, marginBottom: 24 },
   heroTitle: { fontSize: 20, fontWeight: '800', color: '#111827', textAlign: 'center', marginBottom: 8, paddingHorizontal: 16 },
   heroText: { fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 20, paddingHorizontal: 20 },
   donationBadge: { marginTop: 14, backgroundColor: '#fee2e2', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
@@ -98,7 +96,7 @@ const styles = StyleSheet.create({
   perkInfo: { flex: 1 },
   perkName: { fontSize: 15, fontWeight: '700', color: '#111827' },
   perkProvider: { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  redeemBtn: { backgroundColor: '#6366f1', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10 },
+  redeemBtn: { backgroundColor: '#1C3D5A', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10 },
   redeemText: { color: '#fff', fontSize: 13, fontWeight: '700' },
   emptyText: { textAlign: 'center', color: '#9ca3af', fontSize: 14, marginVertical: 20 },
   backBtn: { marginTop: 20, borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },

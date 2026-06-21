@@ -93,7 +93,7 @@ export default function RedeemScreen() {
 
   // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
-    return <View style={styles.loader}><ActivityIndicator size="large" color="#6366f1" /></View>;
+    return <View style={styles.loader}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
   }
 
   if (!redemption) {
@@ -112,7 +112,6 @@ export default function RedeemScreen() {
     return (
       <ScrollView contentContainerStyle={styles.reviewContainer} keyboardShouldPersistTaps="handled">
         <View style={styles.reviewCard}>
-          <Text style={styles.reviewCheck}>✅</Text>
           <Text style={styles.reviewTitle}>Perk redeemed!</Text>
           <Text style={styles.reviewSub}>How was {redemption.perk_name}?</Text>
 
@@ -162,7 +161,6 @@ export default function RedeemScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.successIcon}>✅</Text>
         <Text style={styles.title}>Your Perk is Ready!</Text>
         <Text style={styles.perkName}>{redemption.perk_name}</Text>
         <Text style={styles.instruction}>Show this QR code to the provider</Text>
@@ -178,8 +176,8 @@ export default function RedeemScreen() {
 
         <View style={styles.infoBadge}>
           <Text style={styles.infoText}>Redemption #{redemption.id}</Text>
-          <View style={[styles.statusBadge, { backgroundColor: redemption.status === 'redeemed' ? '#d1fae5' : '#eef2ff' }]}>
-            <Text style={[styles.statusText, { color: redemption.status === 'redeemed' ? '#059669' : '#6366f1' }]}>
+          <View style={[styles.statusBadge, { backgroundColor: redemption.status === 'redeemed' ? '#d1fae5' : '#EEEFF2' }]}>
+            <Text style={[styles.statusText, { color: redemption.status === 'redeemed' ? '#059669' : '#1C3D5A' }]}>
               {redemption.status}
             </Text>
           </View>
@@ -199,10 +197,10 @@ export default function RedeemScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb', padding: 20, justifyContent: 'center' },
+  container: { flex: 1, backgroundColor: '#F7F7F8', padding: 20, justifyContent: 'center' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   errorText: { fontSize: 16, color: '#6b7280', marginBottom: 12 },
-  backLink: { fontSize: 15, color: '#6366f1', fontWeight: '600' },
+  backLink: { fontSize: 15, color: '#1C3D5A', fontWeight: '600' },
   card: {
     backgroundColor: '#fff', borderRadius: 24, padding: 28,
     alignItems: 'center', shadowColor: '#000',
@@ -210,7 +208,7 @@ const styles = StyleSheet.create({
   },
   successIcon: { fontSize: 40, marginBottom: 12 },
   title: { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 6 },
-  perkName: { fontSize: 16, color: '#6366f1', fontWeight: '600', marginBottom: 8 },
+  perkName: { fontSize: 16, color: '#1C3D5A', fontWeight: '600', marginBottom: 8 },
   instruction: { fontSize: 14, color: '#6b7280', marginBottom: 24 },
   qrContainer: { padding: 16, backgroundColor: '#fff', borderRadius: 16, borderWidth: 2, borderColor: '#e5e7eb', marginBottom: 20 },
   infoBadge: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
@@ -220,12 +218,12 @@ const styles = StyleSheet.create({
   cost: { fontSize: 13, color: '#9ca3af', marginTop: 4 },
   waitingText: { fontSize: 12, color: '#6b7280', marginTop: 8, fontStyle: 'italic' },
   doneBtn: {
-    marginTop: 20, backgroundColor: '#6366f1', borderRadius: 14,
+    marginTop: 20, backgroundColor: '#1C3D5A', borderRadius: 14,
     paddingVertical: 16, alignItems: 'center',
   },
   doneBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   // ── Review prompt ──
-  reviewContainer: { flexGrow: 1, backgroundColor: '#f9fafb', padding: 20, justifyContent: 'center' },
+  reviewContainer: { flexGrow: 1, backgroundColor: '#F7F7F8', padding: 20, justifyContent: 'center' },
   reviewCard: {
     backgroundColor: '#fff', borderRadius: 24, padding: 28, alignItems: 'center',
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 4,
@@ -236,14 +234,14 @@ const styles = StyleSheet.create({
   starsRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
   starBtn: { padding: 4 },
   starIcon: { fontSize: 36, color: '#d1d5db' },
-  starFilled: { color: '#f59e0b' },
+  starFilled: { color: '#9A6700' },
   commentInput: {
     width: '100%', backgroundColor: '#f3f4f6', borderRadius: 12,
     paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, color: '#111827',
     textAlignVertical: 'top', marginBottom: 16, minHeight: 80,
   },
   submitBtn: {
-    width: '100%', backgroundColor: '#6366f1', borderRadius: 14,
+    width: '100%', backgroundColor: '#1C3D5A', borderRadius: 14,
     paddingVertical: 14, alignItems: 'center', marginBottom: 10,
   },
   submitBtnDisabled: { opacity: 0.5 },

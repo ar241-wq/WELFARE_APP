@@ -116,7 +116,7 @@ export default function GroupChatThread() {
         keyboardVerticalOffset={0}
       >
         {loading ? (
-          <ActivityIndicator style={{ marginTop: 40 }} color="#6366f1" />
+          <ActivityIndicator style={{ marginTop: 40 }} color="#1C3D5A" />
         ) : (
           <FlatList
             ref={listRef}
@@ -164,16 +164,16 @@ export default function GroupChatThread() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#fafafa' },
+  root: { flex: 1, backgroundColor: '#F7F7F8' },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12,
     backgroundColor: '#fff',
     borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#f0f0f0', gap: 10,
   },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
-  backIcon: { fontSize: 22, color: '#6366f1', lineHeight: 26, marginLeft: -2 },
+  backIcon: { fontSize: 22, color: '#1C3D5A', lineHeight: 26, marginLeft: -2 },
   headerIcon: {
-    width: 42, height: 42, borderRadius: 21, backgroundColor: '#eef2ff',
+    width: 42, height: 42, borderRadius: 21, backgroundColor: '#EEEFF2',
     alignItems: 'center', justifyContent: 'center',
   },
   headerName: { fontSize: 16, fontWeight: '800', color: '#111' },
@@ -183,17 +183,17 @@ const styles = StyleSheet.create({
   msgRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 6, gap: 8 },
   msgRowMine: { flexDirection: 'row-reverse' },
   msgAvatar: {
-    width: 30, height: 30, borderRadius: 15, backgroundColor: '#eef2ff',
+    width: 30, height: 30, borderRadius: 15, backgroundColor: '#EEEFF2',
     alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
   },
   msgAvatarImg: { width: 30, height: 30 },
-  msgAvatarLetter: { fontSize: 12, fontWeight: '800', color: '#6366f1' },
+  msgAvatarLetter: { fontSize: 12, fontWeight: '800', color: '#1C3D5A' },
   msgSenderName: { fontSize: 11, color: '#b0b0b0', marginBottom: 3, marginLeft: 2 },
   bubble: {
     borderRadius: 22, paddingHorizontal: 16, paddingVertical: 10,
     shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
   },
-  bubbleMine: { backgroundColor: '#6366f1', borderBottomRightRadius: 6 },
+  bubbleMine: { backgroundColor: '#1C3D5A', borderBottomRightRadius: 6 },
   bubbleTheirs: { backgroundColor: '#fff', borderBottomLeftRadius: 6, borderWidth: 1, borderColor: '#f0f0f0' },
   bubbleText: { fontSize: 15, color: '#111', lineHeight: 21 },
   bubbleTextMine: { color: '#fff' },
@@ -214,10 +214,10 @@ const styles = StyleSheet.create({
     maxHeight: 110,
   },
   sendBtn: {
-    width: 44, height: 44, borderRadius: 22, backgroundColor: '#6366f1',
+    width: 44, height: 44, borderRadius: 22, backgroundColor: '#1C3D5A',
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#6366f1', shadowOpacity: 0.35, shadowRadius: 8, shadowOffset: { width: 0, height: 3 },
+    shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
   },
-  sendBtnDisabled: { backgroundColor: '#c7d2fe', shadowOpacity: 0 },
+  sendBtnDisabled: { backgroundColor: '#D4D6DC', shadowOpacity: 0 },
   sendIcon: { color: '#fff', fontSize: 20, fontWeight: '800' },
 });

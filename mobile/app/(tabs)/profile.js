@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Cake, Heart, ClipboardList, Ticket, ChevronRight, Copy, LogOut } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { logout, updateProfile } from '../../lib/api';
 
@@ -47,13 +48,12 @@ export default function ProfileScreen() {
   async function saveBirthday() {
     setSaving(true);
     try {
-      // Store as YYYY-MM-DD with year 1900 (year irrelevant, we only match month+day)
       const month = String(selectedMonth + 1).padStart(2, '0');
       const day = String(selectedDay).padStart(2, '0');
       const updated = await updateProfile({ birthday: `1900-${month}-${day}` });
       signIn(updated);
       setShowBirthdayPicker(false);
-      Alert.alert('Saved! 🎂', 'Your birthday has been set. Your colleagues will be notified on the day!');
+      Alert.alert('Saved', 'Your birthday has been set. Your colleagues will be notified on the day!');
     } catch (_) {
       Alert.alert('Error', 'Could not save birthday.');
     }
@@ -67,10 +67,10 @@ export default function ProfileScreen() {
   const initial = user?.full_name?.[0]?.toUpperCase() || '?';
 
   const menuItems = [
-    { icon: '🎂', label: birthdayLabel, onPress: () => setShowBirthdayPicker(true), highlight: !user?.birthday },
-    { icon: '💝', label: 'Life Moments', onPress: () => router.push('/life-moments') },
-    { icon: '📋', label: 'My Perk Requests', onPress: () => router.push('/request/new') },
-    { icon: '🎫', label: 'My Redemptions & Reviews', onPress: () => router.push('/redemptions') },
+    { icon: <Cake size={18} color="#5B5E66" strokeWidth={1.75} />, label: birthdayLabel, onPress: () => setShowBirthdayPicker(true), highlight: !user?.birthday },
+    { icon: <Heart size={18} color="#5B5E66" strokeWidth={1.75} />, label: 'Life Moments', onPress: () => router.push('/life-moments') },
+    { icon: <ClipboardList size={18} color="#5B5E66" strokeWidth={1.75} />, label: 'My Perk Requests', onPress: () => router.push('/request/new') },
+    { icon: <Ticket size={18} color="#5B5E66" strokeWidth={1.75} />, label: 'My Redemptions', onPress: () => router.push('/redemptions') },
   ];
 
   return (
@@ -98,27 +98,31 @@ export default function ProfileScreen() {
               style={styles.referralBox}
               onPress={() => {
                 Clipboard.setString(user.referral_code);
-                Alert.alert('Copied!', 'Referral code copied to clipboard. Share it to earn 100 credits per signup!');
+                Alert.alert('Copied', 'Referral code copied to clipboard. Share it to earn 100 credits per signup!');
               }}
             >
-              <Text style={styles.referralLabel}>Your referral code</Text>
+              <View style={styles.referralTop}>
+                <Text style={styles.referralLabel}>Referral code</Text>
+                <Copy size={13} color="#5B5E66" strokeWidth={1.75} />
+              </View>
               <Text style={styles.referralCode}>{user.referral_code}</Text>
-              <Text style={styles.referralHint}>Tap to copy · Earn 100 credits per signup</Text>
+              <Text style={styles.referralHint}>Earn 100 credits per signup</Text>
             </TouchableOpacity>
           )}
         </View>
 
         <View style={styles.menu}>
           {menuItems.map((item, i) => (
-            <TouchableOpacity key={i} style={styles.menuItem} onPress={item.onPress}>
-              <Text style={styles.menuIcon}>{item.icon}</Text>
+            <TouchableOpacity key={i} style={[styles.menuItem, i === menuItems.length - 1 && { borderBottomWidth: 0 }]} onPress={item.onPress}>
+              <View style={styles.menuIconWrap}>{item.icon}</View>
               <Text style={[styles.menuLabel, item.highlight && styles.menuLabelHighlight]}>{item.label}</Text>
-              <Text style={styles.menuArrow}>›</Text>
+              <ChevronRight size={16} color="#D4D6DC" strokeWidth={1.75} />
             </TouchableOpacity>
           ))}
         </View>
 
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+          <LogOut size={16} color="#B42318" strokeWidth={1.75} />
           <Text style={styles.logoutText}>Sign Out</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -127,11 +131,10 @@ export default function ProfileScreen() {
       <Modal visible={showBirthdayPicker} transparent animationType="slide" onRequestClose={() => setShowBirthdayPicker(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>🎂 Your Birthday</Text>
+            <Text style={styles.modalTitle}>Your Birthday</Text>
             <Text style={styles.modalSub}>We'll surprise your colleagues on your special day!</Text>
 
             <View style={styles.pickerRow}>
-              {/* Month */}
               <View style={styles.pickerCol}>
                 <Text style={styles.pickerLabel}>Month</Text>
                 <ScrollView style={styles.pickerScroll} showsVerticalScrollIndicator={false}>
@@ -147,7 +150,6 @@ export default function ProfileScreen() {
                 </ScrollView>
               </View>
 
-              {/* Day */}
               <View style={styles.pickerCol}>
                 <Text style={styles.pickerLabel}>Day</Text>
                 <ScrollView style={styles.pickerScroll} showsVerticalScrollIndicator={false}>
@@ -165,7 +167,7 @@ export default function ProfileScreen() {
             </View>
 
             <TouchableOpacity style={styles.saveBtn} onPress={saveBirthday} disabled={saving}>
-              <Text style={styles.saveBtnTxt}>{saving ? 'Saving…' : `Save — ${MONTHS[selectedMonth]} ${selectedDay}`}</Text>
+              <Text style={styles.saveBtnTxt}>{saving ? 'Saving...' : `Save — ${MONTHS[selectedMonth]} ${selectedDay}`}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowBirthdayPicker(false)}>
               <Text style={styles.cancelTxt}>Cancel</Text>
@@ -178,65 +180,70 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
-  header: { backgroundColor: '#fff', paddingHorizontal: 20, paddingBottom: 16 },
-  title: { fontSize: 24, fontWeight: '800', color: '#111827' },
-  avatarSection: { alignItems: 'center', backgroundColor: '#fff', paddingVertical: 32, marginBottom: 16 },
-  avatarImage: { width: 80, height: 80, borderRadius: 40, marginBottom: 12 },
+  container: { flex: 1, backgroundColor: '#F7F7F8' },
+  header: { backgroundColor: '#FFFFFF', paddingHorizontal: 20, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#EEEFF2' },
+  title: { fontSize: 22, fontWeight: '700', color: '#0A0A0B', letterSpacing: -0.3 },
+
+  avatarSection: { alignItems: 'center', backgroundColor: '#FFFFFF', paddingVertical: 28, marginBottom: 12, borderBottomWidth: 1, borderBottomColor: '#EEEFF2' },
+  avatarImage: { width: 72, height: 72, borderRadius: 36, marginBottom: 12 },
   avatar: {
-    width: 80, height: 80, borderRadius: 40,
-    backgroundColor: '#6366f1', justifyContent: 'center', alignItems: 'center', marginBottom: 12,
+    width: 72, height: 72, borderRadius: 36,
+    backgroundColor: '#1C3D5A', justifyContent: 'center', alignItems: 'center', marginBottom: 12,
   },
-  avatarText: { fontSize: 32, fontWeight: '800', color: '#fff' },
-  name: { fontSize: 20, fontWeight: '700', color: '#111827' },
-  email: { fontSize: 14, color: '#6b7280', marginTop: 4 },
-  badge: { marginTop: 8, backgroundColor: '#eef2ff', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },
-  badgeText: { fontSize: 12, color: '#6366f1', fontWeight: '600' },
+  avatarText: { fontSize: 28, fontWeight: '700', color: '#FFFFFF' },
+  name: { fontSize: 18, fontWeight: '700', color: '#0A0A0B', letterSpacing: -0.2 },
+  email: { fontSize: 13, color: '#8E9099', marginTop: 3 },
+  badge: { marginTop: 8, backgroundColor: '#EEEFF2', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
+  badgeText: { fontSize: 11, color: '#5B5E66', fontWeight: '600' },
+
   referralBox: {
-    marginTop: 16, backgroundColor: '#f0fdf4', borderWidth: 1.5, borderColor: '#86efac',
-    borderRadius: 16, paddingVertical: 14, paddingHorizontal: 20, alignItems: 'center', width: '80%',
+    marginTop: 16, backgroundColor: '#F7F7F8', borderWidth: 1, borderColor: '#EEEFF2',
+    borderRadius: 12, paddingVertical: 12, paddingHorizontal: 18, alignItems: 'center', width: '80%',
   },
-  referralLabel: { fontSize: 11, color: '#16a34a', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
-  referralCode: { fontSize: 28, fontWeight: '900', color: '#15803d', letterSpacing: 4, marginVertical: 4 },
-  referralHint: { fontSize: 11, color: '#4ade80', fontWeight: '500' },
-  menu: { backgroundColor: '#fff', marginHorizontal: 16, borderRadius: 16, overflow: 'hidden' },
+  referralTop: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
+  referralLabel: { fontSize: 11, color: '#8E9099', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
+  referralCode: { fontSize: 22, fontWeight: '700', color: '#0A0A0B', letterSpacing: 3, marginVertical: 2 },
+  referralHint: { fontSize: 11, color: '#8E9099', fontWeight: '500' },
+
+  menu: { backgroundColor: '#FFFFFF', marginHorizontal: 16, borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#EEEFF2', marginBottom: 8 },
   menuItem: {
-    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 16,
-    borderBottomWidth: 1, borderBottomColor: '#f3f4f6',
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 15,
+    borderBottomWidth: 1, borderBottomColor: '#EEEFF2', gap: 12,
   },
-  menuIcon: { fontSize: 20, marginRight: 12 },
-  menuLabel: { flex: 1, fontSize: 15, fontWeight: '600', color: '#111827' },
-  menuLabelHighlight: { color: '#f59e0b' },
-  menuArrow: { fontSize: 20, color: '#9ca3af' },
+  menuIconWrap: { width: 32, alignItems: 'center' },
+  menuLabel: { flex: 1, fontSize: 14, fontWeight: '500', color: '#0A0A0B' },
+  menuLabelHighlight: { color: '#1C3D5A', fontWeight: '600' },
+
   logoutBtn: {
-    margin: 16, marginTop: 24, padding: 16, borderRadius: 14,
-    borderWidth: 1.5, borderColor: '#fee2e2', backgroundColor: '#fff', alignItems: 'center',
+    margin: 16, marginTop: 8, padding: 14, borderRadius: 12,
+    borderWidth: 1, borderColor: '#FEE2E0', backgroundColor: '#FFFFFF',
+    alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8,
   },
-  logoutText: { color: '#dc2626', fontSize: 15, fontWeight: '700' },
+  logoutText: { color: '#B42318', fontSize: 14, fontWeight: '600' },
 
   // Modal
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(10,10,11,0.48)', justifyContent: 'flex-end' },
   modalCard: {
-    backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28,
+    backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24,
     paddingHorizontal: 24, paddingTop: 28, paddingBottom: 40,
   },
-  modalTitle: { fontSize: 22, fontWeight: '800', color: '#111', marginBottom: 4 },
-  modalSub: { fontSize: 13, color: '#6b7280', marginBottom: 24 },
+  modalTitle: { fontSize: 20, fontWeight: '700', color: '#0A0A0B', marginBottom: 4, letterSpacing: -0.2 },
+  modalSub: { fontSize: 13, color: '#8E9099', marginBottom: 24 },
 
   pickerRow: { flexDirection: 'row', gap: 12, marginBottom: 24 },
   pickerCol: { flex: 1 },
-  pickerLabel: { fontSize: 11, fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 },
-  pickerScroll: { height: 200, backgroundColor: '#f9fafb', borderRadius: 14 },
-  pickerItem: { paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10, marginHorizontal: 4, marginVertical: 2 },
-  pickerItemSelected: { backgroundColor: '#fef3c7' },
-  pickerItemTxt: { fontSize: 15, color: '#6b7280', fontWeight: '500', textAlign: 'center' },
-  pickerItemTxtSelected: { color: '#d97706', fontWeight: '800' },
+  pickerLabel: { fontSize: 11, fontWeight: '600', color: '#8E9099', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 },
+  pickerScroll: { height: 200, backgroundColor: '#F7F7F8', borderRadius: 12 },
+  pickerItem: { paddingVertical: 10, paddingHorizontal: 14, borderRadius: 8, marginHorizontal: 4, marginVertical: 2 },
+  pickerItemSelected: { backgroundColor: '#E8EDF2' },
+  pickerItemTxt: { fontSize: 15, color: '#8E9099', fontWeight: '500', textAlign: 'center' },
+  pickerItemTxtSelected: { color: '#1C3D5A', fontWeight: '700' },
 
   saveBtn: {
-    backgroundColor: '#f59e0b', borderRadius: 16, paddingVertical: 16,
+    backgroundColor: '#1C3D5A', borderRadius: 12, paddingVertical: 16,
     alignItems: 'center', marginBottom: 12,
   },
-  saveBtnTxt: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  saveBtnTxt: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   cancelBtn: { alignItems: 'center', paddingVertical: 10 },
-  cancelTxt: { color: '#9ca3af', fontSize: 15, fontWeight: '600' },
+  cancelTxt: { color: '#8E9099', fontSize: 14, fontWeight: '500' },
 });

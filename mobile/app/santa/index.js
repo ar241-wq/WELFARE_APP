@@ -6,7 +6,7 @@ import { getSantaEvents, joinSantaEvent } from '../../lib/api';
 
 function statusColor(s) {
   if (s === 'open') return '#10b981';
-  if (s === 'assigned') return '#6366f1';
+  if (s === 'assigned') return '#1C3D5A';
   return '#f59e0b';
 }
 function statusLabel(s) {
@@ -46,7 +46,7 @@ export default function SantaScreen() {
     }
   };
 
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#6366f1" /></View>;
+  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
 
   return (
     <ScrollView
@@ -59,7 +59,6 @@ export default function SantaScreen() {
 
       {events.length === 0 && (
         <View style={s.empty}>
-          <Text style={{ fontSize: 52, marginBottom: 12 }}>🎄</Text>
           <Text style={s.emptyTitle}>No events yet</Text>
           <Text style={s.emptySub}>Your HR will create a Secret Santa event for your department.</Text>
         </View>
@@ -96,7 +95,7 @@ export default function SantaScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f9fafb' },
+  root: { flex: 1, backgroundColor: '#F7F7F8' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 28, fontWeight: '900', color: '#111', paddingHorizontal: 20, letterSpacing: -0.5 },
   sub: { fontSize: 14, color: '#9ca3af', fontWeight: '600', paddingHorizontal: 20, marginTop: 4, marginBottom: 20 },
@@ -112,11 +111,11 @@ const s = StyleSheet.create({
   cardTitle: { fontSize: 17, fontWeight: '800', color: '#111', flex: 1, marginRight: 8 },
   statusBadge: { borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1.5 },
   statusTxt: { fontSize: 11, fontWeight: '700' },
-  dept: { fontSize: 13, color: '#6366f1', fontWeight: '600', marginBottom: 10 },
+  dept: { fontSize: 13, color: '#1C3D5A', fontWeight: '600', marginBottom: 10 },
   row: { flexDirection: 'row', gap: 16, marginBottom: 4 },
   meta: { fontSize: 13, color: '#6b7280', marginBottom: 4 },
   joinBtn: {
-    marginTop: 14, backgroundColor: '#6366f1', borderRadius: 12,
+    marginTop: 14, backgroundColor: '#1C3D5A', borderRadius: 12,
     paddingVertical: 12, alignItems: 'center',
   },
   joinBtnOut: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#e5e7eb' },

@@ -73,7 +73,7 @@ function GroupBuySection({ perkId, groupBuys, onRefresh }) {
   return (
     <View style={gb.section}>
       <View style={gb.header}>
-        <Text style={gb.title}>💪 Group Buy</Text>
+        <Text style={gb.title}>Group Buy</Text>
         <Text style={gb.sub}>Buy together, save together</Text>
       </View>
 
@@ -98,7 +98,7 @@ function GroupBuySection({ perkId, groupBuys, onRefresh }) {
                   {buy.discount_rate > 0 ? discountLabel(buy.discount_rate) : 'Need 3+ to unlock'}
                 </Text>
               </View>
-              <Text style={gb.memberCount}>👥 {buy.member_count} joined</Text>
+              <Text style={gb.memberCount}>{buy.member_count} joined</Text>
             </View>
 
             {buy.discount_rate > 0 && (
@@ -124,7 +124,7 @@ function GroupBuySection({ perkId, groupBuys, onRefresh }) {
               {buy.is_member && !buy.is_locked_in && (
                 <>
                   <TouchableOpacity style={gb.lockBtn} onPress={() => handleLockIn(buy.id)} disabled={loading}>
-                    <Text style={gb.lockTxt}>🔒 Lock In & Pay {Math.ceil(buy.discounted_price)} cr</Text>
+                    <Text style={gb.lockTxt}>Lock In & Pay {Math.ceil(buy.discounted_price)} cr</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={gb.leaveBtn} onPress={() => handleJoin(buy.id)} disabled={loading}>
                     <Text style={gb.leaveTxt}>Leave</Text>
@@ -144,7 +144,7 @@ function GroupBuySection({ perkId, groupBuys, onRefresh }) {
       {/* Start new group buy */}
       {!myGroupBuy && (
         <TouchableOpacity style={gb.startBtn} onPress={handleStart} disabled={loading}>
-          {loading ? <ActivityIndicator color="#6366f1" /> : <Text style={gb.startTxt}>Start a Group Buy</Text>}
+          {loading ? <ActivityIndicator color="#1C3D5A" /> : <Text style={gb.startTxt}>Start a Group Buy</Text>}
         </TouchableOpacity>
       )}
     </View>
@@ -157,9 +157,9 @@ const gb = StyleSheet.create({
   title: { fontSize: 18, fontWeight: '800', color: '#111' },
   sub: { fontSize: 13, color: '#6b7280', marginTop: 2 },
   tiersRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
-  tier: { flex: 1, backgroundColor: '#eef2ff', borderRadius: 12, padding: 12, alignItems: 'center', borderWidth: 1.5, borderColor: '#c7d2fe' },
-  tierN: { fontSize: 18, fontWeight: '900', color: '#6366f1' },
-  tierD: { fontSize: 13, fontWeight: '700', color: '#4338ca', marginTop: 2 },
+  tier: { flex: 1, backgroundColor: '#EEEFF2', borderRadius: 12, padding: 12, alignItems: 'center', borderWidth: 1.5, borderColor: '#D4D6DC' },
+  tierN: { fontSize: 18, fontWeight: '900', color: '#1C3D5A' },
+  tierD: { fontSize: 13, fontWeight: '700', color: '#5B5E66', marginTop: 2 },
   buyCard: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1.5, borderColor: '#e5e7eb' },
   buyTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   discountBadge: { backgroundColor: '#f3f4f6', borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 },
@@ -169,12 +169,12 @@ const gb = StyleSheet.create({
   memberCount: { fontSize: 13, fontWeight: '600', color: '#6b7280' },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
   originalPrice: { fontSize: 14, color: '#9ca3af', textDecorationLine: 'line-through' },
-  discountedPrice: { fontSize: 22, fontWeight: '900', color: '#6366f1' },
+  discountedPrice: { fontSize: 22, fontWeight: '900', color: '#1C3D5A' },
   savings: { fontSize: 12, color: '#16a34a', fontWeight: '700', backgroundColor: '#dcfce7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99 },
   nextHint: { fontSize: 12, color: '#6b7280', marginBottom: 8 },
   members: { fontSize: 12, color: '#9ca3af', marginBottom: 12 },
   actions: { gap: 8 },
-  joinBtn: { backgroundColor: '#6366f1', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+  joinBtn: { backgroundColor: '#1C3D5A', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
   joinTxt: { color: '#fff', fontWeight: '800', fontSize: 14 },
   lockBtn: { backgroundColor: '#111', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
   lockTxt: { color: '#fff', fontWeight: '800', fontSize: 14 },
@@ -182,8 +182,8 @@ const gb = StyleSheet.create({
   leaveTxt: { color: '#9ca3af', fontSize: 13, fontWeight: '600' },
   lockedBadge: { backgroundColor: '#dcfce7', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
   lockedTxt: { color: '#16a34a', fontWeight: '800', fontSize: 14 },
-  startBtn: { borderWidth: 1.5, borderColor: '#6366f1', borderRadius: 12, paddingVertical: 12, alignItems: 'center', borderStyle: 'dashed' },
-  startTxt: { color: '#6366f1', fontWeight: '700', fontSize: 14 },
+  startBtn: { borderWidth: 1.5, borderColor: '#1C3D5A', borderRadius: 12, paddingVertical: 12, alignItems: 'center', borderStyle: 'dashed' },
+  startTxt: { color: '#1C3D5A', fontWeight: '700', fontSize: 14 },
 });
 
 export default function PerkDetailScreen() {
@@ -246,7 +246,7 @@ export default function PerkDetailScreen() {
   }
 
   if (loading) {
-    return <View style={styles.loader}><ActivityIndicator size="large" color="#6366f1" /></View>;
+    return <View style={styles.loader}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
   }
 
   if (!perk) {
@@ -265,15 +265,13 @@ export default function PerkDetailScreen() {
             resizeMode="cover"
           />
         ) : (
-          <View style={styles.imagePlaceholder}>
-            <Text style={{ fontSize: 64 }}>🎁</Text>
-          </View>
+          <View style={styles.imagePlaceholder} />
         )}
 
         <View style={styles.content}>
           {perk.is_featured && (
             <View style={styles.featuredBadge}>
-              <Text style={styles.featuredText}>⭐ Featured</Text>
+              <Text style={styles.featuredText}>Featured</Text>
             </View>
           )}
 
@@ -396,7 +394,7 @@ const styles = StyleSheet.create({
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   heroImage: { width: '100%', height: 220 },
   imagePlaceholder: {
-    height: 220, backgroundColor: '#eef2ff',
+    height: 220, backgroundColor: '#EEEFF2',
     justifyContent: 'center', alignItems: 'center',
   },
   content: { padding: 20 },
@@ -410,7 +408,7 @@ const styles = StyleSheet.create({
   provider: { fontSize: 15, color: '#6b7280', fontWeight: '500' },
   verified: { fontSize: 12, color: '#059669', fontWeight: '700', backgroundColor: '#d1fae5', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' },
-  category: { fontSize: 13, color: '#6366f1', fontWeight: '600' },
+  category: { fontSize: 13, color: '#1C3D5A', fontWeight: '600' },
   ratingChip: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#fffbeb', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
   ratingChipText: { fontSize: 13, color: '#f59e0b', fontWeight: '700' },
   ratingCount: { fontSize: 11, color: '#9ca3af' },
@@ -418,10 +416,11 @@ const styles = StyleSheet.create({
   tierChipText: { fontSize: 11, fontWeight: '800' },
   priceCard: {
     flexDirection: 'row', alignItems: 'baseline', gap: 6,
-    backgroundColor: '#eef2ff', padding: 16, borderRadius: 16, marginBottom: 20,
+    backgroundColor: '#F7F7F8', padding: 16, borderRadius: 12, marginBottom: 20,
+    borderWidth: 1, borderColor: '#EEEFF2',
   },
-  priceNum: { fontSize: 36, fontWeight: '800', color: '#6366f1' },
-  priceLabel: { fontSize: 16, color: '#6366f1', fontWeight: '500' },
+  priceNum: { fontSize: 34, fontWeight: '700', color: '#1C3D5A', letterSpacing: -0.5 },
+  priceLabel: { fontSize: 15, color: '#5B5E66', fontWeight: '500' },
   descTitle: { fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 8 },
   desc: { fontSize: 15, color: '#4b5563', lineHeight: 22, marginBottom: 16 },
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
@@ -437,7 +436,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1, borderTopColor: '#f3f4f6',
   },
   redeemBtn: {
-    backgroundColor: '#6366f1', borderRadius: 14,
+    backgroundColor: '#1C3D5A', borderRadius: 14,
     paddingVertical: 16, alignItems: 'center',
   },
   redeemBtnDisabled: { backgroundColor: '#d1d5db' },

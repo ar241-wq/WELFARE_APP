@@ -92,7 +92,7 @@ export default function ChatThread() {
       setShowGift(false);
       Alert.alert('Gifted!', `${giftAmount} credits sent to ${result.recipient_name}.`);
       // Auto-send a DM about the gift
-      const autoMsg = `🎁 I just gifted you ${giftAmount} credits!${giftNote.trim() ? ' ' + giftNote.trim() : ''}`;
+      const autoMsg = `I just gifted you ${giftAmount} credits!${giftNote.trim() ? ' ' + giftNote.trim() : ''}`;
       try {
         const msg = await sendMessage(userId, autoMsg);
         setMessages(prev => [...prev, msg]);
@@ -167,7 +167,7 @@ export default function ChatThread() {
         keyboardVerticalOffset={0}
       >
         {loading ? (
-          <ActivityIndicator style={{ marginTop: 40 }} color="#6366f1" />
+          <ActivityIndicator style={{ marginTop: 40 }} color="#1C3D5A" />
         ) : (
           <FlatList
             ref={listRef}
@@ -178,7 +178,6 @@ export default function ChatThread() {
             onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
             ListEmptyComponent={
               <View style={styles.emptyChat}>
-                <Text style={{ fontSize: 40 }}>👋</Text>
                 <Text style={styles.emptyChatText}>Say hi to {userName?.split(' ')[0]}!</Text>
               </View>
             }
@@ -198,7 +197,7 @@ export default function ChatThread() {
             returnKeyType="default"
           />
           <TouchableOpacity style={styles.giftBtn} onPress={openGiftModal}>
-            <Text style={styles.giftBtnIcon}>🎁</Text>
+            <Text style={styles.giftBtnIcon}>+</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.sendBtn, (!text.trim() || sending) && styles.sendBtnDisabled]}
@@ -260,7 +259,7 @@ export default function ChatThread() {
             >
               {gifting
                 ? <ActivityIndicator color="#fff" size="small" />
-                : <Text style={styles.giftSubmitText}>Gift {giftAmount} Credits 🎁</Text>
+                : <Text style={styles.giftSubmitText}>Gift {giftAmount} Credits</Text>
               }
             </TouchableOpacity>
 
@@ -279,21 +278,21 @@ export default function ChatThread() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#fafafa' },
+  root: { flex: 1, backgroundColor: '#F7F7F8' },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12,
     backgroundColor: '#fff',
     borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#f0f0f0', gap: 10,
   },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
-  backIcon: { fontSize: 22, color: '#6366f1', lineHeight: 26, marginLeft: -2 },
+  backIcon: { fontSize: 22, color: '#1C3D5A', lineHeight: 26, marginLeft: -2 },
   headerAvatar: {
-    width: 42, height: 42, borderRadius: 21, backgroundColor: '#eef2ff',
+    width: 42, height: 42, borderRadius: 21, backgroundColor: '#EEEFF2',
     alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-    borderWidth: 2, borderColor: '#e0e7ff',
+    borderWidth: 2, borderColor: '#EEEFF2',
   },
   headerAvatarImg: { width: 42, height: 42 },
-  headerAvatarLetter: { fontSize: 17, fontWeight: '800', color: '#6366f1' },
+  headerAvatarLetter: { fontSize: 17, fontWeight: '800', color: '#1C3D5A' },
   headerName: { fontSize: 16, fontWeight: '800', color: '#111' },
   headerStatus: { fontSize: 11, color: '#22c55e', fontWeight: '700' },
 
@@ -301,24 +300,24 @@ const styles = StyleSheet.create({
   msgRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 6, gap: 8 },
   msgRowMine: { flexDirection: 'row-reverse' },
   msgAvatar: {
-    width: 30, height: 30, borderRadius: 15, backgroundColor: '#eef2ff',
+    width: 30, height: 30, borderRadius: 15, backgroundColor: '#EEEFF2',
     alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
   },
   msgAvatarImg: { width: 30, height: 30 },
-  msgAvatarLetter: { fontSize: 12, fontWeight: '800', color: '#6366f1' },
+  msgAvatarLetter: { fontSize: 12, fontWeight: '800', color: '#1C3D5A' },
   msgSenderName: { fontSize: 11, color: '#b0b0b0', marginBottom: 3, marginLeft: 2 },
   replyContext: {
     alignSelf: 'flex-start', backgroundColor: '#f3f4f6', borderRadius: 99,
     paddingHorizontal: 10, paddingVertical: 4, marginBottom: 4,
     flexDirection: 'row', alignItems: 'center',
   },
-  replyContextMine: { alignSelf: 'flex-end', backgroundColor: '#e0e7ff' },
+  replyContextMine: { alignSelf: 'flex-end', backgroundColor: '#EEEFF2' },
   replyContextTxt: { fontSize: 11, color: '#6b7280', fontWeight: '600' },
   bubble: {
     borderRadius: 22, paddingHorizontal: 16, paddingVertical: 10,
     shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
   },
-  bubbleMine: { backgroundColor: '#6366f1', borderBottomRightRadius: 6 },
+  bubbleMine: { backgroundColor: '#1C3D5A', borderBottomRightRadius: 6 },
   bubbleTheirs: { backgroundColor: '#fff', borderBottomLeftRadius: 6, borderWidth: 1, borderColor: '#f0f0f0' },
   bubbleText: { fontSize: 15, color: '#111', lineHeight: 21 },
   bubbleTextMine: { color: '#fff' },
@@ -338,16 +337,17 @@ const styles = StyleSheet.create({
     maxHeight: 110,
   },
   giftBtn: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: '#6366f1',
+    width: 36, height: 36, borderRadius: 18, backgroundColor: '#E8EDF2',
     alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: '#D4D6DC',
   },
-  giftBtnIcon: { fontSize: 18 },
+  giftBtnIcon: { fontSize: 18, fontWeight: '700', color: '#1C3D5A', lineHeight: 22 },
   sendBtn: {
-    width: 44, height: 44, borderRadius: 22, backgroundColor: '#6366f1',
+    width: 44, height: 44, borderRadius: 22, backgroundColor: '#1C3D5A',
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#6366f1', shadowOpacity: 0.35, shadowRadius: 8, shadowOffset: { width: 0, height: 3 },
+    shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
   },
-  sendBtnDisabled: { backgroundColor: '#c7d2fe', shadowOpacity: 0 },
+  sendBtnDisabled: { backgroundColor: '#D4D6DC', shadowOpacity: 0 },
   sendIcon: { color: '#fff', fontSize: 20, fontWeight: '800' },
 
   // Modal styles
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24, paddingTop: 28, paddingBottom: 40,
   },
   modalTitle: { fontSize: 20, fontWeight: '800', color: '#111', marginBottom: 6 },
-  balanceText: { fontSize: 13, color: '#6366f1', fontWeight: '700', marginBottom: 20 },
+  balanceText: { fontSize: 13, color: '#1C3D5A', fontWeight: '700', marginBottom: 20 },
   modalSectionLabel: { fontSize: 12, fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 },
   chipsRow: { flexDirection: 'row', gap: 10, marginBottom: 22 },
   chip: {
@@ -368,20 +368,20 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     borderWidth: 2, borderColor: 'transparent',
   },
-  chipSelected: { backgroundColor: '#eef2ff', borderColor: '#6366f1' },
+  chipSelected: { backgroundColor: '#E8EDF2', borderColor: '#1C3D5A' },
   chipText: { fontSize: 15, fontWeight: '700', color: '#6b7280' },
-  chipTextSelected: { color: '#6366f1' },
+  chipTextSelected: { color: '#1C3D5A' },
   noteInput: {
     backgroundColor: '#f3f4f6', borderRadius: 14,
     paddingHorizontal: 16, paddingVertical: 13, fontSize: 15, color: '#111',
     marginBottom: 24,
   },
   giftSubmitBtn: {
-    backgroundColor: '#6366f1', borderRadius: 16, paddingVertical: 16,
+    backgroundColor: '#1C3D5A', borderRadius: 16, paddingVertical: 16,
     alignItems: 'center', justifyContent: 'center', marginBottom: 12,
-    shadowColor: '#6366f1', shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
+    shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
   },
-  giftSubmitBtnDisabled: { backgroundColor: '#c7d2fe', shadowOpacity: 0 },
+  giftSubmitBtnDisabled: { backgroundColor: '#D4D6DC', shadowOpacity: 0 },
   giftSubmitText: { color: '#fff', fontSize: 16, fontWeight: '800' },
   cancelBtn: { alignItems: 'center', paddingVertical: 10 },
   cancelText: { fontSize: 15, color: '#9ca3af', fontWeight: '600' },

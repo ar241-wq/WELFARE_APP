@@ -30,7 +30,7 @@ export default function NewLifeEventScreen() {
     try {
       await markLifeEvent(selected, note);
       Alert.alert(
-        'Life Event Marked 💝',
+        'Life Event Marked',
         'Your HR manager has been notified and will prepare a care package for you. Your colleagues may also send you care credits.',
         [{ text: 'Thank you', onPress: () => router.replace('/life-moments/index') }]
       );
@@ -89,20 +89,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16,
     borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 16, marginBottom: 10,
   },
-  eventOptionSelected: { borderColor: '#6366f1', backgroundColor: '#eef2ff' },
+  eventOptionSelected: { borderColor: '#1C3D5A', backgroundColor: '#EEEFF2' },
   eventIcon: { fontSize: 28 },
   eventText: { flex: 1 },
   eventLabel: { fontSize: 15, fontWeight: '700', color: '#111827' },
-  eventLabelSelected: { color: '#6366f1' },
+  eventLabelSelected: { color: '#1C3D5A' },
   eventDesc: { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  check: { fontSize: 18, color: '#6366f1', fontWeight: '700' },
+  check: { fontSize: 18, color: '#1C3D5A', fontWeight: '700' },
   noteLabel: { fontSize: 14, fontWeight: '600', color: '#374151', marginTop: 16, marginBottom: 8 },
   noteInput: {
     borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12,
     padding: 14, fontSize: 14, color: '#111827', textAlignVertical: 'top', minHeight: 100,
   },
   submitBtn: {
-    marginTop: 20, backgroundColor: '#6366f1', borderRadius: 14,
+    marginTop: 20, backgroundColor: '#1C3D5A', borderRadius: 14,
     paddingVertical: 16, alignItems: 'center',
   },
   submitBtnDisabled: { backgroundColor: '#d1d5db' },

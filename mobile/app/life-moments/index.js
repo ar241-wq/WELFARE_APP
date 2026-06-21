@@ -17,7 +17,7 @@ const EVENT_LABELS = {
 const STATUS_COLORS = {
   pending_approval: { bg: '#fef3c7', text: '#d97706', label: 'Pending Approval' },
   approved: { bg: '#d1fae5', text: '#059669', label: 'Approved' },
-  delivered: { bg: '#eef2ff', text: '#6366f1', label: 'Delivered' },
+  delivered: { bg: '#EEEFF2', text: '#1C3D5A', label: 'Delivered' },
 };
 
 export default function LifeMomentsScreen() {
@@ -40,7 +40,7 @@ export default function LifeMomentsScreen() {
   useEffect(() => { load(); }, []);
 
   if (loading) {
-    return <View style={styles.loader}><ActivityIndicator size="large" color="#6366f1" /></View>;
+    return <View style={styles.loader}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
   }
 
   return (
@@ -50,7 +50,7 @@ export default function LifeMomentsScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} />}
       >
         <View style={styles.banner}>
-          <Text style={styles.bannerTitle}>Life Moments 💝</Text>
+          <Text style={styles.bannerTitle}>Life Moments</Text>
           <Text style={styles.bannerText}>
             Share a life event and let your company and teammates support you with a care package.
           </Text>
@@ -58,7 +58,6 @@ export default function LifeMomentsScreen() {
 
         {events.length === 0 ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>🌱</Text>
             <Text style={styles.emptyTitle}>No life events yet</Text>
             <Text style={styles.emptyText}>When something important happens in your life, mark it here and let your team show up for you.</Text>
           </View>
@@ -104,10 +103,10 @@ export default function LifeMomentsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F7F7F8' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  banner: { backgroundColor: '#eef2ff', borderRadius: 16, padding: 20, marginBottom: 20 },
-  bannerTitle: { fontSize: 18, fontWeight: '800', color: '#4338ca', marginBottom: 6 },
+  banner: { backgroundColor: '#EEEFF2', borderRadius: 16, padding: 20, marginBottom: 20 },
+  bannerTitle: { fontSize: 18, fontWeight: '800', color: '#1C3D5A', marginBottom: 6 },
   bannerText: { fontSize: 14, color: '#6b7280', lineHeight: 20 },
   empty: { alignItems: 'center', paddingVertical: 40 },
   emptyIcon: { fontSize: 48, marginBottom: 12 },
@@ -124,8 +123,8 @@ const styles = StyleSheet.create({
   eventDate: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
   statusPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   statusText: { fontSize: 11, fontWeight: '700' },
-  tapHint: { fontSize: 12, color: '#6366f1', fontWeight: '600', marginTop: 10, marginLeft: 40 },
+  tapHint: { fontSize: 12, color: '#1C3D5A', fontWeight: '600', marginTop: 10, marginLeft: 40 },
   fab: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#f3f4f6' },
-  fabBtn: { backgroundColor: '#6366f1', borderRadius: 14, paddingVertical: 15, alignItems: 'center' },
+  fabBtn: { backgroundColor: '#1C3D5A', borderRadius: 14, paddingVertical: 15, alignItems: 'center' },
   fabText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });

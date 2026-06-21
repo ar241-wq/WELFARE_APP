@@ -5,6 +5,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Search, X, MessageSquare } from 'lucide-react-native';
 import { getConversations, searchUsers, getMe, getRedemptions, getGroupChats } from '../../lib/api';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
@@ -26,10 +27,10 @@ function timeAgo(dateStr) {
 
 function Avatar({ url, name, size = 52 }) {
   return (
-    <View style={{ width: size, height: size, borderRadius: size / 2, overflow: 'hidden', backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ width: size, height: size, borderRadius: size / 2, overflow: 'hidden', backgroundColor: '#EEEFF2', alignItems: 'center', justifyContent: 'center' }}>
       {url
         ? <Image source={{ uri: resolveUrl(url) }} style={{ width: size, height: size }} />
-        : <Text style={{ fontSize: size * 0.38, fontWeight: '800', color: '#6366f1' }}>{(name || '?')[0]}</Text>
+        : <Text style={{ fontSize: size * 0.38, fontWeight: '800', color: '#1C3D5A' }}>{(name || '?')[0]}</Text>
       }
     </View>
   );
@@ -40,7 +41,7 @@ function WellnessGate() {
   return (
     <View style={styles.gate}>
       <View style={styles.gateCard}>
-        <Text style={{ fontSize: 48, marginBottom: 16 }}>💬</Text>
+        <MessageSquare size={40} color="#1C3D5A" strokeWidth={1.5} style={{ marginBottom: 16 }} />
         <Text style={styles.gateTitle}>Wellness Chat</Text>
         <Text style={styles.gateSub}>
           Redeem a perk to unlock private messaging with your wellness community — colleagues who share your interests.
@@ -103,7 +104,7 @@ export default function ChatScreen() {
     router.push({ pathname: '/chat/group/[groupId]', params: { groupId: group.id, groupName: group.name, groupIcon: group.icon || '💬' } });
   };
 
-  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#6366f1" /></View>;
+  if (loading) return <View style={styles.center}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
   if (hasAccess === false) return <WellnessGate />;
 
   const showSearch = query.trim().length > 0;
@@ -124,7 +125,7 @@ export default function ChatScreen() {
           <Text style={styles.rowTime}>{timeAgo(item.last_time)}</Text>
         </View>
         <Text style={[styles.rowPreview, item.unread > 0 && { color: '#111', fontWeight: '600' }]} numberOfLines={1}>
-          {item.last_message || 'Say hi 👋'}
+          {item.last_message || 'Say hi'}
         </Text>
       </View>
     </TouchableOpacity>
@@ -158,17 +159,17 @@ export default function ChatScreen() {
       {/* Search */}
       <View style={styles.searchRow}>
         <View style={styles.searchBox}>
-          <Text style={{ fontSize: 15, marginRight: 8 }}>🔍</Text>
+          <Search size={15} color="#8E9099" strokeWidth={1.75} style={{ marginRight: 8 }} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search colleagues…"
-            placeholderTextColor="#b0b0b0"
+            placeholder="Search colleagues..."
+            placeholderTextColor="#8E9099"
             value={query}
             onChangeText={setQuery}
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery('')}>
-              <Text style={{ color: '#b0b0b0', fontSize: 16 }}>✕</Text>
+              <X size={15} color="#8E9099" strokeWidth={2} />
             </TouchableOpacity>
           )}
         </View>
@@ -182,7 +183,7 @@ export default function ChatScreen() {
           contentContainerStyle={{ paddingTop: 8 }}
           ListEmptyComponent={!searching
             ? <View style={styles.empty}><Text style={styles.emptyTxt}>No colleagues found</Text></View>
-            : <ActivityIndicator style={{ marginTop: 24 }} color="#6366f1" />
+            : <ActivityIndicator style={{ marginTop: 24 }} color="#1C3D5A" />
           }
         />
       ) : (
@@ -191,7 +192,7 @@ export default function ChatScreen() {
           keyExtractor={i => String(i.user_id)}
           renderItem={renderConvo}
           contentContainerStyle={{ paddingTop: 8 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6366f1" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1C3D5A" />}
           ListHeaderComponent={() => {
             const deptChats = groupChats.filter(g => g.type === 'department');
             const communityChats = groupChats.filter(g => g.type === 'community');
@@ -206,7 +207,7 @@ export default function ChatScreen() {
                     <Text style={styles.rowTime}>{g.member_count} members</Text>
                   </View>
                   <Text style={styles.rowPreview} numberOfLines={1}>
-                    {g.last_message ? `${g.last_sender}: ${g.last_message}` : 'Start the conversation 👋'}
+                    {g.last_message ? `${g.last_sender}: ${g.last_message}` : 'Start the conversation'}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -215,7 +216,7 @@ export default function ChatScreen() {
               <View>
                 {deptChats.length > 0 && (
                   <>
-                    <Text style={styles.sectionLabel}>🏢 My Department</Text>
+                    <Text style={styles.sectionLabel}>My Department</Text>
                     {deptChats.map(renderGroup)}
                   </>
                 )}
@@ -231,7 +232,7 @@ export default function ChatScreen() {
           }}
           ListEmptyComponent={groupChats.length === 0 ? (
             <View style={styles.empty}>
-              <Text style={{ fontSize: 44, marginBottom: 12 }}>💬</Text>
+              <MessageSquare size={40} color="#D4D6DC" strokeWidth={1.5} style={{ marginBottom: 12 }} />
               <Text style={styles.emptyTitle}>No messages yet</Text>
               <Text style={styles.emptyTxt}>Search for a colleague to start a conversation</Text>
             </View>
@@ -243,24 +244,25 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#fff' },
+  root: { flex: 1, backgroundColor: '#FFFFFF' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 14 },
   headerTitle: { fontSize: 28, fontWeight: '800', color: '#111', letterSpacing: -0.5 },
   headerSub: { fontSize: 12, color: '#a3a3a3', marginTop: 1 },
   searchRow: { paddingHorizontal: 16, paddingBottom: 8 },
   searchBox: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#f3f4f6',
-    borderRadius: 99, paddingHorizontal: 16, paddingVertical: 11,
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#F7F7F8',
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10,
+    borderWidth: 1, borderColor: '#EEEFF2',
   },
   searchInput: { flex: 1, fontSize: 15, color: '#111' },
   row: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#f3f4f6',
+    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#EEEFF2',
   },
   badge: {
     position: 'absolute', right: -2, top: -2, minWidth: 18, height: 18, borderRadius: 9,
-    backgroundColor: '#6366f1', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#1C3D5A', alignItems: 'center', justifyContent: 'center',
     borderWidth: 2, borderColor: '#fff', paddingHorizontal: 3,
   },
   badgeTxt: { color: '#fff', fontSize: 10, fontWeight: '800' },
@@ -268,20 +270,20 @@ const styles = StyleSheet.create({
   rowName: { fontSize: 15, fontWeight: '700', color: '#111' },
   rowTime: { fontSize: 12, color: '#b0b0b0' },
   rowPreview: { fontSize: 13, color: '#a3a3a3', marginTop: 2 },
-  startBtn: { backgroundColor: '#eef2ff', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 99 },
-  startBtnTxt: { color: '#6366f1', fontWeight: '700', fontSize: 13 },
+  startBtn: { backgroundColor: '#E8EDF2', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: '#D4D6DC' },
+  startBtnTxt: { color: '#1C3D5A', fontWeight: '600', fontSize: 13 },
   empty: { alignItems: 'center', paddingTop: 56, paddingHorizontal: 32 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 6 },
   emptyTxt: { fontSize: 14, color: '#a3a3a3', textAlign: 'center' },
   sectionLabel: { fontSize: 11, fontWeight: '700', color: '#a3a3a3', textTransform: 'uppercase', letterSpacing: 0.8, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 6 },
-  groupIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center' },
-  gate: { flex: 1, backgroundColor: '#f9fafb', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  groupIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#EEEFF2', alignItems: 'center', justifyContent: 'center' },
+  gate: { flex: 1, backgroundColor: '#F7F7F8', alignItems: 'center', justifyContent: 'center', padding: 24 },
   gateCard: {
     backgroundColor: '#fff', borderRadius: 28, padding: 32, alignItems: 'center',
-    shadowColor: '#6366f1', shadowOpacity: 0.1, shadowRadius: 24, shadowOffset: { width: 0, height: 8 }, elevation: 6, width: '100%',
+    shadowColor: '#1C3D5A', shadowOpacity: 0.1, shadowRadius: 24, shadowOffset: { width: 0, height: 8 }, elevation: 6, width: '100%',
   },
   gateTitle: { fontSize: 22, fontWeight: '800', color: '#111', marginBottom: 10 },
   gateSub: { fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 22, marginBottom: 24 },
-  gateBtn: { backgroundColor: '#6366f1', paddingHorizontal: 28, paddingVertical: 14, borderRadius: 99 },
+  gateBtn: { backgroundColor: '#1C3D5A', paddingHorizontal: 28, paddingVertical: 14, borderRadius: 99 },
   gateBtnTxt: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

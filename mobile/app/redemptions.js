@@ -125,7 +125,7 @@ export default function RedemptionsScreen() {
   if (loading) {
     return (
       <View style={[s.container, { paddingTop: insets.top, justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#1C3D5A" />
       </View>
     );
   }
@@ -198,10 +198,10 @@ export default function RedemptionsScreen() {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F7F7F8' },
   header: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
   back: { marginBottom: 4 },
-  backTxt: { fontSize: 15, color: '#6366f1', fontWeight: '600' },
+  backTxt: { fontSize: 15, color: '#1C3D5A', fontWeight: '600' },
   title: { fontSize: 22, fontWeight: '800', color: '#111827' },
   empty: { textAlign: 'center', color: '#9ca3af', marginTop: 60, fontSize: 15 },
   card: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1.5, borderColor: '#e5e7eb' },
@@ -212,8 +212,8 @@ const s = StyleSheet.create({
   statusTxt: { fontSize: 12, fontWeight: '700' },
   cardMeta: { flexDirection: 'row', gap: 16 },
   metaText: { fontSize: 12, color: '#9ca3af' },
-  reviewBtn: { marginTop: 12, backgroundColor: '#fef3c7', borderRadius: 12, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: '#f59e0b' },
-  reviewBtnTxt: { fontSize: 14, fontWeight: '700', color: '#d97706' },
+  reviewBtn: { marginTop: 12, backgroundColor: '#E8EDF2', borderRadius: 12, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: '#D4D6DC' },
+  reviewBtnTxt: { fontSize: 14, fontWeight: '700', color: '#1C3D5A' },
   reviewedTag: { marginTop: 10, alignSelf: 'flex-start', backgroundColor: '#d1fae5', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99 },
   reviewedTxt: { fontSize: 12, color: '#059669', fontWeight: '700' },
 });
@@ -225,13 +225,13 @@ const rw = StyleSheet.create({
   perkName: { fontSize: 15, color: '#6b7280', marginBottom: 20 },
   stars: { flexDirection: 'row', gap: 10, justifyContent: 'center', marginBottom: 6 },
   star: { fontSize: 36, color: '#e5e7eb' },
-  starFilled: { color: '#f59e0b' },
+  starFilled: { color: '#9A6700' },
   starsLabel: { textAlign: 'center', fontSize: 14, color: '#6b7280', fontWeight: '600', marginBottom: 20 },
   input: {
-    backgroundColor: '#f9fafb', borderRadius: 14, borderWidth: 1.5, borderColor: '#e5e7eb',
+    backgroundColor: '#F7F7F8', borderRadius: 14, borderWidth: 1.5, borderColor: '#e5e7eb',
     padding: 14, fontSize: 15, color: '#111827', minHeight: 90, textAlignVertical: 'top', marginBottom: 16,
   },
-  submitBtn: { backgroundColor: '#6366f1', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginBottom: 10 },
+  submitBtn: { backgroundColor: '#1C3D5A', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginBottom: 10 },
   submitDisabled: { backgroundColor: '#d1d5db' },
   submitTxt: { color: '#fff', fontSize: 16, fontWeight: '800' },
   skipBtn: { alignItems: 'center', paddingVertical: 10 },

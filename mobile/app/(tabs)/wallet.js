@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ArrowUpRight, ArrowDownLeft, Gift, ChevronRight, X, Search } from 'lucide-react-native';
 import { getWallet, getTransactions, searchUsers, giftCredits } from '../../lib/api';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
@@ -21,14 +22,17 @@ function TransactionItem({ item }) {
   const isCredit = item.amount > 0;
   return (
     <View style={styles.txItem}>
-      <View style={[styles.txIcon, { backgroundColor: isCredit ? '#d1fae5' : '#fee2e2' }]}>
-        <Text style={{ fontSize: 16 }}>{isCredit ? '💰' : '🛍️'}</Text>
+      <View style={[styles.txIcon, { backgroundColor: isCredit ? '#E6F4ED' : '#FEE2E0' }]}>
+        {isCredit
+          ? <ArrowDownLeft size={16} color="#1F7A4D" strokeWidth={2} />
+          : <ArrowUpRight size={16} color="#B42318" strokeWidth={2} />
+        }
       </View>
       <View style={styles.txInfo}>
         <Text style={styles.txDesc} numberOfLines={1}>{item.description}</Text>
         <Text style={styles.txDate}>{new Date(item.created_at).toLocaleDateString()}</Text>
       </View>
-      <Text style={[styles.txAmount, { color: isCredit ? '#059669' : '#dc2626' }]}>
+      <Text style={[styles.txAmount, { color: isCredit ? '#1F7A4D' : '#B42318' }]}>
         {isCredit ? '+' : ''}{item.amount}
       </Text>
     </View>
@@ -36,7 +40,7 @@ function TransactionItem({ item }) {
 }
 
 function GiftModal({ visible, balance, onClose, onSuccess }) {
-  const [step, setStep] = useState('search'); // 'search' | 'amount'
+  const [step, setStep] = useState('search');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -45,7 +49,6 @@ function GiftModal({ visible, balance, onClose, onSuccess }) {
   const [note, setNote] = useState('');
   const [gifting, setGifting] = useState(false);
 
-  // Reset when modal closes
   useEffect(() => {
     if (!visible) {
       setTimeout(() => {
@@ -59,7 +62,6 @@ function GiftModal({ visible, balance, onClose, onSuccess }) {
     }
   }, [visible]);
 
-  // Debounced search
   useEffect(() => {
     if (!query.trim()) { setResults([]); setSearching(false); return; }
     setSearching(true);
@@ -96,33 +98,31 @@ function GiftModal({ visible, balance, onClose, onSuccess }) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.modalCard}>
-
-          {/* Handle bar */}
           <View style={styles.handle} />
 
           {step === 'search' && (
             <>
-              <Text style={styles.modalTitle}>Gift Credits 🎁</Text>
+              <Text style={styles.modalTitle}>Gift Credits</Text>
               <Text style={styles.modalSub}>Search for a colleague to send credits to</Text>
 
               <View style={styles.searchBox}>
-                <Text style={{ fontSize: 15, marginRight: 8 }}>🔍</Text>
+                <Search size={15} color="#8E9099" strokeWidth={1.75} style={{ marginRight: 8 }} />
                 <TextInput
                   style={styles.searchInput}
-                  placeholder="Search by name or email…"
-                  placeholderTextColor="#b0b0b0"
+                  placeholder="Search by name or email..."
+                  placeholderTextColor="#8E9099"
                   value={query}
                   onChangeText={setQuery}
                   autoFocus
                 />
                 {query.length > 0 && (
                   <TouchableOpacity onPress={() => setQuery('')}>
-                    <Text style={{ color: '#b0b0b0', fontSize: 16 }}>✕</Text>
+                    <X size={15} color="#8E9099" strokeWidth={2} />
                   </TouchableOpacity>
                 )}
               </View>
 
-              {searching && <ActivityIndicator color="#6366f1" style={{ marginTop: 20 }} />}
+              {searching && <ActivityIndicator color="#1C3D5A" style={{ marginTop: 20 }} />}
 
               <FlatList
                 data={results}
@@ -141,7 +141,7 @@ function GiftModal({ visible, balance, onClose, onSuccess }) {
                       <Text style={styles.userName}>{item.full_name}</Text>
                       <Text style={styles.userEmail}>{item.email}</Text>
                     </View>
-                    <Text style={{ color: '#6366f1', fontSize: 20 }}>›</Text>
+                    <ChevronRight size={16} color="#8E9099" strokeWidth={1.75} />
                   </TouchableOpacity>
                 )}
                 ListEmptyComponent={
@@ -197,8 +197,8 @@ function GiftModal({ visible, balance, onClose, onSuccess }) {
               <Text style={styles.sectionLabel}>Note (optional)</Text>
               <TextInput
                 style={styles.noteInput}
-                placeholder="Add a note…"
-                placeholderTextColor="#9ca3af"
+                placeholder="Add a note..."
+                placeholderTextColor="#8E9099"
                 value={note}
                 onChangeText={setNote}
                 maxLength={200}
@@ -211,7 +211,7 @@ function GiftModal({ visible, balance, onClose, onSuccess }) {
               >
                 {gifting
                   ? <ActivityIndicator color="#fff" size="small" />
-                  : <Text style={styles.giftBtnTxt}>Send {amount} Credits 🎁</Text>
+                  : <Text style={styles.giftBtnTxt}>Send {amount} Credits</Text>
                 }
               </TouchableOpacity>
 
@@ -220,7 +220,6 @@ function GiftModal({ visible, balance, onClose, onSuccess }) {
               </TouchableOpacity>
             </>
           )}
-
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -254,12 +253,12 @@ export default function WalletScreen() {
     setShowGift(false);
     const newBalance = Number(result.new_balance);
     setWallet(prev => prev ? { ...prev, balance: newBalance } : prev);
-    Alert.alert('Sent! 🎁', `${result.amount} credits gifted to ${result.recipient_name}.`);
-    load(); // refresh transactions
+    Alert.alert('Sent', `${result.amount} credits gifted to ${result.recipient_name}.`);
+    load();
   };
 
   if (loading) {
-    return <View style={styles.loader}><ActivityIndicator size="large" color="#6366f1" /></View>;
+    return <View style={styles.loader}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
   }
 
   return (
@@ -267,10 +266,10 @@ export default function WalletScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 40 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor="#1C3D5A" />}
       >
         <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-          <Text style={styles.title}>My Wallet</Text>
+          <Text style={styles.title}>Wallet</Text>
         </View>
 
         {wallet && (
@@ -284,16 +283,17 @@ export default function WalletScreen() {
           </View>
         )}
 
-        {/* Gift Credits Button */}
         <TouchableOpacity style={styles.giftRow} onPress={() => setShowGift(true)} activeOpacity={0.8}>
           <View style={styles.giftRowLeft}>
-            <Text style={styles.giftRowIcon}>🎁</Text>
+            <View style={styles.giftRowIconWrap}>
+              <Gift size={18} color="#1C3D5A" strokeWidth={1.75} />
+            </View>
             <View>
               <Text style={styles.giftRowTitle}>Gift Credits</Text>
               <Text style={styles.giftRowSub}>Send credits to a colleague</Text>
             </View>
           </View>
-          <Text style={styles.giftRowChevron}>›</Text>
+          <ChevronRight size={16} color="#8E9099" strokeWidth={1.75} />
         </TouchableOpacity>
 
         <Text style={styles.sectionTitle}>Transaction History</Text>
@@ -316,108 +316,106 @@ export default function WalletScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F7F7F8' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { backgroundColor: '#fff', paddingHorizontal: 20, paddingBottom: 16 },
-  title: { fontSize: 24, fontWeight: '800', color: '#111827' },
+  header: { backgroundColor: '#FFFFFF', paddingHorizontal: 20, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#EEEFF2' },
+  title: { fontSize: 22, fontWeight: '700', color: '#0A0A0B', letterSpacing: -0.3 },
+
   balanceCard: {
-    margin: 16, padding: 28, borderRadius: 20,
-    backgroundColor: '#6366f1',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 16, elevation: 8,
+    margin: 16, padding: 28, borderRadius: 16,
+    backgroundColor: '#1C3D5A',
+    shadowColor: '#0A0A0B', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 12, elevation: 4,
     alignItems: 'center',
   },
-  balanceLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: '500' },
-  balanceNum: { color: '#fff', fontSize: 64, fontWeight: '800', marginTop: 4 },
-  balanceCredits: { color: 'rgba(255,255,255,0.8)', fontSize: 18, marginTop: 2 },
-  expires: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 12 },
+  balanceLabel: { color: 'rgba(255,255,255,0.65)', fontSize: 13, fontWeight: '500' },
+  balanceNum: { color: '#FFFFFF', fontSize: 56, fontWeight: '700', marginTop: 4, letterSpacing: -1 },
+  balanceCredits: { color: 'rgba(255,255,255,0.65)', fontSize: 16, marginTop: 2 },
+  expires: { color: 'rgba(255,255,255,0.5)', fontSize: 12, marginTop: 12 },
 
   giftRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    marginHorizontal: 16, marginBottom: 16, padding: 16,
-    backgroundColor: '#fff', borderRadius: 16,
-    borderWidth: 1.5, borderColor: '#e0e7ff',
-    shadowColor: '#6366f1', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2,
+    marginHorizontal: 16, marginBottom: 8, padding: 14,
+    backgroundColor: '#FFFFFF', borderRadius: 12, borderWidth: 1, borderColor: '#EEEFF2',
   },
   giftRowLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  giftRowIcon: { fontSize: 28 },
-  giftRowTitle: { fontSize: 15, fontWeight: '700', color: '#111827' },
-  giftRowSub: { fontSize: 12, color: '#6366f1', marginTop: 1 },
-  giftRowChevron: { fontSize: 22, color: '#6366f1', fontWeight: '700' },
+  giftRowIconWrap: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#E8EDF2', alignItems: 'center', justifyContent: 'center' },
+  giftRowTitle: { fontSize: 14, fontWeight: '600', color: '#0A0A0B' },
+  giftRowSub: { fontSize: 12, color: '#8E9099', marginTop: 1 },
 
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#111827', marginHorizontal: 16, marginTop: 8, marginBottom: 8 },
+  sectionTitle: { fontSize: 13, fontWeight: '600', color: '#8E9099', marginHorizontal: 16, marginTop: 20, marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 },
   txItem: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: '#fff', marginHorizontal: 16, marginBottom: 8,
-    padding: 14, borderRadius: 14, borderWidth: 1, borderColor: '#f3f4f6',
+    backgroundColor: '#FFFFFF', marginHorizontal: 16, marginBottom: 6,
+    padding: 14, borderRadius: 12, borderWidth: 1, borderColor: '#EEEFF2',
   },
-  txIcon: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+  txIcon: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
   txInfo: { flex: 1 },
-  txDesc: { fontSize: 14, fontWeight: '600', color: '#111827' },
-  txDate: { fontSize: 12, color: '#9ca3af', marginTop: 2 },
-  txAmount: { fontSize: 16, fontWeight: '700' },
-  empty: { textAlign: 'center', color: '#9ca3af', marginTop: 40, fontSize: 14 },
+  txDesc: { fontSize: 14, fontWeight: '500', color: '#0A0A0B' },
+  txDate: { fontSize: 12, color: '#8E9099', marginTop: 2 },
+  txAmount: { fontSize: 15, fontWeight: '700' },
+  empty: { textAlign: 'center', color: '#8E9099', marginTop: 40, fontSize: 14 },
 
   // Modal
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(10,10,11,0.48)', justifyContent: 'flex-end' },
   modalCard: {
-    backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28,
+    backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24,
     paddingHorizontal: 24, paddingTop: 12, paddingBottom: 40,
     maxHeight: '90%',
   },
-  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#e5e7eb', alignSelf: 'center', marginBottom: 20 },
-  modalTitle: { fontSize: 20, fontWeight: '800', color: '#111827', marginBottom: 4 },
-  modalSub: { fontSize: 13, color: '#6b7280', marginBottom: 18 },
+  handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#EEEFF2', alignSelf: 'center', marginBottom: 20 },
+  modalTitle: { fontSize: 20, fontWeight: '700', color: '#0A0A0B', marginBottom: 4, letterSpacing: -0.2 },
+  modalSub: { fontSize: 13, color: '#8E9099', marginBottom: 18 },
 
   searchBox: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#f3f4f6',
-    borderRadius: 99, paddingHorizontal: 16, paddingVertical: 11, marginBottom: 8,
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#F7F7F8',
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 11, marginBottom: 8,
+    borderWidth: 1, borderColor: '#EEEFF2',
   },
-  searchInput: { flex: 1, fontSize: 15, color: '#111' },
+  searchInput: { flex: 1, fontSize: 15, color: '#0A0A0B' },
 
   userRow: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#f3f4f6', gap: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#EEEFF2', gap: 12,
   },
   userAvatar: {
-    width: 44, height: 44, borderRadius: 22, backgroundColor: '#eef2ff',
+    width: 40, height: 40, borderRadius: 20, backgroundColor: '#EEEFF2',
     alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
   },
-  userAvatarImg: { width: 44, height: 44 },
-  userAvatarLetter: { fontSize: 18, fontWeight: '800', color: '#6366f1' },
-  userName: { fontSize: 15, fontWeight: '700', color: '#111' },
-  userEmail: { fontSize: 12, color: '#9ca3af', marginTop: 1 },
-  noResults: { textAlign: 'center', color: '#9ca3af', marginTop: 24, fontSize: 14 },
+  userAvatarImg: { width: 40, height: 40 },
+  userAvatarLetter: { fontSize: 16, fontWeight: '700', color: '#1C3D5A' },
+  userName: { fontSize: 14, fontWeight: '600', color: '#0A0A0B' },
+  userEmail: { fontSize: 12, color: '#8E9099', marginTop: 1 },
+  noResults: { textAlign: 'center', color: '#8E9099', marginTop: 24, fontSize: 14 },
 
   backRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, gap: 4 },
-  backArrow: { fontSize: 24, color: '#6366f1', lineHeight: 28 },
-  backLabel: { fontSize: 15, color: '#6366f1', fontWeight: '600' },
+  backArrow: { fontSize: 22, color: '#1C3D5A', lineHeight: 26 },
+  backLabel: { fontSize: 14, color: '#1C3D5A', fontWeight: '600' },
 
   recipientRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 6 },
-  recipientName: { fontSize: 17, fontWeight: '700', color: '#111' },
-  balanceHint: { fontSize: 13, color: '#6366f1', fontWeight: '600', marginBottom: 20 },
+  recipientName: { fontSize: 16, fontWeight: '700', color: '#0A0A0B' },
+  balanceHint: { fontSize: 13, color: '#5B5E66', fontWeight: '500', marginBottom: 20 },
 
-  sectionLabel: { fontSize: 12, fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10, marginTop: 4 },
-  chipsRow: { flexDirection: 'row', gap: 10, marginBottom: 22 },
+  sectionLabel: { fontSize: 11, fontWeight: '600', color: '#8E9099', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10, marginTop: 4 },
+  chipsRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
   chip: {
-    flex: 1, paddingVertical: 13, borderRadius: 14, backgroundColor: '#f3f4f6',
-    alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'transparent',
+    flex: 1, paddingVertical: 13, borderRadius: 10, backgroundColor: '#F7F7F8',
+    alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: 'transparent',
   },
-  chipSelected: { backgroundColor: '#eef2ff', borderColor: '#6366f1' },
+  chipSelected: { backgroundColor: '#E8EDF2', borderColor: '#1C3D5A' },
   chipDisabled: { opacity: 0.35 },
-  chipText: { fontSize: 15, fontWeight: '700', color: '#6b7280' },
-  chipTextSelected: { color: '#6366f1' },
+  chipText: { fontSize: 15, fontWeight: '600', color: '#8E9099' },
+  chipTextSelected: { color: '#1C3D5A' },
 
   noteInput: {
-    backgroundColor: '#f3f4f6', borderRadius: 14,
-    paddingHorizontal: 16, paddingVertical: 13, fontSize: 15, color: '#111', marginBottom: 24,
+    backgroundColor: '#F7F7F8', borderRadius: 10, borderWidth: 1, borderColor: '#EEEFF2',
+    paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: '#0A0A0B', marginBottom: 20,
   },
   giftBtn: {
-    backgroundColor: '#6366f1', borderRadius: 16, paddingVertical: 16,
+    backgroundColor: '#1C3D5A', borderRadius: 12, paddingVertical: 16,
     alignItems: 'center', justifyContent: 'center', marginBottom: 12,
-    shadowColor: '#6366f1', shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
   },
-  giftBtnDisabled: { backgroundColor: '#c7d2fe', shadowOpacity: 0 },
-  giftBtnTxt: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  giftBtnDisabled: { backgroundColor: '#D4D6DC' },
+  giftBtnTxt: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   cancelBtn: { alignItems: 'center', paddingVertical: 10 },
-  cancelTxt: { fontSize: 15, color: '#9ca3af', fontWeight: '600' },
+  cancelTxt: { fontSize: 14, color: '#8E9099', fontWeight: '500' },
 });

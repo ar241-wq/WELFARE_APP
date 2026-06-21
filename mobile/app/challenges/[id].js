@@ -7,11 +7,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getChallengeDetail } from '../../lib/api';
 
 const TYPE_META = {
-  kpi:         { label: 'KPI Target',        icon: '📊', color: '#1d4ed8', bg: '#eff6ff' },
-  ai_adoption: { label: 'AI Adoption',       icon: '🤖', color: '#6d28d9', bg: '#f5f3ff' },
-  first_to:    { label: 'First to Complete', icon: '⚡', color: '#b45309', bg: '#fffbeb' },
-  innovation:  { label: 'Innovation',        icon: '💡', color: '#065f46', bg: '#ecfdf5' },
-  custom:      { label: 'Challenge',         icon: '🎯', color: '#374151', bg: '#f3f4f6' },
+  kpi:         { label: 'KPI Target',        color: '#1C3D5A', bg: '#E8EDF2' },
+  ai_adoption: { label: 'AI Adoption',       color: '#1C3D5A', bg: '#E8EDF2' },
+  first_to:    { label: 'First to Complete', color: '#5B5E66', bg: '#EEEFF2' },
+  innovation:  { label: 'Innovation',        color: '#065f46', bg: '#D1FAE5' },
+  custom:      { label: 'Challenge',         color: '#5B5E66', bg: '#EEEFF2' },
 };
 
 export default function ChallengeDetailScreen() {
@@ -29,7 +29,7 @@ export default function ChallengeDetailScreen() {
   }, [id]);
 
   if (loading) {
-    return <View style={styles.loader}><ActivityIndicator size="large" color="#6366f1" /></View>;
+    return <View style={styles.loader}><ActivityIndicator size="large" color="#1C3D5A" /></View>;
   }
   if (!challenge) {
     return <View style={styles.loader}><Text style={{ color: '#6b7280' }}>Challenge not found.</Text></View>;
@@ -53,7 +53,6 @@ export default function ChallengeDetailScreen() {
         {/* Hero */}
         <View style={styles.hero}>
           <View style={[styles.typePill, { backgroundColor: meta.bg }]}>
-            <Text style={styles.typePillIcon}>{meta.icon}</Text>
             <Text style={[styles.typePillTxt, { color: meta.color }]}>{meta.label}</Text>
           </View>
           <Text style={styles.heroTitle}>{challenge.title}</Text>
@@ -61,7 +60,7 @@ export default function ChallengeDetailScreen() {
             <Text style={styles.heroDeadline}>Deadline: {new Date(challenge.deadline).toLocaleDateString()}</Text>
           )}
           <View style={styles.prizeBox}>
-            <Text style={styles.prizeLabelTop}>🏆 Prize Pool</Text>
+            <Text style={styles.prizeLabelTop}>Prize Pool</Text>
             <Text style={styles.prizeTotal}>{challenge.reward_credits} credits</Text>
             <Text style={styles.prizeSub}>split equally among winning department members</Text>
           </View>
@@ -70,7 +69,6 @@ export default function ChallengeDetailScreen() {
         {/* My department banner */}
         {myDept && !isCompleted && (
           <View style={styles.myDeptBanner}>
-            <Text style={styles.myDeptIcon}>🏢</Text>
             <View style={{ flex: 1 }}>
               <Text style={styles.myDeptTitle}>You're competing with {myDept.name}</Text>
               <Text style={styles.myDeptSub}>If your department wins, you and your colleagues share the prize.</Text>
@@ -81,12 +79,11 @@ export default function ChallengeDetailScreen() {
         {/* Winner banner */}
         {isCompleted && challenge.winner_department && (
           <View style={styles.winnerBanner}>
-            <Text style={styles.winnerEmoji}>🏆</Text>
             <View style={{ flex: 1 }}>
               <Text style={styles.winnerLabel}>Winning Department</Text>
               <Text style={styles.winnerName}>{challenge.winner_department.name}</Text>
               {myDept && myDept.id === challenge.winner_department.id && (
-                <Text style={styles.winnerYou}>That's your team! Credits sent to your wallet 🎉</Text>
+                <Text style={styles.winnerYou}>That's your team! Credits sent to your wallet.</Text>
               )}
             </View>
           </View>
@@ -100,7 +97,7 @@ export default function ChallengeDetailScreen() {
 
         {challenge.target_metric ? (
           <View style={styles.metricBox}>
-            <Text style={styles.metricLabel}>🎯 Success Metric</Text>
+            <Text style={styles.metricLabel}>Success Metric</Text>
             <Text style={styles.metricText}>{challenge.target_metric}</Text>
           </View>
         ) : null}
@@ -117,7 +114,7 @@ export default function ChallengeDetailScreen() {
             return (
               <View key={dept.id} style={[styles.deptRow, isWinner && styles.deptRowWinner, isMe && !isWinner && styles.deptRowMe]}>
                 <View style={styles.deptRank}>
-                  <Text style={styles.deptRankTxt}>{isWinner ? '🏆' : `#${i + 1}`}</Text>
+                  <Text style={styles.deptRankTxt}>{isWinner ? '★' : `#${i + 1}`}</Text>
                 </View>
                 <View style={{ flex: 1 }}>
                   <View style={styles.deptNameRow}>
@@ -141,11 +138,11 @@ export default function ChallengeDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F7F7F8' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   topBar: { paddingHorizontal: 16, paddingBottom: 8, backgroundColor: '#fff' },
   backBtn: { paddingVertical: 4 },
-  backTxt: { fontSize: 17, color: '#6366f1', fontWeight: '600' },
+  backTxt: { fontSize: 17, color: '#1C3D5A', fontWeight: '600' },
 
   hero: {
     backgroundColor: '#fff', paddingHorizontal: 24, paddingTop: 8, paddingBottom: 28,
@@ -160,30 +157,28 @@ const styles = StyleSheet.create({
   heroTitle: { fontSize: 22, fontWeight: '900', color: '#111827', textAlign: 'center' },
   heroDeadline: { fontSize: 13, color: '#9ca3af' },
   prizeBox: {
-    backgroundColor: '#fef3c7', borderRadius: 20, paddingHorizontal: 24, paddingVertical: 16,
-    alignItems: 'center', borderWidth: 2, borderColor: '#fde68a', width: '100%', marginTop: 4,
+    backgroundColor: '#E8EDF2', borderRadius: 20, paddingHorizontal: 24, paddingVertical: 16,
+    alignItems: 'center', borderWidth: 1.5, borderColor: '#D4D6DC', width: '100%', marginTop: 4,
   },
-  prizeLabelTop: { fontSize: 12, fontWeight: '700', color: '#92400e', marginBottom: 4 },
-  prizeTotal: { fontSize: 36, fontWeight: '900', color: '#d97706' },
-  prizeSub: { fontSize: 11, color: '#92400e', marginTop: 4, textAlign: 'center' },
+  prizeLabelTop: { fontSize: 12, fontWeight: '700', color: '#5B5E66', marginBottom: 4 },
+  prizeTotal: { fontSize: 36, fontWeight: '900', color: '#1C3D5A' },
+  prizeSub: { fontSize: 11, color: '#8E9099', marginTop: 4, textAlign: 'center' },
 
   myDeptBanner: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: '#eff6ff',
+    marginHorizontal: 16, marginTop: 16, backgroundColor: '#F7F7F8',
     borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'flex-start', gap: 12,
-    borderWidth: 1.5, borderColor: '#bfdbfe',
+    borderWidth: 1.5, borderColor: '#D4D6DC',
   },
-  myDeptIcon: { fontSize: 28 },
-  myDeptTitle: { fontSize: 14, fontWeight: '800', color: '#1d4ed8', marginBottom: 3 },
-  myDeptSub: { fontSize: 13, color: '#1e40af', lineHeight: 18 },
+  myDeptTitle: { fontSize: 14, fontWeight: '800', color: '#1C3D5A', marginBottom: 3 },
+  myDeptSub: { fontSize: 13, color: '#5B5E66', lineHeight: 18 },
 
   winnerBanner: {
-    marginHorizontal: 16, marginTop: 16, backgroundColor: '#fef3c7',
+    marginHorizontal: 16, marginTop: 16, backgroundColor: '#F7F7F8',
     borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12,
-    borderWidth: 2, borderColor: '#fde68a',
+    borderWidth: 1.5, borderColor: '#D4D6DC',
   },
-  winnerEmoji: { fontSize: 34 },
-  winnerLabel: { fontSize: 11, fontWeight: '700', color: '#92400e', textTransform: 'uppercase' },
-  winnerName: { fontSize: 18, fontWeight: '900', color: '#d97706' },
+  winnerLabel: { fontSize: 11, fontWeight: '700', color: '#8E9099', textTransform: 'uppercase' },
+  winnerName: { fontSize: 18, fontWeight: '900', color: '#1C3D5A' },
   winnerYou: { fontSize: 13, color: '#059669', fontWeight: '700', marginTop: 3 },
 
   section: { marginHorizontal: 16, marginTop: 20 },
@@ -191,28 +186,28 @@ const styles = StyleSheet.create({
   desc: { fontSize: 15, color: '#374151', lineHeight: 22, backgroundColor: '#fff', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb' },
   metricBox: {
     marginHorizontal: 16, marginTop: 16,
-    backgroundColor: '#eef2ff', borderRadius: 14, padding: 14,
-    borderWidth: 1.5, borderColor: '#c7d2fe',
+    backgroundColor: '#F7F7F8', borderRadius: 14, padding: 14,
+    borderWidth: 1.5, borderColor: '#D4D6DC',
   },
-  metricLabel: { fontSize: 11, fontWeight: '800', color: '#4338ca', textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 4 },
-  metricText: { fontSize: 14, fontWeight: '700', color: '#3730a3' },
+  metricLabel: { fontSize: 11, fontWeight: '800', color: '#5B5E66', textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 4 },
+  metricText: { fontSize: 14, fontWeight: '700', color: '#1C3D5A' },
 
   deptRow: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
     backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 8,
     borderWidth: 1.5, borderColor: '#e5e7eb',
   },
-  deptRowWinner: { borderColor: '#fde68a', backgroundColor: '#fef3c7' },
-  deptRowMe: { borderColor: '#c7d2fe', backgroundColor: '#eef2ff' },
+  deptRowWinner: { borderColor: '#D4D6DC', backgroundColor: '#E8EDF2' },
+  deptRowMe: { borderColor: '#1C3D5A', backgroundColor: '#F7F7F8' },
   deptRank: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
   deptRankTxt: { fontSize: 14, fontWeight: '800', color: '#374151' },
   deptNameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   deptName: { fontSize: 14, fontWeight: '700', color: '#111827' },
-  deptNameWinner: { color: '#d97706' },
-  deptYouBadge: { fontSize: 10, fontWeight: '800', color: '#4338ca', backgroundColor: '#eef2ff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8 },
+  deptNameWinner: { color: '#1C3D5A' },
+  deptYouBadge: { fontSize: 10, fontWeight: '800', color: '#1C3D5A', backgroundColor: '#E8EDF2', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8 },
   deptMembers: { fontSize: 12, color: '#6b7280', marginTop: 2 },
   deptPrize: { alignItems: 'center' },
   deptEach: { fontSize: 18, fontWeight: '900', color: '#374151' },
-  deptEachWinner: { color: '#d97706' },
+  deptEachWinner: { color: '#1C3D5A' },
   deptEachLabel: { fontSize: 10, color: '#9ca3af', fontWeight: '600' },
 });
