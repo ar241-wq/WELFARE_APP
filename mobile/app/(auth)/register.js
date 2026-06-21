@@ -12,6 +12,7 @@ export default function RegisterScreen() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleRegister() {
@@ -25,7 +26,7 @@ export default function RegisterScreen() {
     }
     setLoading(true);
     try {
-      await register(fullName.trim(), email.trim(), password);
+      await register(fullName.trim(), email.trim(), password, referralCode.trim().toUpperCase());
       Alert.alert('Account Created', 'You can now sign in.', [
         { text: 'Sign In', onPress: () => router.replace('/(auth)/login') },
       ]);
@@ -76,6 +77,17 @@ export default function RegisterScreen() {
             secureTextEntry
           />
 
+          <Text style={styles.label}>Referral Code <Text style={styles.optional}>(optional)</Text></Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. A1B2C3D4"
+            placeholderTextColor="#9ca3af"
+            value={referralCode}
+            onChangeText={setReferralCode}
+            autoCapitalize="characters"
+            autoCorrect={false}
+          />
+
           <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
             {loading ? (
               <ActivityIndicator color="#fff" />
@@ -115,4 +127,5 @@ const styles = StyleSheet.create({
   link: { alignItems: 'center', marginTop: 16 },
   linkText: { color: '#6b7280', fontSize: 14 },
   linkBold: { color: '#6366f1', fontWeight: '700' },
+  optional: { color: '#9ca3af', fontWeight: '400' },
 });

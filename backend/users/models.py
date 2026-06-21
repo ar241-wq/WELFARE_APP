@@ -1,5 +1,10 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+import uuid
+
+
+def generate_referral_code():
+    return uuid.uuid4().hex[:8].upper()
 
 
 class UserManager(BaseUserManager):
@@ -41,6 +46,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    referral_code = models.CharField(max_length=8, unique=True, default=generate_referral_code)
+    referred_by = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals'
+    )
 
     objects = UserManager()
 

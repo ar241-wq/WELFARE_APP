@@ -32,7 +32,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'full_name', 'role', 'avatar', 'is_verified', 'created_at', 'provider_profile']
+        fields = ['id', 'email', 'full_name', 'role', 'avatar', 'is_verified', 'created_at', 'provider_profile', 'referral_code']
 
     def get_provider_profile(self, obj):
         if obj.role == 'provider' and hasattr(obj, 'provider_profile'):
